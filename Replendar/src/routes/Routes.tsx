@@ -10,6 +10,7 @@ function Router() {
       <Route path="/info" element={<Info />}></Route>
       <Route path="/community" element={<Community />}></Route>
       <Route path="/login" element={<Login />}></Route>
+      <Route path="/settings"></Route>
     </Routes>
   );
 }
