@@ -6,6 +6,8 @@ function Router() {
     <Routes>
       <Route path="/" element={<div>Home</div>}></Route>
       <Route path="/info" element={<Info />}></Route>
+      <Route path="/community"></Route>
+      <Route path="/settings"></Route>
     </Routes>
   );
 }
