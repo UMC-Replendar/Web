@@ -1,18 +1,11 @@
-import "../assets/css/App.css";
-import styled from "styled-components";
+import OngoingTasks from "./OngoingTasks";
 
 function App() {
   return (
     <>
-      <Div>시작해볼까요</Div>
+      <OngoingTasks/>
     </>
   );
 }
 
 export default App;
-
-const Div = styled.h1`
-  ${({ theme }) => theme.fonts.sansita_one};
-  color: ${({ theme }) => theme.colors.pc1};
-  text-align: center;
-`;
