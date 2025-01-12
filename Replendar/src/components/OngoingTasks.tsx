@@ -1,15 +1,29 @@
 import styled from 'styled-components';
 
+//진행 중인 과제, 과제 추가하기, task box사이의 바텀 마진 입니다.
+const MarginBottom = {
+  20: '20px',
+};
+
+const PageWrapper = styled.div`
+  margin-top: 40px;
+  margin-left: 92px;
+  margin-right: 80px;
+`;
+
 const MainPageTitle = styled.h1`
   font-size: 28px;
-  margin: 125px 0 19px 279px;
+  /* margin: 125px 0 19px 279px; */
+  /* margin-top: 50px; */
+  margin-bottom: ${MarginBottom[20]};
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-start;
-  margin-left: 274px;
-  margin-bottom: 20px;
+  /* margin-left: 274px; */
+  /* margin-bottom: 20px; */
+  margin-bottom: ${MarginBottom[20]};
 `;
 
 const AddButton = styled.button`
@@ -35,13 +49,13 @@ const More = styled.span`
   color: #666666;
   cursor: pointer;
   margin-left: auto;
-  margin-right: 106px;
+  /* margin-right: 106px; */
 `;
 
 const TaskBox = styled.div`
   background-color: #fcf6f5;
   border-radius: 10px;
-  margin: 0 80px 49px 278px;
+  /* margin: 0 80px 49px 278px; */
   padding: 62px 86px;
 `;
 
@@ -134,7 +148,7 @@ function Task({ color, name, time }: TaskProps) {
 
 function OngoingTasks() {
   return (
-    <>
+    <PageWrapper>
       <MainPageTitle>진행 중인 과제</MainPageTitle>
       <ButtonContainer>
         <AddButton>과제 추가하기</AddButton>
@@ -148,7 +162,7 @@ function OngoingTasks() {
         <Task color="#7AC19A" name="과제 3" time="10h 10m 22s" />
         <Task color="#9DCFB4" name="과제 4" time="10h 10m 22s" />
       </TaskBox>
-    </>
+    </PageWrapper>
   );
 }
 
