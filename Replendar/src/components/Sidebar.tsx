@@ -43,7 +43,7 @@ function Sidebar() {
 export default Sidebar;
 
 const SidebarContainer = styled.div`
-  position: fixed;
+  /* position: fixed; */
   width: 188px;
   height: 1080px;
   flex-shrink: 0;
