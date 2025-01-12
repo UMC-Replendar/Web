@@ -1,4 +1,4 @@
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle } from 'styled-components';
 
 export const GlobalStyle = createGlobalStyle`
 /* box-sizing 규칙을 명시합니다. */
@@ -39,6 +39,7 @@ ol[role='list'] {
 body {
   min-height: 100vh;
   line-height: 1.5;
+  margin: 0;
 }
 
 /* 제목 요소와 상호작용하는 요소에 대해 line-height를 더 짧게 설정합니다. */
