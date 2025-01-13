@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import CustomCalendar from './CustomCalendar';
 
 //진행 중인 과제, 과제 추가하기, task box사이의 바텀 마진 입니다.
 const MarginBottom = {
@@ -11,7 +12,7 @@ const PageWrapper = styled.div`
   margin-right: 80px;
 `;
 
-const MainPageTitle = styled.h1`
+const MainPageTitle = styled.h4`
   font-size: 28px;
   /* margin: 125px 0 19px 279px; */
   /* margin-top: 50px; */
@@ -57,6 +58,7 @@ const TaskBox = styled.div`
   border-radius: 10px;
   /* margin: 0 80px 49px 278px; */
   padding: 62px 86px;
+  box-shadow: 0 9px 19.3px rgba(205, 205, 205, 1);
 `;
 
 const TaskBlockContainer = styled.div`
@@ -162,6 +164,8 @@ function OngoingTasks() {
         <Task color="#7AC19A" name="과제 3" time="10h 10m 22s" />
         <Task color="#9DCFB4" name="과제 4" time="10h 10m 22s" />
       </TaskBox>
+
+      <CustomCalendar />
     </PageWrapper>
   );
 }
