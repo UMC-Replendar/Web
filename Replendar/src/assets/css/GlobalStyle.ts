@@ -81,6 +81,9 @@ textarea,
 select {
   font: inherit;
 }
+a {
+  text-decoration: none;
+}
 
 /* 행 속성이 없는 textarea가 너무 작지 않도록 합니다. */
 textarea:not([rows]) {
