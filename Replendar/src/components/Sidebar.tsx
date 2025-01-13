@@ -2,6 +2,9 @@ import styled from 'styled-components';
 import CharacterTestImg from '../assets/images/CharacterTestImg.png';
 import HomeImg from '../assets/images/HomeIcon.png';
 import CommunityIcon from '../assets/images/CommunityIcon.png';
+import InfoIcon from '../assets/images/InfoIcon.png';
+import SettingsIcon from '../assets/images/SettingsIcon.png';
+
 import { Link, useLocation } from 'react-router-dom';
 
 interface MenuProps {
@@ -30,13 +33,13 @@ function Sidebar() {
             </Link>
           </Menu>
           <Menu isActive={isActive('/info')}>
-            <IconImg />
+            <IconImg src={InfoIcon} />
             <Link to="/info">
               <MenuItem>내정보</MenuItem>
             </Link>
           </Menu>
           <Menu isActive={isActive('/settings')}>
-            <IconImg />
+            <IconImg src={SettingsIcon} />
             <Link to="/settings">
               <MenuItem>환경설정</MenuItem>
             </Link>
@@ -61,10 +64,12 @@ const SidebarContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 250px;
 `;
 const MenuContainer = styled.div`
   display: flex;
   flex-direction: column;
+  margin-top: 270px;
   gap: 20px;
 `;
 
@@ -76,7 +81,7 @@ const Menu = styled.nav<MenuProps>`
   padding-right: 55px;
   padding-bottom: 10px;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 13px;
   align-self: stretch;
   text-decoration-line: none;
@@ -87,7 +92,7 @@ const Menu = styled.nav<MenuProps>`
 const IconImg = styled.img``;
 
 const MenuItem = styled.div`
-  color: black;
+  color: white;
   font-family: Pretendard;
   font-size: 20px;
   font-style: normal;
@@ -99,5 +104,4 @@ const CharacterImg = styled.img`
   /* position: fixed; */
   width: 188px;
   bottom: 0;
-  align-self: flex-start;
 `;

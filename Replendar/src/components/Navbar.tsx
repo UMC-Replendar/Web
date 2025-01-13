@@ -3,12 +3,17 @@ import AppIcon from '../assets/images/AppIcon.png';
 import DateImg from '../assets/images/DateImg.png';
 // import ProfileImg from '../assets/images/ProfileImg.png';
 import ProfileImage from '../assets/images/ProfileImg.png';
+import { Link } from 'react-router-dom';
 function NavBar() {
   return (
     <NavWrapper>
       <IconWrapper>
-        <IconImg src={AppIcon} />
-        <AppName>Replendar</AppName>
+        <Link to={'/'}>
+          <IconImg src={AppIcon} />
+        </Link>
+        <Link to={'/'}>
+          <AppName>Replendar</AppName>
+        </Link>
       </IconWrapper>
       <ProfileWrapper>
         <UserContainer>
@@ -16,8 +21,12 @@ function NavBar() {
           <ProfileStatus>Today</ProfileStatus>
         </UserContainer>
         <UserContainer>
-          <ProfileImg src={ProfileImage} />
-          <ProfileStatus>닉네임</ProfileStatus>
+          <Link to={'/info'}>
+            <ProfileImg src={ProfileImage} />
+          </Link>
+          <Link to={'/info'}>
+            <ProfileStatus>닉네임</ProfileStatus>
+          </Link>
         </UserContainer>
       </ProfileWrapper>
     </NavWrapper>
