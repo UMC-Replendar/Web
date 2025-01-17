@@ -35,7 +35,7 @@ const StoredTaskPage = () => {
     <Container>
       <Wrapper>
         <Image src="src/assets/images/StoredWork.svg" alt="X" />
-        <Text>완료한 과제</Text>
+        <Text>보관한 과제</Text>
       </Wrapper>
       <Box />
     </Container>

@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 interface HistoryEntry {
   date: string;
@@ -16,16 +17,31 @@ const HistoryContainer = styled.div`
   flex-direction: column;
 `;
 
+const Image = styled.img`
+  width: 35px;
+  height: 35px;
+`;
+
+const HistoryButton = styled.button`
+  display: flex;
+  gap: 10px;
+  border: none;
+  cursor: pointer;
+  width: 200px;
+  background-color: white;
+`;
 const HistoryTitle = styled.div`
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 10px;
 `;
 
-const TableContainer = styled.div`
+const TableContainer = styled.button`
   background-color: #eaeaea;
   padding: 20px;
   border-radius: 8px;
+  border: none;
+  cursor: pointer;
 `;
 
 const Table = styled.table`
@@ -53,14 +69,18 @@ const StatusIndicator = styled.div<StatusIndicatorProps>`
 `;
 
 function HistoryList() {
+  const navigate = useNavigate();
   const historyEntries: HistoryEntry[] = [
     { date: '11/02', time: '23:55', task: '~~~과제', status: '완료' },
     { date: '11/01', time: '23:48', task: '~~~과제', status: '미완료' },
   ];
 
   return (
-    <HistoryContainer>
-      <HistoryTitle>히스토리</HistoryTitle>
+    <HistoryContainer onClick={() => navigate('/history')}>
+      <HistoryButton onClick={() => navigate('/history')}>
+        <Image src="src/assets/images/Pencil.svg" alt="X" />
+        <HistoryTitle>히스토리</HistoryTitle>
+      </HistoryButton>
       <TableContainer>
         <Table>
           <thead>

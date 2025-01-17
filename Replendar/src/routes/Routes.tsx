@@ -6,7 +6,8 @@ import OngoingTasks from '../components/OngoingTasks';
 import Settings from '../pages/Settings';
 import CompletedTasksPage from '../components/infoComopnents/CompletedTasksPage';
 import StoredTasksPage from '../components/infoComopnents/StoredTasksPage';
-
+import HistoryPage from '../components/infoComopnents/HistoryPage';
+import SignUp from '../pages/SignUp';
 function Router() {
   return (
     <Routes>
@@ -17,6 +18,8 @@ function Router() {
       <Route path="/settings" element={<Settings />}></Route>
       <Route path="/completed" element={<CompletedTasksPage />} />
       <Route path="/stored" element={<StoredTasksPage />} />
+      <Route path="/history" element={<HistoryPage />}></Route>
+      <Route path="/signup" element={<SignUp />}></Route>
     </Routes>
   );
 }
