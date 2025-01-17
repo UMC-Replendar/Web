@@ -4,6 +4,7 @@ import DateImg from '../assets/images/DateImg.png';
 // import ProfileImg from '../assets/images/ProfileImg.png';
 import ProfileImage from '../assets/images/ProfileImg.png';
 import { Link } from 'react-router-dom';
+import KakaoLogo from '../assets/images/KakaoTalk_logo.png';
 function NavBar() {
   return (
     <NavWrapper>
@@ -16,6 +17,14 @@ function NavBar() {
         </Link>
       </IconWrapper>
       <ProfileWrapper>
+        <UserContainer>
+          <Link to={'/login'}>
+            <ProfileImg src={KakaoLogo} />
+          </Link>
+          <Link to={'/login'}>
+            <ProfileStatus>임시 로그인</ProfileStatus>
+          </Link>
+        </UserContainer>
         <UserContainer>
           <ProfileImg src={DateImg} />
           <ProfileStatus>Today</ProfileStatus>
