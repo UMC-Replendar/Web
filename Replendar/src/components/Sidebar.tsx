@@ -20,30 +20,30 @@ function Sidebar() {
     <>
       <SidebarContainer>
         <MenuContainer>
-          <Menu isActive={isActive('/')}>
-            <IconImg src={HomeImg} />
-            <Link to="/">
+          <Link to="/">
+            <Menu isActive={isActive('/')}>
+              <IconImg src={HomeImg} />
               <MenuItem>홈</MenuItem>
-            </Link>
-          </Menu>
-          <Menu isActive={isActive('/community')}>
-            <IconImg src={CommunityIcon} />
-            <Link to="/community">
+            </Menu>
+          </Link>
+          <Link to="/community">
+            <Menu isActive={isActive('/community')}>
+              <IconImg src={CommunityIcon} />
               <MenuItem>커뮤니티</MenuItem>
-            </Link>
-          </Menu>
-          <Menu isActive={isActive('/info')}>
-            <IconImg src={InfoIcon} />
-            <Link to="/info">
+            </Menu>
+          </Link>
+          <Link to="/info">
+            <Menu isActive={isActive('/info')}>
+              <IconImg src={InfoIcon} />
               <MenuItem>내정보</MenuItem>
-            </Link>
-          </Menu>
-          <Menu isActive={isActive('/settings')}>
-            <IconImg src={SettingsIcon} />
-            <Link to="/settings">
+            </Menu>
+          </Link>
+          <Link to="/settings">
+            <Menu isActive={isActive('/settings')}>
+              <IconImg src={SettingsIcon} />
               <MenuItem>환경설정</MenuItem>
-            </Link>
-          </Menu>
+            </Menu>
+          </Link>
         </MenuContainer>
         <CharacterImg src={CharacterTestImg}></CharacterImg>
       </SidebarContainer>
