@@ -13,7 +13,7 @@ const ToggleContainer = styled.div`
 const ToggleLabel = styled.label`
   position: relative;
   display: inline-block;
-  width: 125px;
+  width: 120px;
   height: 60px;
   cursor: pointer;
 `;
@@ -24,11 +24,11 @@ const ToggleInput = styled.input`
   height: 0;
 
   &:checked + span {
-    background: linear-gradient(90deg, #22bd68 0%, #148949 100%);
+    background: linear-gradient(270deg, #1cb6d9 0%, #7cd7eb 100%);
   }
 
   &:checked + span:before {
-    transform: translateX(65px);
+    transform: translateX(60px);
   }
 `;
 
@@ -38,7 +38,7 @@ const Slider = styled.span`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #848484;
+  background-color: #868686;
   transition: 0.4s;
   border-radius: 50px;
 

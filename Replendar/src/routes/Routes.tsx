@@ -2,7 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import Info from '../pages/Info';
 import Community from '../pages/community';
 import Login from '../pages/login';
-import OngoingTasks from '../components/OngoingTasks';
+import OngoingTasks from '../pages/OngoingTasks';
 import Settings from '../pages/Settings';
 import CompletedTasksPage from '../components/infoComopnents/CompletedTasksPage';
 import StoredTasksPage from '../components/infoComopnents/StoredTasksPage';
