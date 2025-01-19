@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import styled from 'styled-components';
+import ToggleSwitch from './ToggleSwitch';
 import CustomCalendar from './CustomCalendar';
 
 //진행 중인 과제, 과제 추가하기, task box사이의 바텀 마진 입니다.
@@ -91,64 +93,29 @@ const RemainingTime = styled.div`
   color: white;
 `;
 
-const ToggleSwitchContainer = styled.div`
-  display: flex;
-  align-items: center;
-  margin-left: 35px;
-`;
-
-const ToggleSwitch = styled.input`
-  appearance: none;
-  width: 125px;
-  height: 60px;
-  background-color: #848484;
-  border-radius: 50px;
-  position: relative;
-  cursor: pointer;
-  transition: background-color 0.3s;
-
-  &:checked {
-    background-color: #22bd68;
-  }
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 3px;
-    top: 3px;
-    width: 50px;
-    height: 50px;
-    background-color: white;
-    border-radius: 50%;
-    transition: 0.3s;
-  }
-
-  &:checked::before {
-    transform: translateX(65px);
-  }
-`;
-
-interface TaskProps {
+interface TaskData {
   color: string;
   name: string;
   time: string;
-}
-
-function Task({ color, name, time }: TaskProps) {
-  return (
-    <TaskBlockContainer>
-      <TaskBlock color={color}>
-        <TaskName>{name}</TaskName>
-        <RemainingTime>{time}</RemainingTime>
-      </TaskBlock>
-      <ToggleSwitchContainer>
-        <ToggleSwitch />
-      </ToggleSwitchContainer>
-    </TaskBlockContainer>
-  );
+  isToggled: boolean;
 }
 
 function OngoingTasks() {
+  const [tasks, setTasks] = useState<TaskData[]>([
+    { color: '#2BAE66', name: '과제 1', time: '10h 10m 20s', isToggled: false },
+    { color: '#25C26C', name: '과제 2', time: '10h 10m 22s', isToggled: false },
+    { color: '#7AC19A', name: '과제 3', time: '10h 10m 22s', isToggled: false },
+    { color: '#9DCFB4', name: '과제 4', time: '10h 10m 22s', isToggled: false },
+  ]);
+
+  const handleToggle = (index: number) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task, i) =>
+        i === index ? { ...task, isToggled: !task.isToggled } : task
+      )
+    );
+  };
+
   return (
     <PageWrapper>
       <MainPageTitle>진행 중인 과제</MainPageTitle>
@@ -159,14 +126,40 @@ function OngoingTasks() {
       </ButtonContainer>
 
       <TaskBox>
-        <Task color="#2BAE66" name="과제 1" time="10h 10m 20s" />
-        <Task color="#25C26C" name="과제 2" time="10h 10m 22s" />
-        <Task color="#7AC19A" name="과제 3" time="10h 10m 22s" />
-        <Task color="#9DCFB4" name="과제 4" time="10h 10m 22s" />
+        {tasks.map((task, index) => (
+          <Task
+            key={task.name}
+            color={task.color}
+            name={task.name}
+            time={task.time}
+            isToggled={task.isToggled}
+            onToggle={() => handleToggle(index)}
+          />
+        ))}
       </TaskBox>
 
       <CustomCalendar />
     </PageWrapper>
+  );
+}
+
+interface TaskProps {
+  color: string;
+  name: string;
+  time: string;
+  isToggled: boolean;
+  onToggle: () => void;
+}
+
+function Task({ color, name, time, isToggled, onToggle }: TaskProps) {
+  return (
+    <TaskBlockContainer>
+      <TaskBlock color={color}>
+        <TaskName>{name}</TaskName>
+        <RemainingTime>{time}</RemainingTime>
+      </TaskBlock>
+      <ToggleSwitch isOn={isToggled} onToggle={onToggle} />
+    </TaskBlockContainer>
   );
 }
 
