@@ -74,7 +74,7 @@ const TaskBox = styled.div<{ isScrollable: boolean }>`
   ${({ isScrollable }) =>
     isScrollable
       ? `
-    max-height: 720px;
+    max-height: 744px;
     overflow-y: auto;
   `
       : `
