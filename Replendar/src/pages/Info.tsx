@@ -19,10 +19,6 @@ const Info = () => {
         <ProfileSection />
         <TaskSummary />
         <HistoryList />
-        <HistoryList />
-        <HistoryList />
-        <HistoryList />
-        <HistoryList />
       </Container>
     </>
   );
