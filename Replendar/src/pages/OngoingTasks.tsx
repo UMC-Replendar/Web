@@ -17,6 +17,9 @@ const PageWrapper = styled.div`
   margin-top: 40px;
   margin-left: 92px;
   margin-right: 80px;
+  /* height: 150%; */
+  display: flex;
+  flex-direction: column;
 `;
 
 const MainPageTitle = styled.h4`
@@ -158,49 +161,51 @@ function OngoingTasks() {
   };
 
   return (
-    <PageWrapper>
-      <MainPageTitle>진행 중인 과제</MainPageTitle>
-      <ButtonContainer>
-        <AddButton onClick={handleAddTask}>
-          과제 추가하기
-          <img src={PlusIcon} alt="Plus Icon" />
-        </AddButton>
-        {tasks.length > 3 && (
-          <More onClick={handleShowMore}>
-            {visibleTasksCount === Math.min(10, tasks.length)
-              ? '닫기'
-              : '더보기'}
-            <img
-              src={
-                visibleTasksCount === Math.min(10, tasks.length)
-                  ? UpArrowIcon
-                  : DownArrowIcon
-              }
-              alt={
-                visibleTasksCount === Math.min(10, tasks.length)
-                  ? 'Up Arrow'
-                  : 'Down Arrow'
-              }
+    <>
+      <PageWrapper>
+        <MainPageTitle>진행 중인 과제</MainPageTitle>
+        <ButtonContainer>
+          <AddButton onClick={handleAddTask}>
+            과제 추가하기
+            <img src={PlusIcon} alt="Plus Icon" />
+          </AddButton>
+          {tasks.length > 3 && (
+            <More onClick={handleShowMore}>
+              {visibleTasksCount === Math.min(10, tasks.length)
+                ? '닫기'
+                : '더보기'}
+              <img
+                src={
+                  visibleTasksCount === Math.min(10, tasks.length)
+                    ? UpArrowIcon
+                    : DownArrowIcon
+                }
+                alt={
+                  visibleTasksCount === Math.min(10, tasks.length)
+                    ? 'Up Arrow'
+                    : 'Down Arrow'
+                }
+              />
+            </More>
+          )}
+        </ButtonContainer>
+
+        <TaskBox isScrollable={tasks.length > 10}>
+          {tasks.slice(0, visibleTasksCount).map((task, index) => (
+            <Task
+              key={task.name}
+              color={task.color}
+              name={task.name}
+              time={task.time}
+              isToggled={task.isToggled}
+              onToggle={() => handleToggle(index)}
             />
-          </More>
-        )}
-      </ButtonContainer>
+          ))}
+        </TaskBox>
 
-      <TaskBox isScrollable={tasks.length > 10}>
-        {tasks.slice(0, visibleTasksCount).map((task, index) => (
-          <Task
-            key={task.name}
-            color={task.color}
-            name={task.name}
-            time={task.time}
-            isToggled={task.isToggled}
-            onToggle={() => handleToggle(index)}
-          />
-        ))}
-      </TaskBox>
-
-      <CustomCalendar />
-    </PageWrapper>
+        <CustomCalendar />
+      </PageWrapper>
+    </>
   );
 }
 

@@ -47,7 +47,7 @@ export default Settings;
 const SettingsContainer = styled.div`
   display: flex;
   width: 100%;
-  height: 100%;
+  height: 130%;
   flex-direction: column;
   gap: 20px;
 `;
