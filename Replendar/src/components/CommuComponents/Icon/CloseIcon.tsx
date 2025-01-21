@@ -32,13 +32,13 @@ const CloseIcon: React.FC<IconProps> = ({
     <path
       d="M47.5 8.74219L51.2583 12.5005"
       stroke={fill}
-      stroke-linecap="round"
+      strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M47.5 8.74219L43.7417 12.5005"
       stroke={fill}
-      stroke-linecap="round"
+      strokeLinecap="round"
       strokeLinejoin="round"
     />
   </svg>
