@@ -50,6 +50,7 @@ const NavWrapper = styled.div`
   flex-direction: row;
   justify-content: space-between;
   margin-right: 120px;
+  margin-left: 70px;
 `;
 
 const IconWrapper = styled.div`
