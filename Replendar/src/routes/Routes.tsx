@@ -12,6 +12,7 @@ import DetailPage from '../components/SettingsComponents/DetailPage';
 import IssuPage from '../components/SettingsComponents/IssuPage';
 import ThemeSettingPage from '../components/SettingsComponents/ThemeSettingPage';
 import NotifyPage from '../components/SettingsComponents/NotifyPage';
+import Redirect from '../components/LoginComponents/Redirect';
 
 function Router() {
   return (
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/stored" element={<StoredTasksPage />} />
       <Route path="/history" element={<HistoryPage />}></Route>
       <Route path="/signup" element={<SignUp />}></Route>
+      <Route path="/oauth/kakao/callback" element={<Redirect />}></Route>
     </Routes>
   );
 }
