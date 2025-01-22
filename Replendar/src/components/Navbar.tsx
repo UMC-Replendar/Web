@@ -1,11 +1,24 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import AppIcon from '../assets/images/AppIcon.png';
-import DateImg from '../assets/images/DateImg.png';
-// import ProfileImg from '../assets/images/ProfileImg.png';
 import ProfileImage from '../assets/images/ProfileImg.png';
 import { Link } from 'react-router-dom';
 import KakaoLogo from '../assets/images/KakaoTalk_logo.png';
+import { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+
 function NavBar() {
+  const [currentTime, setCurrentTime] = useState(
+    dayjs().format('YYYY:MM:DD HH:mm:ss')
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(dayjs().format('YYYY:MM:DD HH:mm:ss'));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <NavWrapper>
       <IconWrapper>
@@ -26,8 +39,9 @@ function NavBar() {
           </Link>
         </UserContainer>
         <UserContainer>
-          <ProfileImg src={DateImg} />
-          <ProfileStatus>Today</ProfileStatus>
+          <ProfileStatus>
+            <TimeDisplay>{currentTime}</TimeDisplay>
+          </ProfileStatus>
         </UserContainer>
         <UserContainer>
           <Link to={'/info'}>
@@ -58,6 +72,14 @@ const IconWrapper = styled.div`
   justify-content: center;
   align-items: center;
   gap: 15px;
+  transition:
+    filter 0.3s ease-in-out,
+    opacity 0.3s ease-in-out;
+
+  &:hover {
+    filter: brightness(0.8);
+    opacity: 0.8;
+  }
 `;
 
 const IconImg = styled.img`
@@ -68,7 +90,7 @@ const IconImg = styled.img`
 const AppName = styled.span`
   color: #000;
   font-family: Jua;
-  font-size: 15px;
+  font-size: 20px;
   font-style: normal;
   font-weight: Bold;
   line-height: normal;
@@ -84,17 +106,36 @@ const ProfileWrapper = styled.div`
 const UserContainer = styled.div`
   display: flex;
   gap: 10px;
+  padding: 10px 15px;
+  border-radius: 0px; /* 둥근 모서리 적용 */
+  transition: box-shadow 0.3s ease-in-out;
+
+  &:hover {
+    box-shadow: 0px 7px 5px -5px #7ac19a;
+  }
+`;
+
+const fadeAnimation = keyframes`
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 1; }
+`;
+
+const TimeDisplay = styled.span`
+  font-size: 20px;
+
+  animation: ${fadeAnimation} 0.8s ease-in-out;
 `;
 
 const ProfileImg = styled.img`
-  width: 24px;
-  height: 24px;
+  width: 34px;
+  height: 34px;
 `;
 
 const ProfileStatus = styled.span`
   color: #000;
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 20px;
   font-style: normal;
   font-weight: 500;
   line-height: normal;
