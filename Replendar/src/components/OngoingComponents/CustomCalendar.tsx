@@ -51,24 +51,62 @@ const StyledCalendar = styled(Calendar)`
     display: none;
   }
 
-  .react-calendar__tile {
-    height: 118px;
-    border: 1px solid #ebf4ef;
-  }
-
-  .react-calendar__month-view__days {
-    border-collapse: collapse;
-  }
-
   .react-calendar__month-view__weekdays {
-    border: 1px solid #ebf4ef;
     text-align: left;
     color: #aaaaaa;
+
+    div:nth-child(1) {
+      color: #eb8a8a;
+    }
+  }
+
+  .react-calendar__month-view__weekdays__weekday {
+    padding: 7px 8px;
+    border-right: 1px solid #ebf4ef;
+    &:last-child {
+      border-right: none;
+    }
+  }
+
+  .react-calendar__tile {
+    height: 118px;
+    border-top: 1px solid #ebf4ef;
+    border-right: 1px solid #ebf4ef;
+    color: #666666;
+    display: flex;
+    align-items: flex-start;
+    padding: 8px;
+  }
+
+  .react-calendar__month-view__days > .react-calendar__tile:nth-child(7n) {
+    border-right: none;
+  }
+
+  .neighboringMonth {
+    color: #aaaaaa;
+  }
+
+  .currentMonthSunday {
+    color: #eb8a8a;
+  }
+
+  .react-calendar__tile--now {
+    background-color: transparent;
+  }
+
+  .react-calendar__tile--active {
+    background-color: transparent;
+  }
+
+  .react-calendar__tile:enabled:hover {
+    background-color: transparent;
+    cursor: default;
   }
 `;
 
 function CustomCalendar() {
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(new Date()); // 선택한 날짜
+  const [viewDate, setViewDate] = useState(new Date()); // 캘린더에 표시되는 월
 
   const getMonthYearText = (date: Date) => {
     const year = date.getFullYear();
@@ -77,27 +115,23 @@ function CustomCalendar() {
   };
 
   const goToPreviousMonth = () => {
-    const newDate = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth() - 1,
-      1
-    );
-    setCurrentDate(newDate);
+    setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1));
   };
 
   const goToNextMonth = () => {
-    const newDate = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth() + 1,
-      1
-    );
-    setCurrentDate(newDate);
+    setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1));
   };
+
+  const isSameMonth = (date: Date, baseDate: Date) =>
+    date.getMonth() === baseDate.getMonth() &&
+    date.getFullYear() === baseDate.getFullYear();
+
+  const isSunday = (date: Date) => date.getDay() === 0;
 
   return (
     <CalendarWrapper>
       <CalendarHeader>
-        <MonthText>{getMonthYearText(currentDate)}</MonthText>
+        <MonthText>{getMonthYearText(viewDate)}</MonthText>
         <ArrowButton onClick={goToPreviousMonth}>
           <img src={PreviousArrowIcon} alt="이전 달" />
         </ArrowButton>
@@ -108,7 +142,23 @@ function CustomCalendar() {
 
       <ScheduleText>달력에 스케쥴표를 확인하세요</ScheduleText>
 
-      <StyledCalendar value={currentDate} locale="ko-KR" />
+      <StyledCalendar
+        value={currentDate}
+        locale="ko-KR"
+        calendarType="gregory"
+        activeStartDate={viewDate}
+        formatDay={(_locale, date) => date.getDate().toString()}
+        tileClassName={({ date }) => {
+          if (!isSameMonth(date, viewDate)) return 'neighboringMonth';
+          if (isSameMonth(date, viewDate) && isSunday(date))
+            return 'currentMonthSunday';
+          return null;
+        }}
+        onClickDay={(value) => setCurrentDate(value)}
+        onActiveStartDateChange={({ activeStartDate }) => {
+          if (activeStartDate) setViewDate(activeStartDate);
+        }}
+      />
     </CalendarWrapper>
   );
 }
