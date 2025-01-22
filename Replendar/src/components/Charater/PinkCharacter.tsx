@@ -34,11 +34,11 @@ const Dot2 = styled(Dot)`
 `;
 
 const Smile = styled.img`
-  width: 43px; /* SVG의 크기 조절 */
+  width: 43px;
   height: auto;
   position: absolute;
-  left: 26px; /* 위치 조정 */
-  top: 50px; /* 위치 조정 */
+  left: 26px;
+  top: 50px;
 `;
 
 const PinkCharacter = () => (

@@ -33,11 +33,11 @@ const EyeRight = styled(Eye)`
   top: 34px;
 `;
 const Smile = styled.img`
-  width: 40px; /* SVG의 크기 조절 */
+  width: 40px;
   height: auto;
   position: absolute;
-  left: 27px; /* 위치 조정 */
-  top: 49px; /* 위치 조정 */
+  left: 27px;
+  top: 49px;
 `;
 
 const OrangeCharacter = () => {
