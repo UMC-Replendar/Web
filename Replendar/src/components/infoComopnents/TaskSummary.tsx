@@ -18,6 +18,7 @@ const SummaryButton = styled.button`
   border: none;
   border-radius: 10px;
   cursor: pointer;
+  background-color: #fcf6f5;
 
   &:hover {
     background: #f0f0f0;
