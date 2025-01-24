@@ -1,9 +1,12 @@
 import styled from 'styled-components';
 
 const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+
   height: 90%;
   width: 80%;
-  margin: 0 auto;
+  margin: 50px auto 0;
   gap: 20px;
 `;
 
@@ -30,16 +33,21 @@ const Text = styled.div`
   font-size: 20px;
 `;
 
-const CompletedTasksPage = () => {
+interface TaskCardProps {
+  imageSrc: string;
+  title: string;
+}
+
+const TaskCard = ({ imageSrc, title }: TaskCardProps) => {
   return (
     <Container>
       <Wrapper>
-        <Image src="src/assets/images/Worked.svg" alt="X" />
-        <Text>완료한 과제</Text>
+        <Image src={imageSrc} alt="Task Icon" />
+        <Text>{title}</Text>
       </Wrapper>
       <Box />
     </Container>
   );
 };
 
-export default CompletedTasksPage;
+export default TaskCard;
