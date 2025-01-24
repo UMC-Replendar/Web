@@ -4,14 +4,16 @@ import Community from '../pages/community';
 import Login from '../pages/login';
 import OngoingTasks from '../pages/OngoingTasks';
 import Settings from '../pages/Settings';
-import CompletedTasksPage from '../components/infoComopnents/CompletedTasksPage';
-import StoredTasksPage from '../components/infoComopnents/StoredTasksPage';
+import CompletedTasksPage from '../components/infoComopnents/taskPage/CompletedTasksPage';
+import StoredTasksPage from '../components/infoComopnents/taskPage/StoredTasksPage';
 import HistoryPage from '../components/infoComopnents/HistoryPage';
 import SignUp from '../pages/SignUp';
 import DetailPage from '../components/SettingsComponents/DetailPage';
 import AskPage from '../components/SettingsComponents/AskPage';
 import ThemeSettingPage from '../components/SettingsComponents/ThemeSettingPage';
 import NotifyPage from '../components/SettingsComponents/NotifyPage';
+import NotCompletedTaskPage from '../components/infoComopnents/taskPage/NotCompletedTaskPage';
+import ImportantTaskPage from '../components/infoComopnents/taskPage/ImportantTaskPage';
 
 function Router() {
   return (
@@ -29,6 +31,8 @@ function Router() {
       <Route path="/stored" element={<StoredTasksPage />} />
       <Route path="/history" element={<HistoryPage />}></Route>
       <Route path="/signup" element={<SignUp />}></Route>
+      <Route path="/notcompleted" element={<NotCompletedTaskPage />}></Route>
+      <Route path="/important" element={<ImportantTaskPage />}></Route>
     </Routes>
   );
 }
