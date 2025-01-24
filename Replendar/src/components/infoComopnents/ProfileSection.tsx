@@ -7,7 +7,7 @@ const ProfileContainer = styled.div`
 `;
 
 const ProfilePicture = styled.div`
-  background-color: lightgrey;
+  background-color: #fcf6f5;
   border-radius: 50%;
   width: 300px;
   height: 300px;

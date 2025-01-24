@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import KakaoLogo from '../assets/images/KakaoTalk_logo.png';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-
+import ChillChillGuy from '../assets/images/ChillGuy.png';
 function NavBar() {
   const [currentTime, setCurrentTime] = useState(
     dayjs().format('YYYY:MM:DD HH:mm:ss')
@@ -36,6 +36,14 @@ function NavBar() {
           </Link>
           <Link to={'/login'}>
             <ProfileStatus>임시 로그인</ProfileStatus>
+          </Link>
+        </UserContainer>
+        <UserContainer>
+          <Link to={'/signup'}>
+            <ProfileImg src={ChillChillGuy} />
+          </Link>
+          <Link to={'/signup'}>
+            <ProfileStatus>회원가입</ProfileStatus>
           </Link>
         </UserContainer>
         <UserContainer>
