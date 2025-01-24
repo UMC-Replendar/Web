@@ -9,7 +9,7 @@ import StoredTasksPage from '../components/infoComopnents/StoredTasksPage';
 import HistoryPage from '../components/infoComopnents/HistoryPage';
 import SignUp from '../pages/SignUp';
 import DetailPage from '../components/SettingsComponents/DetailPage';
-import IssuPage from '../components/SettingsComponents/IssuPage';
+import AskPage from '../components/SettingsComponents/AskPage';
 import ThemeSettingPage from '../components/SettingsComponents/ThemeSettingPage';
 import NotifyPage from '../components/SettingsComponents/NotifyPage';
 
@@ -22,7 +22,7 @@ function Router() {
       <Route path="/login" element={<Login />}></Route>
       <Route path="/settings" element={<Settings />}></Route>
       <Route path="/settings/theme" element={<ThemeSettingPage />}></Route>
-      <Route path="/settings/ask" element={<IssuPage />}></Route>
+      <Route path="/settings/ask" element={<AskPage />}></Route>
       <Route path="/settings/notify" element={<NotifyPage />}></Route>
       <Route path="/settings/detail" element={<DetailPage />}></Route>
       <Route path="/completed" element={<CompletedTasksPage />} />
