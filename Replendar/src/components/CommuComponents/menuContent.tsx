@@ -1,35 +1,41 @@
-import styled from 'styled-components';
-import Friend1 from './commuContent/friend1';
+import FriendRegister from './commuContent/friendRegister';
+import FriendNews from './commuContent/friendNews';
+import FriendList from './commuContent/friendList';
+import FriendManagement from './commuContent/friendManagement';
+import TaskList from './commuContent/taskList';
+import DepartmentList from './commuContent/departmentNews';
+import LectureList from './commuContent/lectureList';
+
 interface MenuContentProps {
   menuState: string;
+  expanded: string;
 }
-const MenuContent: React.FC<MenuContentProps> = ({ menuState }) => {
+const MenuContent: React.FC<MenuContentProps> = ({ menuState, expanded }) => {
   let content;
-
   switch (menuState) {
     case '친구등록':
-      content = <Friend1 />;
+      content = <FriendRegister />;
       break;
     case '친구목록':
-      content = <div>친구목록</div>;
+      content = <FriendList />;
       break;
     case '친구소식':
-      content = <div>친구소식</div>;
+      content = <FriendNews expanded={expanded} />;
       break;
     case '친구관리':
-      content = <div>친구관리</div>;
+      content = <FriendManagement />;
       break;
     case '학과소식':
-      content = <div>학과소식</div>;
+      content = <DepartmentList expanded={expanded} />;
       break;
     case '과제목록':
-      content = <div>과제목록</div>;
+      content = <TaskList />;
       break;
     case '강좌목록':
-      content = <div>강좌목록</div>;
+      content = <LectureList />;
       break;
     default:
-      content = <div>디폴트는 없어</div>;
+      content = <FriendRegister />;
   }
 
   return <>{content}</>;
