@@ -1,3 +1,3 @@
 export default function AskPage() {
-  return <h1>ask</h1>;
+  return <h1>ask page</h1>;
 }
