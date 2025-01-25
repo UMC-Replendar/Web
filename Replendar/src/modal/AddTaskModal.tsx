@@ -1,0 +1,311 @@
+import { useState } from 'react';
+import styled from 'styled-components';
+import BookmarkIcon from '../assets/images/BookmarkIcon.svg';
+// import CalendarIcon from '../assets/images/CalendarIcon.svg';
+import LockIcon from '../assets/images/LockIcon.svg';
+import UnLockIcon from '../assets/images/UnLockIcon.svg';
+import GrayPlusIcon from '../assets/images/GrayPlusIcon.svg';
+import ToggleSwitch from '../components/OngoingComponents/ToggleSwitch';
+
+interface AddTaskModalProps {
+  onClose: () => void;
+  onAddTask: (name: string, deadline: string) => void;
+}
+
+const ModalOverlay = styled.div`
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 60px 68px 28px 68px;
+  gap: 51px;
+  width: 74%;
+  height: auto;
+  background: #fcf6f5;
+  border-radius: 20px;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
+  z-index: 1000;
+`;
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+`;
+
+const TitleContainer = styled.div`
+  display: flex;
+  padding: 8px 8px 8px 0px;
+  align-items: center;
+  gap: 8px;
+`;
+
+const Title = styled.h4`
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+`;
+
+const ActionButton = styled.button`
+  display: flex;
+  padding: 6.5px 15px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  border: 1px solid #666666;
+  background: white;
+  color: #666666;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+`;
+
+const Section = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 13px;
+  align-self: stretch;
+`;
+
+const Label = styled.h5`
+  color: #7e7f7f;
+  font-size: 23px;
+  font-weight: 500;
+  margin: 0;
+`;
+
+const Input = styled.input`
+  display: flex;
+  padding: 8px 16px;
+  align-items: center;
+  gap: 8px;
+  border-radius: 5px;
+  border: none;
+  background: white;
+  color: #666666;
+  font-size: 19px;
+  font-weight: 500;
+`;
+
+const TaskNameSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 123px;
+`;
+
+const TaskDeadlineSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 77px;
+`;
+
+const OpenSettingSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 111px;
+`;
+
+const OpenSettingButton = styled.button<{ isActive: boolean }>`
+  display: flex;
+  padding: 5px 15px;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  border-radius: 10px;
+  border: 1px solid ${({ isActive }) => (isActive ? '#666666' : '#d5d5d5')};
+  background: white;
+  cursor: pointer;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const AlertSettingSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 107px;
+`;
+
+const AlertCycleSettingSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 62px;
+`;
+
+const AlarmCycleSettingButton = styled.button<{ isActive: boolean }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  padding: 0px 10px;
+  border-radius: 5px;
+  border: 1px solid ${({ isActive }) => (isActive ? '#666666' : '#e8e8e8')};
+  background: none;
+  color: #9a9a9a;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+`;
+
+const ShareSection = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 85px;
+`;
+
+const PlusFriendsButton = styled.button`
+  display: flex;
+  padding: 5px 15px;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  border-radius: 10px;
+  border: 1px solid #666666;
+  background: white;
+  color: #666666;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+`;
+
+const MemoSection = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 142px;
+  width: 100%;
+`;
+
+const MemoInput = styled.input`
+  height: 295px;
+  border-radius: 10px;
+  border: 1px solid #d5d5d5;
+  flex-grow: 1;
+`;
+
+const ActionButtons = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  width: 100%;
+`;
+
+function AddTaskModal({ onClose, onAddTask }: AddTaskModalProps) {
+  const [taskName, setTaskName] = useState('');
+  const [deadline, setDeadline] = useState('');
+  const [isPublic, setIsPublic] = useState(true);
+  const [isOn, setIsOn] = useState(false);
+  const [alarmCount, setAlarmCount] = useState(3);
+
+  const handleComplete = () => {
+    if (!taskName.trim()) {
+      alert('과제명을 입력해주세요.');
+      return;
+    }
+    if (!deadline) {
+      alert('마감일을 선택해주세요.');
+      return;
+    }
+    onAddTask(taskName, deadline);
+  };
+
+  return (
+    <ModalOverlay>
+      <Header>
+        <TitleContainer>
+          <Title>과제 추가하기</Title>
+          <img src={BookmarkIcon} alt="Bookmark Icon" />
+        </TitleContainer>
+
+        <ActionButton>불러오기</ActionButton>
+      </Header>
+
+      <Section>
+        <TaskNameSection>
+          <Label>과제명</Label>
+          <Input
+            placeholder="과제 이름을 입력하세요"
+            value={taskName}
+            onChange={(e) => setTaskName(e.target.value)}
+          />
+        </TaskNameSection>
+
+        <TaskDeadlineSection>
+          <Label>과제 마감일</Label>
+          <Input
+            type="date"
+            value={deadline}
+            onChange={(e) => setDeadline(e.target.value)}
+          />
+        </TaskDeadlineSection>
+      </Section>
+
+      <Section>
+        <OpenSettingSection>
+          <Label>공개 설정</Label>
+          <ButtonGroup>
+            <OpenSettingButton
+              isActive={isPublic}
+              onClick={() => setIsPublic(true)}
+            >
+              <img src={UnLockIcon} alt="UnLock Icon" />
+              공개
+            </OpenSettingButton>
+            <OpenSettingButton
+              isActive={!isPublic}
+              onClick={() => setIsPublic(false)}
+            >
+              <img src={LockIcon} alt="Lock Icon" />
+              비공개
+            </OpenSettingButton>
+          </ButtonGroup>
+        </OpenSettingSection>
+
+        <AlertSettingSection>
+          <Label>알림 설정</Label>
+          <ToggleSwitch isOn={isOn} onToggle={() => setIsOn(!isOn)} />
+        </AlertSettingSection>
+
+        <AlertCycleSettingSection>
+          <Label>알림 주기 설정</Label>
+          <ButtonGroup>
+            {[3, 24, 10, 1].map((count) => (
+              <AlarmCycleSettingButton
+                key={count}
+                isActive={alarmCount === count}
+                onClick={() => setAlarmCount(count)}
+              >
+                {count === 3 ? '3회' : `${count}시간 전`}
+              </AlarmCycleSettingButton>
+            ))}
+          </ButtonGroup>
+        </AlertCycleSettingSection>
+      </Section>
+
+      <ShareSection>
+        <Label>공유할 친구</Label>
+        <PlusFriendsButton>
+          <img src={GrayPlusIcon} alt="Gray Plus Icon" />
+          추가
+        </PlusFriendsButton>
+      </ShareSection>
+
+      <MemoSection>
+        <Label>메모</Label>
+        <MemoInput />
+      </MemoSection>
+
+      <ActionButtons>
+        <ActionButton>임시저장</ActionButton>
+        <ActionButton onClick={onClose}>수정</ActionButton>
+        <ActionButton onClick={handleComplete}>완료</ActionButton>
+      </ActionButtons>
+    </ModalOverlay>
+  );
+}
+
+export default AddTaskModal;
