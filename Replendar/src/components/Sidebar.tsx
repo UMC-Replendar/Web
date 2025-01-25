@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import CharacterTestImg from '../assets/images/CharacterTestImg.png';
+import Characters from '../assets/images/SideBarIcons/Characters.svg';
 import HomeImg from '../assets/images/HomeIcon.png';
 import CommunityIcon from '../assets/images/CommunityIcon.png';
 import InfoIcon from '../assets/images/InfoIcon.png';
@@ -16,7 +16,7 @@ function Sidebar() {
   const [scrollY, setScrollY] = useState(0); // 스크롤 위치 상태
 
   const handleScroll = () => {
-    setScrollY(window.scrollY); // 현재 스크롤 Y 위치 업데이트
+    setScrollY(window.scrollY * 0.67); // 현재 스크롤 Y 위치 업데이트
   };
 
   useEffect(() => {
@@ -57,7 +57,7 @@ function Sidebar() {
           </Menu>
         </Link>
       </MenuContainer>
-      <CharacterImg src={CharacterTestImg} />
+      <CharacterImg src={Characters} />
     </SidebarContainer>
   );
 }
@@ -70,8 +70,6 @@ const Width = {
 
 const SidebarContainer = styled.div<{ scrollY: number }>`
   position: sticky;
-  /* top: 0; */
-  /* left: 0; */
   width: 188px;
   height: 100%;
   flex-shrink: 0;
@@ -85,11 +83,12 @@ const SidebarContainer = styled.div<{ scrollY: number }>`
   gap: 250px;
   transform: translate(
     calc(${Width[188]} * -0.8),
-    ${(props) => props.scrollY}px
+    calc(${(props) => props.scrollY}px * 2.2)
   );
+
   transition: transform 0.4s ease-out;
   &:hover {
-    transform: translate(0, ${(props) => props.scrollY}px);
+    transform: translate(0, calc(${(props) => props.scrollY}px * 2.2));
   }
 `;
 
@@ -98,6 +97,7 @@ const MenuContainer = styled.div`
   flex-direction: column;
   margin-top: 270px;
   gap: 20px;
+  height: 100%;
 `;
 
 const Menu = styled.nav<MenuProps>`
@@ -116,7 +116,10 @@ const Menu = styled.nav<MenuProps>`
   background: ${(props) => (props.isActive ? '#00893d' : 'transparent')};
 `;
 
-const IconImg = styled.img``;
+const IconImg = styled.img`
+  width: 30px;
+  height: 30px;
+`;
 
 const MenuItem = styled.div`
   color: white;
@@ -131,4 +134,5 @@ const CharacterImg = styled.img`
   width: 188px;
   bottom: 0;
   border-bottom-right-radius: 40px;
+  /* margin-top: 40px; */
 `;
