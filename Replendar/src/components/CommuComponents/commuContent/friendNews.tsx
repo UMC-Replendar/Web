@@ -35,7 +35,7 @@ const CenterDiv = styled.div`
 `;
 
 const FriendNews: React.FC<{ expanded: string }> = ({ expanded }) => {
-  const visibleItems = expanded === 'true' ? 10 : 5;
+  const visibleItems = expanded === 'true' ? 12 : 5;
 
   //임시데이터
   const [registerStates, setRegisterStates] = useState<boolean[]>(
@@ -58,7 +58,7 @@ const FriendNews: React.FC<{ expanded: string }> = ({ expanded }) => {
               <BlueButton status="등록됨">등록됨</BlueButton>
             ) : (
               <BlueButton onClick={() => toggleRegister(index)}>
-                내 할 일에 등록
+                내 일정에 등록
               </BlueButton>
             )}
           </RightAlignedItem>

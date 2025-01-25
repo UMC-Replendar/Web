@@ -158,7 +158,7 @@ const ShareSection = styled.div`
   gap: 85px;
 `;
 
-const PlusFriendsButton = styled.button`
+export const PlusFriendsButton = styled.button`
   display: flex;
   padding: 5px 15px;
   justify-content: center;

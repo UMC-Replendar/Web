@@ -86,4 +86,16 @@ const data = [
     nickname: 'BugHunter',
     ongoingTaskNum: 1,
   },
+  {
+    id: 4,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 5,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
 ];
