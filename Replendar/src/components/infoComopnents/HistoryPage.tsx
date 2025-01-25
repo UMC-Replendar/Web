@@ -55,11 +55,13 @@ const ContentBox = styled.div`
   gap: 5px;
   height: 100%;
 `;
-
-const HistoryItem = styled.div`
-  background: white;
-  padding: 20px;
+const HistoryWhiteBox = styled.div`
+  background-color: white;
   border-radius: 20px;
+`;
+const HistoryItem = styled.div`
+  padding: 20px;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -107,20 +109,22 @@ const HistoryPage: React.FC = () => {
         ))}
       </Menu>
       <ContentBox>
-        {content.map((item, index) => (
-          <HistoryItem key={index}>
-            <HistoryDetails>
-              <div>{item.date}</div>
-              <div>{item.time}</div>
-              <div>{item.task}</div>
-            </HistoryDetails>
-            <BlueButton
-              status={item.status === '완료' ? '등록됨' : '내 일정에 등록'}
-            >
-              {item.status}
-            </BlueButton>
-          </HistoryItem>
-        ))}
+        <HistoryWhiteBox>
+          {content.map((item, index) => (
+            <HistoryItem key={index}>
+              <HistoryDetails>
+                <div>{item.date}</div>
+                <div>{item.time}</div>
+                <div>{item.task}</div>
+              </HistoryDetails>
+              <BlueButton
+                status={item.status === '완료' ? '등록됨' : '내 일정에 등록'}
+              >
+                {item.status}
+              </BlueButton>
+            </HistoryItem>
+          ))}
+        </HistoryWhiteBox>
       </ContentBox>
     </Container>
   );
