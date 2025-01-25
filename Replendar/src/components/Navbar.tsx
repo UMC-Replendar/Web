@@ -67,7 +67,8 @@ function NavBar() {
 export default NavBar;
 
 const NavWrapper = styled.div`
-  height: 100px;
+  height: 46px;
+  margin-top: 30px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;

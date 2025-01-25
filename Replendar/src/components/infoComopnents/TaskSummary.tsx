@@ -4,23 +4,24 @@ import { useNavigate } from 'react-router-dom';
 const SummaryContainer = styled.div`
   display: flex;
   flex-direction: row;
-  gap: 20px;
+  gap: 27px;
   width: 100%;
 `;
 
 const SummaryButton = styled.button`
   display: flex;
   align-items: center;
-  padding: 31.5px 26px; /* padding-top과 bottom 값 조정 */
-  width: 300px;
-  height: 180px;
+  padding: 31.5px 26px;
+  width: 100%;
+  max-width: 300px;
+  height: 141px;
   border: none;
   border-radius: 20px;
   cursor: pointer;
   background-color: #fcf6f5;
-  box-shadow: 0px 4px 6px -3px #cdcdcd;
-  overflow: hidden;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
   justify-content: center;
+  align-items: center;
   gap: 69px;
 
   &:hover {
@@ -37,24 +38,24 @@ const TaskContainer = styled.div`
 `;
 
 const TaskText = styled.div`
-  flex: 1;
+  width: 150px;
+  align-self: stretch;
   text-align: right;
   color: #666666;
   font-size: 28px;
   font-weight: 500;
   line-height: 39.2px;
   font-family: Pretendard, sans-serif;
-  word-wrap: break-word;
 `;
 
 const TaskCount = styled.div`
+  align-self: stretch;
   text-align: right;
   color: #666666;
   font-size: 28px;
   font-weight: 500;
   line-height: 39.2px;
   font-family: Pretendard, sans-serif;
-  word-wrap: break-word;
 `;
 
 const IconContainer = styled.div`
@@ -107,7 +108,7 @@ function TaskSummary() {
           />
         </IconContainer>
         <TaskContainer>
-          <TaskText>완료 못한 과제</TaskText>
+          <TaskText>미완료 과제</TaskText>
           <TaskCount>3</TaskCount>
         </TaskContainer>
       </SummaryButton>
