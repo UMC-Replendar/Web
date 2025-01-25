@@ -1,12 +1,17 @@
 import styled from 'styled-components';
-type BlueBtnProps = {
-  children: React.ReactNode;
-  bgColor?: string; // children을 받을 수 있도록 ReactNode 사용
+
+interface BlueBtnProps {
+  status?: '등록됨' | '내 일정에 등록';
   onClick?: () => void;
-};
-const BlueButton: React.FC<BlueBtnProps> = ({ children, bgColor, onClick }) => {
+  children: React.ReactNode;
+}
+const BlueButton: React.FC<BlueBtnProps> = ({
+  children,
+  status = '내 일정에 등록',
+  onClick,
+}) => {
   return (
-    <BlueBtn bgColor={bgColor} onClick={onClick}>
+    <BlueBtn status={status} onClick={onClick}>
       {children}
     </BlueBtn>
   );
@@ -14,9 +19,10 @@ const BlueButton: React.FC<BlueBtnProps> = ({ children, bgColor, onClick }) => {
 
 export default BlueButton;
 
-const BlueBtn = styled.button<{ bgColor?: string }>`
+const BlueBtn = styled.button<{ status: '등록됨' | '내 일정에 등록' }>`
   border-radius: 50px;
-  background-color: ${({ bgColor }) => bgColor || '#73d5ff'};
+  background-color: ${({ status }) =>
+    status === '등록됨' ? '#BABABA' : '#73D5FF'};
   color: white;
   border: none;
   width: 106px;
