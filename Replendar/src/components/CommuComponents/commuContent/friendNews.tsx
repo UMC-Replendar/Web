@@ -1,6 +1,7 @@
 import { Register, Registered } from '../commuIcons';
 import styled from 'styled-components';
 import { useState } from 'react';
+import BlueButton from '../../blueButton';
 
 const Container = styled.div`
   width: 95%;
@@ -35,9 +36,12 @@ const CenterDiv = styled.div`
 
 const FriendNews: React.FC<{ expanded: string }> = ({ expanded }) => {
   const visibleItems = expanded === 'true' ? 10 : 5;
+
+  //임시데이터
   const [registerStates, setRegisterStates] = useState<boolean[]>(
     Array(data.length).fill(false)
   );
+
   const toggleRegister = (index: number) => {
     setRegisterStates((prevStates) =>
       prevStates.map((state, i) => (i === index ? !state : state))
@@ -51,9 +55,11 @@ const FriendNews: React.FC<{ expanded: string }> = ({ expanded }) => {
           <CenterDiv>{item.message}</CenterDiv>
           <RightAlignedItem>
             {registerStates[index] ? (
-              <Registered />
+              <BlueButton status="등록됨">등록됨</BlueButton>
             ) : (
-              <Register onClick={() => toggleRegister(index)} />
+              <BlueButton onClick={() => toggleRegister(index)}>
+                내 할 일에 등록
+              </BlueButton>
             )}
           </RightAlignedItem>
         </FlexDiv>

@@ -33,7 +33,7 @@ const ButtonContainer = styled.div`
   margin-bottom: ${MarginBottom[15]};
 `;
 
-const AddButton = styled.button`
+export const AddButton = styled.button`
   display: flex;
   padding: 8px 16px;
   justify-content: center;
