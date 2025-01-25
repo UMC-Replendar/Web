@@ -12,8 +12,12 @@ import DetailPage from '../components/SettingsComponents/DetailPage';
 import AskPage from '../components/SettingsComponents/AskPage';
 import ThemeSettingPage from '../components/SettingsComponents/ThemeSettingPage';
 import NotifyPage from '../components/SettingsComponents/NotifyPage';
+
+import Redirect from '../components/LoginComponents/Redirect';
+
 import NotCompletedTaskPage from '../components/infoComopnents/taskPage/NotCompletedTaskPage';
 import ImportantTaskPage from '../components/infoComopnents/taskPage/ImportantTaskPage';
+
 
 function Router() {
   return (
@@ -31,6 +35,9 @@ function Router() {
       <Route path="/stored" element={<StoredTasksPage />} />
       <Route path="/history" element={<HistoryPage />}></Route>
       <Route path="/signup" element={<SignUp />}></Route>
+
+      <Route path="/auth" element={<Redirect />}></Route>
+
       <Route path="/notcompleted" element={<NotCompletedTaskPage />}></Route>
       <Route path="/important" element={<ImportantTaskPage />}></Route>
     </Routes>

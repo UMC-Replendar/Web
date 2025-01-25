@@ -2,11 +2,12 @@ import styled from 'styled-components';
 
 const ProfileContainer = styled.div`
   display: flex;
-  gap: 80px;
+  gap: 100px;
   align-items: center;
   flex-direction: row;
   margin-left: 25%;
-  margin-top: 50px;
+  margin-top: 52px;
+  margin-bottom: 54px;
 `;
 
 const ProfilePicture = styled.div`

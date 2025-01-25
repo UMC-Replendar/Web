@@ -47,9 +47,13 @@ const Image = styled.img`
   height: 500px;
 `;
 
-const Login = () => {
+function Login() {
   const handleKakaoLogin = () => {
     console.log('카카오 로그인 버튼 클릭됨!');
+    const REST_API_KEY: string = import.meta.env.VITE_KAKAO_API_KEY; // 발급받은 클라이언트 아이디
+    const REDIRECT_URI: string = import.meta.env.VITE_REDIRECT_URI_KAKAO; // Callback URL
+    const KAKAO_AUTH_URL: string = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}`;
+    window.location.href = KAKAO_AUTH_URL;
     // 예: window.Kakao.Auth.login({...});
   };
 
@@ -63,6 +67,6 @@ const Login = () => {
       </KakaoButton>
     </Container>
   );
-};
+}
 
 export default Login;
