@@ -9,10 +9,19 @@ export const GlobalStyle = createGlobalStyle`
 }
 
 /* 폰트 크기의 팽창을 방지합니다. */
+
+/* view port 설정 */
 html {
   -moz-text-size-adjust: none;
   -webkit-text-size-adjust: none;
   text-size-adjust: none;
+  /* height: 1080px; */
+
+  /* height: 100%; */
+  /* height: 1080px; */
+  /* max-width: 1920px; */
+  /* max-height: 1080px; */
+  
 }
 
 /* 기본 여백을 제거하여 작성된 CSS를 더 잘 제어할 수 있습니다. */
@@ -36,10 +45,20 @@ ol[role='list'] {
 }
 
 /* 핵심 body의 기본값을 설정합니다. */
+
 body {
   /* min-height: 100vh; */
   line-height: 1.5;
   margin: 0;
+  /* transform: scale(0.67);
+  transform-origin: top left;
+  width: 1980px;
+  height: 150%;
+  overflow-x: hidden; */
+      }
+
+#root {
+  /* height: 100%; */
 }
 
 /* 제목 요소와 상호작용하는 요소에 대해 line-height를 더 짧게 설정합니다. */
