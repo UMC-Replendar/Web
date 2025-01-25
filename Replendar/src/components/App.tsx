@@ -21,7 +21,6 @@ export default App;
 
 const PageWrapper = styled.div`
   display: flex;
-  height: 100vh;
 `;
 
 const MainWrapper = styled.div`

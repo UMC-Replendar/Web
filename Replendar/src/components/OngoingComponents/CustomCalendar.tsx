@@ -1,45 +1,55 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import PreviousArrowIcon from '/src/assets/images/PreviousArrowIcon.png';
-import NextArrowIcon from '/src/assets/images/NextArrowIcon.png';
+import PreviousArrowIcon from '/src/assets/images/PreviousArrowIcon.svg';
+import NextArrowIcon from '/src/assets/images/NextArrowIcon.svg';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 
 const CalendarWrapper = styled.div`
-  margin-top: 30px;
+  margin-top: 66px;
 `;
 
 const CalendarHeader = styled.div`
   display: flex;
-  justify-content: flex-start;
   align-items: center;
+  gap: 15px;
+  align-self: center;
   margin-bottom: 4px;
-  margin-left: 9px;
+  margin-left: 22px;
 `;
 
 const MonthText = styled.h4`
   font-size: 28px;
-  align-items: center;
+  font-weight: 700;
   margin: 0;
-  padding-right: 15px;
+`;
+
+const ArrowButtonContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
 `;
 
 const ArrowButton = styled.button`
-  background: none;
-  border: none;
-  padding-right: 10px;
+  all: unset;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
+  width: 22px;
+  height: 22px;
 
   img {
-    width: 22px;
-    height: 22px;
+    width: 100%;
+    height: 100%;
   }
 `;
 
 const ScheduleText = styled.p`
-  font-size: 16px;
-  margin: 0 0 26px 9px;
   color: #666666;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 26px 22px;
 `;
 
 const StyledCalendar = styled(Calendar)`
@@ -132,12 +142,14 @@ function CustomCalendar() {
     <CalendarWrapper>
       <CalendarHeader>
         <MonthText>{getMonthYearText(viewDate)}</MonthText>
-        <ArrowButton onClick={goToPreviousMonth}>
-          <img src={PreviousArrowIcon} alt="이전 달" />
-        </ArrowButton>
-        <ArrowButton onClick={goToNextMonth}>
-          <img src={NextArrowIcon} alt="다음 달" />
-        </ArrowButton>
+        <ArrowButtonContainer>
+          <ArrowButton onClick={goToPreviousMonth}>
+            <img src={PreviousArrowIcon} alt="이전 달" />
+          </ArrowButton>
+          <ArrowButton onClick={goToNextMonth}>
+            <img src={NextArrowIcon} alt="다음 달" />
+          </ArrowButton>
+        </ArrowButtonContainer>
       </CalendarHeader>
 
       <ScheduleText>달력에 스케쥴표를 확인하세요</ScheduleText>

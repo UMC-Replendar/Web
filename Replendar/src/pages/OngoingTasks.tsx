@@ -2,9 +2,10 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import ToggleSwitch from '../components/OngoingComponents/ToggleSwitch';
 import CustomCalendar from '../components/OngoingComponents/CustomCalendar';
-import PlusIcon from '../assets/images/PlusIcon.png';
-import DownArrowIcon from '../assets/images/DownArrowIcon.png';
-import UpArrowIcon from '../assets/images/UpArrowIcon.png';
+import AddTaskModal from '../modal/AddTaskModal';
+import PlusIcon from '../assets/images/PlusIcon.svg';
+import DownArrowIcon from '../assets/images/DownArrowIcon.svg';
+import UpArrowIcon from '../assets/images/UpArrowIcon.svg';
 
 //진행 중인 과제, 과제 추가하기, task box사이의 바텀 마진 입니다.
 const MarginBottom = {
@@ -14,10 +15,9 @@ const MarginBottom = {
 };
 
 const PageWrapper = styled.div`
-  margin-top: 40px;
-  margin-left: 92px;
-  margin-right: 80px;
-  /* height: 150%; */
+  margin-top: 79px;
+  margin-left: 66px;
+  margin-right: 163px;
   display: flex;
   flex-direction: column;
 `;
@@ -33,31 +33,34 @@ const ButtonContainer = styled.div`
   margin-bottom: ${MarginBottom[15]};
 `;
 
-const AddButton = styled.button`
+export const AddButton = styled.button`
   display: flex;
-  align-items: center;
   padding: 8px 16px;
+  justify-content: center;
+  align-items: center;
   gap: 8px;
-  font-size: 16px;
-  color: black;
-  background-color: #e8e8e8;
-  border: none;
   border-radius: 50px;
+  border: none;
+  background-color: #e8e8e8;
+  color: black;
+  font-size: 16px;
+  font-weight: 500;
   cursor: pointer;
 
   img {
-    width: 15px;
-    height: 15px;
+    width: 13px;
+    height: 13px;
   }
 `;
 
 const More = styled.div`
   display: flex;
+  padding: 0px 6px;
   align-items: center;
-  padding: 0 6px 0 6px;
   gap: 6px;
-  font-size: 16px;
   color: #666666;
+  font-size: 16px;
+  font-weight: 500;
   cursor: pointer;
 
   img {
@@ -144,68 +147,81 @@ function OngoingTasks() {
   };
 
   const handleShowMore = () => {
-    setVisibleTasksCount((prevCount) =>
-      prevCount === tasks.length ? 3 : tasks.length
-    );
+    if (visibleTasksCount < tasks.length) {
+      setVisibleTasksCount(tasks.length);
+    } else {
+      setVisibleTasksCount(3);
+    }
   };
 
-  const handleAddTask = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleAddTask = (name: string, deadline: string) => {
     const newTask: TaskData = {
       color: '#7AC19A',
-      name: `과제 ${tasks.length + 1}`,
-      time: '11h 10m 22s',
+      name,
+      time: deadline,
       isToggled: false,
     };
-    setTasks((prevTasks) => [...prevTasks, newTask]);
-    setVisibleTasksCount(tasks.length + 1);
+    setTasks((prevTasks) => {
+      const updatedTasks = [...prevTasks, newTask];
+      const shouldExpand = updatedTasks.length > 3;
+      setVisibleTasksCount(shouldExpand ? updatedTasks.length : 3);
+      return updatedTasks;
+    });
+    setIsModalOpen(false);
   };
 
   return (
-    <>
-      <PageWrapper>
-        <MainPageTitle>진행 중인 과제</MainPageTitle>
-        <ButtonContainer>
-          <AddButton onClick={handleAddTask}>
-            과제 추가하기
-            <img src={PlusIcon} alt="Plus Icon" />
-          </AddButton>
-          {tasks.length > 3 && (
-            <More onClick={handleShowMore}>
-              {visibleTasksCount === Math.min(10, tasks.length)
-                ? '닫기'
-                : '더보기'}
-              <img
-                src={
-                  visibleTasksCount === Math.min(10, tasks.length)
-                    ? UpArrowIcon
-                    : DownArrowIcon
-                }
-                alt={
-                  visibleTasksCount === Math.min(10, tasks.length)
-                    ? 'Up Arrow'
-                    : 'Down Arrow'
-                }
-              />
-            </More>
-          )}
-        </ButtonContainer>
-
-        <TaskBox isScrollable={tasks.length > 10}>
-          {tasks.slice(0, visibleTasksCount).map((task, index) => (
-            <Task
-              key={task.name}
-              color={task.color}
-              name={task.name}
-              time={task.time}
-              isToggled={task.isToggled}
-              onToggle={() => handleToggle(index)}
+    <PageWrapper>
+      <MainPageTitle>진행 중인 과제</MainPageTitle>
+      <ButtonContainer>
+        <AddButton onClick={handleOpenModal}>
+          과제 추가하기
+          <img src={PlusIcon} alt="Plus Icon" />
+        </AddButton>
+        {tasks.length > 3 && (
+          <More onClick={handleShowMore}>
+            {visibleTasksCount === tasks.length ? '닫기' : '더보기'}
+            <img
+              src={
+                visibleTasksCount === tasks.length ? UpArrowIcon : DownArrowIcon
+              }
+              alt={
+                visibleTasksCount === tasks.length ? 'Up Arrow' : 'Down Arrow'
+              }
             />
-          ))}
-        </TaskBox>
+          </More>
+        )}
+      </ButtonContainer>
 
-        <CustomCalendar />
-      </PageWrapper>
-    </>
+      <TaskBox isScrollable={tasks.length > 10}>
+        {tasks.slice(0, visibleTasksCount).map((task, index) => (
+          <Task
+            key={index}
+            color={task.color}
+            name={task.name}
+            time={task.time}
+            isToggled={task.isToggled}
+            onToggle={() => handleToggle(index)}
+          />
+        ))}
+      </TaskBox>
+
+      <CustomCalendar />
+
+      {isModalOpen && (
+        <AddTaskModal onClose={handleCloseModal} onAddTask={handleAddTask} />
+      )}
+    </PageWrapper>
   );
 }
 
