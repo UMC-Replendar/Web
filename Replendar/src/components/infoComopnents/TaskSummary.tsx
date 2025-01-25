@@ -13,8 +13,8 @@ const SummaryButton = styled.button`
   align-items: center;
   padding: 31.5px 26px;
   width: 100%;
-  max-width: 300px;
-  height: 141px;
+  max-width: 320px;
+  height: 161px;
   border: none;
   border-radius: 20px;
   cursor: pointer;
@@ -59,8 +59,8 @@ const TaskCount = styled.div`
 `;
 
 const IconContainer = styled.div`
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   padding: 2.33px 4.28px;
   display: flex;
   justify-content: center;
@@ -68,8 +68,8 @@ const IconContainer = styled.div`
 `;
 
 const Icon = styled.img`
-  width: 21.45px;
-  height: 25.35px;
+  width: 30px;
+  height: 30px;
 `;
 
 function TaskSummary() {
