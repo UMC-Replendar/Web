@@ -1,7 +1,6 @@
 import styled from 'styled-components';
-
 const FriendList = () => {
-  return <Container>친구목록</Container>;
+  return <Container></Container>;
 };
 
 export default FriendList;
