@@ -30,7 +30,7 @@ function Router() {
       <Route path="/stored" element={<StoredTasksPage />} />
       <Route path="/history" element={<HistoryPage />}></Route>
       <Route path="/signup" element={<SignUp />}></Route>
-      <Route path="/oauth/kakao/callback" element={<Redirect />}></Route>
+      <Route path="/auth" element={<Redirect />}></Route>
     </Routes>
   );
 }
