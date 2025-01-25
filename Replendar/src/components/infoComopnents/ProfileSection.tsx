@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { useState } from 'react';
 
 const ProfileContainer = styled.div`
   display: flex;
@@ -10,19 +11,32 @@ const ProfileContainer = styled.div`
   margin-bottom: 54px;
 `;
 
-const ProfilePicture = styled.div`
-  padding: 140px 96px;
+const ProfilePicture = styled.label`
+  width: 320px;
+  height: 320px;
   background: #fcf6f5;
   box-shadow: 0px 4px 6px -3px #cdcdcd;
   border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  cursor: pointer;
 `;
 
-const ProfileText = styled.div`
-  color: #666666;
-  font-size: 28px;
-  font-weight: 700;
-  line-height: 39.2px;
-  word-wrap: break-word;
+const UploadIcon = styled.img`
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+`;
+
+const UploadText = styled.div`
+  font-size: 17px;
+  font-weight: 500;
+  color: #7e7f7f;
+  text-align: center;
+  user-select: none;
 `;
 
 const InfoBox = styled.div`
@@ -39,13 +53,39 @@ const Nickname = styled.h2`
 const InfoText = styled.p`
   font-size: 18px;
 `;
+
 const Message = styled.p``;
+
 function ProfileSection() {
+  const [image, setImage] = useState<string | null>(null);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <ProfileContainer>
-      <ProfilePicture>
-        <ProfileText>프로필 사진</ProfileText>
+      <ProfilePicture htmlFor="file-upload">
+        {image ? (
+          <UploadIcon src={image} alt="프로필 사진 미리보기" />
+        ) : (
+          <UploadText>프로필 사진 업로드 가능 해봐여</UploadText>
+        )}
       </ProfilePicture>
+      <input
+        id="file-upload"
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handleImageUpload}
+      />
       <InfoBox>
         <Nickname>닉네임</Nickname>
         <Message>상태 메시지 자리</Message>
