@@ -1,6 +1,14 @@
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle, ThemeProvider } from 'styled-components';
+import { useThemeStore, themeColors } from '../../store/ThemeStore';
 
-export const GlobalStyle = createGlobalStyle`
+const GlobalStyle = createGlobalStyle`
+
+@font-face {
+    font-family: 'Pretendard';
+    src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
 /* box-sizing 규칙을 명시합니다. */
 *,
 *::before,
@@ -50,6 +58,7 @@ body {
   /* min-height: 100vh; */
   line-height: 1.5;
   margin: 0;
+  font-family: 'Pretendard'
   /* transform: scale(0.67);
   transform-origin: top left;
   width: 1980px;
@@ -114,3 +123,15 @@ textarea:not([rows]) {
   scroll-margin-block: 5ex;
 }
 `;
+
+export default function ThemedApp({ children }: { children: React.ReactNode }) {
+  const { selectedTheme } = useThemeStore();
+  const theme = themeColors[selectedTheme] || themeColors['기본테마'];
+
+  return (
+    <ThemeProvider theme={theme}>
+      <GlobalStyle />
+      {children}
+    </ThemeProvider>
+  );
+}

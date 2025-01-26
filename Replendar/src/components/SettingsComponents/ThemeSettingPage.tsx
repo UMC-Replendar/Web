@@ -1,13 +1,9 @@
-import { useState } from 'react';
 import styled from 'styled-components';
 import ThemeSettingIcon from '../../assets/images/SettingsPageIcons/ThemeSettingIcon.png';
+import { useThemeStore, themeColors } from '../../store/ThemeStore';
 
 export default function ThemeSettingPage() {
-  const [selectedTheme, setSelectedTheme] = useState('기본테마');
-
-  const handleThemeSelect = (theme: string) => {
-    setSelectedTheme(theme);
-  };
+  const { selectedTheme, setTheme } = useThemeStore();
 
   return (
     <Container>
@@ -15,35 +11,21 @@ export default function ThemeSettingPage() {
         <TitleIcon src={ThemeSettingIcon} />
         <TitleSpan>테마설정</TitleSpan>
       </TitleContainer>
-      <OptionContainer>
-        <SelectButton
-          selected={selectedTheme === '기본테마'}
-          onClick={() => handleThemeSelect('기본테마')}
-        />
-        <ThemeOption selected={selectedTheme === '기본테마'}>
-          <ThemeText>기본테마</ThemeText>
-        </ThemeOption>
-      </OptionContainer>
 
-      <OptionContainer>
-        <SelectButton
-          selected={selectedTheme === '테마 1'}
-          onClick={() => handleThemeSelect('테마 1')}
-        />
-        <ThemeOption selected={selectedTheme === '테마 1'}>
-          <ThemeText>테마 1</ThemeText>
-        </ThemeOption>
-      </OptionContainer>
-
-      <OptionContainer>
-        <SelectButton
-          selected={selectedTheme === '테마2'}
-          onClick={() => handleThemeSelect('테마2')}
-        />
-        <ThemeOption selected={selectedTheme === '테마2'}>
-          <ThemeText>테마2</ThemeText>
-        </ThemeOption>
-      </OptionContainer>
+      {Object.keys(themeColors).map((theme) => (
+        <OptionContainer key={theme}>
+          <SelectButton
+            selected={selectedTheme === theme}
+            onClick={() => setTheme(theme)}
+          />
+          <ThemeOption
+            selected={selectedTheme === theme}
+            style={{ backgroundColor: themeColors[theme].main }}
+          >
+            <ThemeText>{theme}</ThemeText>
+          </ThemeOption>
+        </OptionContainer>
+      ))}
     </Container>
   );
 }
@@ -70,11 +52,8 @@ const TitleIcon = styled.img`
 `;
 
 const TitleSpan = styled.span`
-  font-family: Pretendard;
   font-size: 28px;
-  font-style: normal;
   font-weight: 700;
-  line-height: 140%; /* 39.2px */
 `;
 
 const OptionContainer = styled.div`
@@ -87,27 +66,21 @@ const SelectButton = styled.div<{ selected: boolean }>`
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 2px solid ${(props) => (props.selected ? '#2bae66' : '#E8E8E8')};
-  background-color: ${(props) => (props.selected ? '#2bae66' : '#E8E8E8')};
+  border: 2px solid ${(props) => (props.selected ? '#2BAE66' : '#E8E8E8')};
+  background-color: ${(props) => (props.selected ? '#2BAE66' : '#E8E8E8')};
   cursor: pointer;
-  transition: all 0.3s ease-in-out;
-
-  &:hover {
-    border-color: #2bae66;
-  }
 `;
 
 const ThemeOption = styled.div<{ selected: boolean }>`
   padding: 20px;
   width: 355px;
-  height: 199.476px;
+  height: 199px;
   border-radius: 10px;
   background: #fcf6f5;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease-in-out;
-
-  ${(props) =>
-    props.selected ? 'box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2)' : null}
+  box-shadow: ${(props) =>
+    props.selected
+      ? '0px 4px 15px rgba(0, 0, 0, 0.2)'
+      : '0px 4px 10px rgba(0, 0, 0, 0.05)'};
 `;
 
 const ThemeText = styled.span`

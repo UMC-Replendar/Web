@@ -6,6 +6,7 @@ import CommunityIcon from '../assets/images/CommunityIcon.png';
 import InfoIcon from '../assets/images/InfoIcon.png';
 import SettingsIcon from '../assets/images/SettingsIcon.png';
 import { Link, useLocation } from 'react-router-dom';
+import { useThemeStore, themeColors } from '../store/ThemeStore';
 
 interface MenuProps {
   isActive: boolean;
@@ -14,6 +15,7 @@ interface MenuProps {
 function Sidebar() {
   const location = useLocation();
   const [scrollY, setScrollY] = useState(0); // 스크롤 위치 상태
+  const { selectedTheme } = useThemeStore();
 
   const handleScroll = () => {
     setScrollY(window.scrollY * 0.67); // 현재 스크롤 Y 위치 업데이트
@@ -30,7 +32,10 @@ function Sidebar() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <SidebarContainer scrollY={scrollY}>
+    <SidebarContainer
+      style={{ backgroundColor: themeColors[selectedTheme].sidebar }}
+      scrollY={scrollY}
+    >
       <MenuContainer>
         <Link to="/">
           <Menu isActive={isActive('/')}>
