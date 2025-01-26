@@ -20,12 +20,9 @@ export default function NotifyPage() {
       </TitleContainer>
       <NoticeContainer>
         <NoticeTable>
-          <thead>
-            <tr>
-              <TableHeader>날짜</TableHeader>
-              <TableHeader>제목</TableHeader>
-            </tr>
-          </thead>
+          <TableHeader>날짜</TableHeader>
+          <TableHeader>제목</TableHeader>
+          <thead></thead>
           <tbody>
             {notices.map((notice, index) => (
               <TableRow key={index}>
@@ -55,6 +52,8 @@ const NoticeTable = styled.table`
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  background-color: white;
+  border-radius: 20px;
 `;
 
 const TableHeader = styled.th`
@@ -62,19 +61,22 @@ const TableHeader = styled.th`
   font-weight: bold;
   color: #333;
   padding: 15px;
-  background: #f5ebe7;
-  border-bottom: 2px solid #e0d5d2;
+  background-color: #fcf6f5;
 `;
 
 const TableRow = styled.tr`
-  &:nth-child(even) {
+  /* &:nth-child(even) {
     background: #f9f3f1;
-  }
+  } */
 `;
 
 const TableCell = styled.td`
-  font-size: 16px;
   color: #555;
   padding: 15px;
-  border-bottom: 1px solid #eee;
+  font-family: Pretendard;
+  font-size: 19px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 140%;
+  /* border-bottom: 1px solid #eee; */
 `;
