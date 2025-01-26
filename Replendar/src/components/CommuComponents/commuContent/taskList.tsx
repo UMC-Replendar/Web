@@ -2,6 +2,10 @@ import styled from 'styled-components';
 import { AddButton } from '../../../pages/OngoingTasks';
 import PlusIcon from '../../../assets/images/PlusIcon.svg';
 import BlueButton from '../../blueButton';
+import DownArrow from '../../../assets/images/downArrow.svg';
+
+import useModalStore from '../../../store/modalStore';
+import CommuModalContent from '../modalContents/commuModalContent';
 
 const Container = styled.div`
   width: 95%;
@@ -14,47 +18,95 @@ const Container = styled.div`
   padding: 10px 20px 10px 20px;
   gap: 15px;
   box-sizing: border-box;
+  border-collapse: collapse;
+
+  th,
+  td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 12px 15px;
+    font-size: 19px;
+  }
+`;
+const SpaceBtwDiv = styled.div`
+  div {
+    gap: 20px;
+    display: flex;
+  }
+  img {
+    vertical-align: middle; /* 이미지 정렬 */
+  }
+  span {
+    display: flex;
+    font-size: 19px;
+  }
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 95%;
+  margin: 30px 0px 0px 0px;
 `;
 
 const TaskList: React.FC<{ expanded: string }> = ({ expanded }) => {
+  const visibleItems = expanded === 'true' ? 10 : 3;
+
+  const { openModal } = useModalStore();
+
+  const handleOpenModal = () => {
+    openModal(<CommuModalContent />);
+  };
   return (
     <>
-      <AddButton>
-        과제 추가하기
-        <img src={PlusIcon} alt="Plus Icon" />
-      </AddButton>
-      <Container>
-        <thead>
-          <tr>
-            <th>학년</th>
-            <th>등록일</th>
-            <th>교수</th>
-            <th>강좌</th>
-            <th>과제명</th>
-            <th>마감일</th>
-            <th>과제등록</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((item, index) => (
-            <tr key={index}>
-              <td>{item.grade}</td>
-              <td>{item.registrationDate}</td>
-              <td>{item.professor}</td>
-              <td>{item.course}</td>
-              <td>{item.assignment}</td>
-              <td>{item.deadline}</td>
+      <SpaceBtwDiv>
+        <AddButton onClick={handleOpenModal}>
+          과제 추가하기
+          <img src={PlusIcon} alt="Plus Icon" />
+        </AddButton>
+        <div>
+          <span>2학년</span>
+          <span>정렬</span>
+          <span>교수명</span>
+          <span>
+            교수명 <img src={DownArrow} alt="DownArrow Icon" />
+          </span>
+        </div>
+      </SpaceBtwDiv>
 
-              <td>
-                {item.isRegistered ? (
-                  <BlueButton status="등록됨">등록됨</BlueButton>
-                ) : (
-                  <BlueButton>내 일정에 등록</BlueButton>
-                )}
-              </td>
+      <Container>
+        <table>
+          <thead>
+            <tr>
+              <th>학년</th>
+              <th>등록일</th>
+              <th>교수</th>
+              <th>강좌</th>
+              <th>과제명</th>
+              <th>마감일</th>
+              <th>과제등록</th>
             </tr>
-          ))}
-        </tbody>
+          </thead>
+          <tbody>
+            {data.slice(0, visibleItems).map((item, index) => (
+              <tr key={index}>
+                <td>{item.grade}</td>
+                <td>{item.registrationDate}</td>
+                <td>{item.professor}</td>
+                <td>{item.course}</td>
+                <td>{item.assignment}</td>
+                <td>{item.deadline}</td>
+
+                <td>
+                  {item.isRegistered ? (
+                    <BlueButton status="등록됨">등록됨</BlueButton>
+                  ) : (
+                    <BlueButton>내 일정에 등록</BlueButton>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </Container>
     </>
   );
@@ -65,7 +117,7 @@ export default TaskList;
 //임시데이터
 const data = [
   {
-    grade: '1학년',
+    grade: '1',
     registrationDate: '1/10',
     professor: '김영희',
     course: '컴퓨터공학',
@@ -74,7 +126,7 @@ const data = [
     isRegistered: true,
   },
   {
-    grade: '2학년',
+    grade: '2',
     registrationDate: '1/15',
     professor: '이철수',
     course: '수학',
@@ -83,7 +135,7 @@ const data = [
     isRegistered: true,
   },
   {
-    grade: '3학년',
+    grade: '3',
     registrationDate: '1/20',
     professor: '박민정',
     course: '물리학',
@@ -92,7 +144,7 @@ const data = [
     isRegistered: false,
   },
   {
-    grade: '1학년',
+    grade: '1',
     registrationDate: '1/12',
     professor: '김영희',
     course: '영어',
@@ -101,7 +153,7 @@ const data = [
     isRegistered: true,
   },
   {
-    grade: '2학년',
+    grade: '2',
     registrationDate: '1/17',
     professor: '이철수',
     course: '역사',
@@ -110,7 +162,7 @@ const data = [
     isRegistered: false,
   },
   {
-    grade: '3학년',
+    grade: '3',
     registrationDate: '1/22',
     professor: '박민정',
     course: '화학',
@@ -119,7 +171,7 @@ const data = [
     isRegistered: true,
   },
   {
-    grade: '1학년',
+    grade: '1',
     registrationDate: '1/11',
     professor: '김영희',
     course: '프로그래밍',
@@ -128,7 +180,7 @@ const data = [
     isRegistered: true,
   },
   {
-    grade: '2학년',
+    grade: '2',
     registrationDate: '1/16',
     professor: '이철수',
     course: '통계학',
@@ -137,7 +189,7 @@ const data = [
     isRegistered: false,
   },
   {
-    grade: '3학년',
+    grade: '3',
     registrationDate: '1/21',
     professor: '박민정',
     course: '경제학',
@@ -146,7 +198,7 @@ const data = [
     isRegistered: true,
   },
   {
-    grade: '1학년',
+    grade: '1',
     registrationDate: '1/13',
     professor: '김영희',
     course: '생물학',
@@ -155,7 +207,7 @@ const data = [
     isRegistered: true,
   },
   {
-    grade: '2학년',
+    grade: '2',
     registrationDate: '1/18',
     professor: '이철수',
     course: '컴퓨터공학',
@@ -164,7 +216,7 @@ const data = [
     isRegistered: false,
   },
   {
-    grade: '3학년',
+    grade: '3',
     registrationDate: '1/23',
     professor: '박민정',
     course: '심리학',
