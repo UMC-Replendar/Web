@@ -1,7 +1,6 @@
 import GrayPlusIcon from '../../../assets/images/GrayPlusIcon.svg';
 import { PlusFriendsButton } from '../../../modal/AddTaskModal';
 import useModalStore from '../../../store/modalStore';
-import styled from 'styled-components';
 
 const AddGroup: React.FC = () => {
   const { closeModal } = useModalStore();
