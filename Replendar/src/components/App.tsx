@@ -3,14 +3,21 @@ import '../assets/css/App.css';
 import Router from '../routes/Routes';
 import Sidebar from './Sidebar';
 import NavBar from './Navbar';
+import { useLocation } from 'react-router-dom';
 // import OngoingTasks from './OngoingTasks';
 
 function App() {
+  const location = useLocation();
+
+  const hideLayout =
+    location.pathname === '/login' || location.pathname === '/signup';
+
   return (
     <PageWrapper>
-      <Sidebar />
+      {!hideLayout && <Sidebar />}
+
       <MainWrapper>
-        <NavBar />
+        {!hideLayout && <NavBar />}
         <Router />
       </MainWrapper>
     </PageWrapper>
