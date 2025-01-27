@@ -49,7 +49,7 @@ const CommuModalContent: React.FC = () => {
 export default CommuModalContent;
 
 const MemoDiv = styled.div`
-  backgroud-color: white;
+  background-color: white;
   width: 300px;
   height: 200px;
   border: solid 1px black;
@@ -71,8 +71,7 @@ const FlexGroup = styled.div`
   padding: 5px;
 `;
 const FlexEndGroup = styled.label`
-justify-content: flex-end;
- display: flex;
- padding: 5px;
-  }
+  justify-content: flex-end;
+  display: flex;
+  padding: 5px;
 `;

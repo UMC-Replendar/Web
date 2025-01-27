@@ -1,4 +1,3 @@
-import { Register, Registered } from '../commuIcons';
 import styled from 'styled-components';
 import { useState } from 'react';
 import BlueButton from '../../blueButton';
