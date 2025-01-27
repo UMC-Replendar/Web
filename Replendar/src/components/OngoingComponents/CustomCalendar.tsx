@@ -13,14 +13,18 @@ const CalendarHeader = styled.div`
   display: flex;
   align-items: center;
   gap: 15px;
-  align-self: center;
+  align-self: stretch;
   margin-bottom: 4px;
   margin-left: 22px;
 `;
 
 const MonthText = styled.h4`
+  color: black;
+  font-family: Pretendard;
   font-size: 28px;
+  font-style: normal;
   font-weight: 700;
+  line-height: 140%;
   margin: 0;
 `;
 
@@ -32,23 +36,17 @@ const ArrowButtonContainer = styled.div`
 
 const ArrowButton = styled.button`
   all: unset;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   cursor: pointer;
-  width: 22px;
-  height: 22px;
-
-  img {
-    width: 100%;
-    height: 100%;
-  }
 `;
 
 const ScheduleText = styled.p`
+  align-self: stretch;
   color: #666666;
+  font-family: Pretendard;
   font-size: 16px;
+  font-style: normal;
   font-weight: 500;
+  line-height: 140%;
   margin: 0 0 26px 22px;
 `;
 
@@ -63,7 +61,12 @@ const StyledCalendar = styled(Calendar)`
 
   .react-calendar__month-view__weekdays {
     text-align: left;
-    color: #aaaaaa;
+    color: #666666;
+    font-family: Pretendard;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 140%;
 
     div:nth-child(1) {
       color: #eb8a8a;
@@ -71,21 +74,35 @@ const StyledCalendar = styled(Calendar)`
   }
 
   .react-calendar__month-view__weekdays__weekday {
-    padding: 7px 8px;
+    display: flex;
+    padding: 8px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    align-self: stretch;
     border-right: 1px solid #ebf4ef;
+
     &:last-child {
       border-right: none;
     }
   }
 
   .react-calendar__tile {
-    height: 118px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    flex: 1 0 0;
+    align-self: stretch;
     border-top: 1px solid #ebf4ef;
     border-right: 1px solid #ebf4ef;
     color: #666666;
-    display: flex;
-    align-items: flex-start;
-    padding: 8px;
+    font-family: Pretendard;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 140%;
+    height: 135px;
   }
 
   .react-calendar__month-view__days > .react-calendar__tile:nth-child(7n) {
@@ -114,7 +131,51 @@ const StyledCalendar = styled(Calendar)`
   }
 `;
 
-function CustomCalendar() {
+const TaskMarkerContainer = styled.div`
+  display: flex;
+  padding-left: 5px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  align-self: stretch;
+
+  span {
+    color: #3982e2;
+    text-align: center;
+    font-family: Pretendard;
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+`;
+
+const TaskMarker = styled.div`
+  display: flex;
+  height: 25px;
+  padding: 8px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  align-self: stretch;
+  border-radius: 50px 0px 0px 50px;
+  background: #2bae66;
+  color: white;
+  font-family: Pretendard;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+`;
+
+interface CustomCalendarProps {
+  tasks: { name: string; deadline: string }[];
+}
+
+function CustomCalendar({ tasks }: CustomCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date()); // 선택한 날짜
   const [viewDate, setViewDate] = useState(new Date()); // 캘린더에 표시되는 월
 
@@ -164,6 +225,41 @@ function CustomCalendar() {
           if (!isSameMonth(date, viewDate)) return 'neighboringMonth';
           if (isSameMonth(date, viewDate) && isSunday(date))
             return 'currentMonthSunday';
+          return null;
+        }}
+        tileContent={({ date }) => {
+          const formattedDate = date
+            .toLocaleDateString('ko-KR', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            })
+            .replace(/\\./g, '-');
+
+          const tasksForDate = tasks.filter((task) => {
+            const taskDate = new Date(task.deadline);
+            const localDate = taskDate
+              .toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              })
+              .replace(/\\./g, '-');
+            return localDate === formattedDate;
+          });
+
+          if (tasksForDate.length > 0) {
+            return (
+              <TaskMarkerContainer>
+                {tasksForDate.slice(0, 2).map((task, index) => (
+                  <TaskMarker key={index}>{task.name}</TaskMarker>
+                ))}
+                {tasksForDate.length > 2 && (
+                  <span>총 {tasksForDate.length}개</span>
+                )}
+              </TaskMarkerContainer>
+            );
+          }
           return null;
         }}
         onClickDay={(value) => setCurrentDate(value)}
