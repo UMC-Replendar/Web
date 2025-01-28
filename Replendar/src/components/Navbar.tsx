@@ -114,6 +114,7 @@ const ProfileWrapper = styled.div`
 
 const UserContainer = styled.div`
   display: flex;
+  align-items: center;
   gap: 10px;
   padding: 10px 15px;
   border-radius: 0px; /* 둥근 모서리 적용 */
