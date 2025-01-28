@@ -1844,6 +1844,7 @@ box-shadow: 0px 5px 15.7px 0px rgba(177, 198, 187, 0.4);
   gap: 47px;
 `,xs=j.div`
   display: flex;
+  align-items: center;
   gap: 10px;
   padding: 10px 15px;
   border-radius: 0px; /* 둥근 모서리 적용 */
@@ -2012,4 +2013,4 @@ textarea:not([rows]) {
 :target {
   scroll-margin-block: 5ex;
 }
-`;var lA={};Sv.createRoot(document.getElementById("root")).render(f.jsx(k.StrictMode,{children:f.jsx(Ub,{basename:lA.PUBLIC_URL,children:f.jsxs(b3,{theme:aA,children:[f.jsx(rA,{}),f.jsx(P7,{})]})})}));
+`;var lA={};const iA=lA.PUBLIC_URL;Sv.createRoot(document.getElementById("root")).render(f.jsx(k.StrictMode,{children:f.jsx(Ub,{basename:iA,children:f.jsxs(b3,{theme:aA,children:[f.jsx(rA,{}),f.jsx(P7,{})]})})}));
