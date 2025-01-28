@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import BookmarkIcon from '../assets/images/BookmarkIcon.svg';
 // import CalendarIcon from '../assets/images/CalendarIcon.svg';
@@ -9,7 +9,7 @@ import ToggleSwitch from '../components/OngoingComponents/ToggleSwitch';
 
 interface AddTaskModalProps {
   onClose: () => void;
-  onAddTask: (name: string, deadline: string) => void;
+  onAddTask: (name: string, deadline: string, time: string) => void;
 }
 
 const ModalOverlay = styled.div`
@@ -19,12 +19,44 @@ const ModalOverlay = styled.div`
   align-items: flex-start;
   padding: 60px 68px 28px 68px;
   gap: 51px;
-  width: 74%;
+  width: 84%;
   height: auto;
   background: #fcf6f5;
   border-radius: 20px;
   box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
   z-index: 1000;
+`;
+
+const SelectFriendsModal = styled.div`
+  position: absolute;
+  width: 452px;
+  height: 461px;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.25);
+  z-index: 2000;
+`;
+
+const SelectFriendsModalTitle = styled.h5`
+  font-size: 23px;
+  font-weight: 600;
+  margin: 24px 0 50px 24px;
+`;
+
+const FriendsList = styled.ul`
+  display: flex;
+  width: 392px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+`;
+
+const FriendsItem = styled.li`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  align-self: stretch;
 `;
 
 const Header = styled.div`
@@ -39,6 +71,10 @@ const TitleContainer = styled.div`
   padding: 8px 8px 8px 0px;
   align-items: center;
   gap: 8px;
+
+  img {
+    cursor: pointer;
+  }
 `;
 
 const Title = styled.h4`
@@ -82,7 +118,7 @@ const Input = styled.input`
   align-items: center;
   gap: 8px;
   border-radius: 5px;
-  border: none;
+  border: 1px solid #e8e8e8;
   background: white;
   color: #666666;
   font-size: 19px;
@@ -98,7 +134,7 @@ const TaskNameSection = styled.div`
 const TaskDeadlineSection = styled.div`
   display: flex;
   align-items: center;
-  gap: 77px;
+  gap: 72px;
 `;
 
 const OpenSettingSection = styled.div`
@@ -180,11 +216,15 @@ const MemoSection = styled.div`
   width: 100%;
 `;
 
-const MemoInput = styled.input`
+const MemoInput = styled.textarea`
+  flex-grow: 1;
   height: 295px;
+  padding: 10px;
   border-radius: 10px;
   border: 1px solid #d5d5d5;
-  flex-grow: 1;
+  background: white;
+  font-size: 16px;
+  font-weight: 500;
 `;
 
 const ActionButtons = styled.div`
@@ -197,9 +237,22 @@ const ActionButtons = styled.div`
 function AddTaskModal({ onClose, onAddTask }: AddTaskModalProps) {
   const [taskName, setTaskName] = useState('');
   const [deadline, setDeadline] = useState('');
+  const [time, setTime] = useState('');
+  const [placeholderDate, setPlaceholderDate] = useState('');
   const [isPublic, setIsPublic] = useState(true);
   const [isOn, setIsOn] = useState(false);
   const [alarmCount, setAlarmCount] = useState(3);
+  const [friendsPopupOpen, setFriendsPopupOpen] = useState(false);
+  const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
+  const [friends, setFriends] = useState<string[]>([]);
+
+  useEffect(() => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    setPlaceholderDate(`${year} / ${month} / ${day}`);
+  }, []);
 
   const handleComplete = () => {
     if (!taskName.trim()) {
@@ -210,7 +263,7 @@ function AddTaskModal({ onClose, onAddTask }: AddTaskModalProps) {
       alert('마감일을 선택해주세요.');
       return;
     }
-    onAddTask(taskName, deadline);
+    onAddTask(taskName, deadline, time);
   };
 
   return (
@@ -237,9 +290,18 @@ function AddTaskModal({ onClose, onAddTask }: AddTaskModalProps) {
         <TaskDeadlineSection>
           <Label>과제 마감일</Label>
           <Input
-            type="date"
+            type="text"
             value={deadline}
+            placeholder={placeholderDate}
             onChange={(e) => setDeadline(e.target.value)}
+            maxLength={10}
+          />
+          <Input
+            type="text"
+            value={time}
+            placeholder="23:55"
+            onChange={(e) => setTime(e.target.value)}
+            maxLength={5}
           />
         </TaskDeadlineSection>
       </Section>
@@ -288,11 +350,22 @@ function AddTaskModal({ onClose, onAddTask }: AddTaskModalProps) {
 
       <ShareSection>
         <Label>공유할 친구</Label>
-        <PlusFriendsButton>
+        <PlusFriendsButton onClick={() => setFriendsPopupOpen(true)}>
           <img src={GrayPlusIcon} alt="Gray Plus Icon" />
           추가
         </PlusFriendsButton>
       </ShareSection>
+
+      {friendsPopupOpen && (
+        <SelectFriendsModal>
+          <SelectFriendsModalTitle>공유할 친구 선택</SelectFriendsModalTitle>
+          <FriendsList>
+            {friends.map((friend) => (
+              <FriendsItem key={friend}></FriendsItem>
+            ))}
+          </FriendsList>
+        </SelectFriendsModal>
+      )}
 
       <MemoSection>
         <Label>메모</Label>
