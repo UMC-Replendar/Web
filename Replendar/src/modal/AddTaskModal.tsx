@@ -243,8 +243,7 @@ function AddTaskModal({ onClose, onAddTask }: AddTaskModalProps) {
   const [isOn, setIsOn] = useState(false);
   const [alarmCount, setAlarmCount] = useState(3);
   const [friendsPopupOpen, setFriendsPopupOpen] = useState(false);
-  const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
-  const [friends, setFriends] = useState<string[]>([]);
+  const [friends] = useState<string[]>([]);
 
   useEffect(() => {
     const today = new Date();
