@@ -9,7 +9,7 @@ import { GlobalStyle } from './assets/css/GlobalStyle.ts';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={process.env.PUBLIC_URL}>
       <ThemeProvider theme={theme}>
         <GlobalStyle />
         <App />
