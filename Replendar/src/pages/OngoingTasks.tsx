@@ -5,6 +5,8 @@ import AddTaskModal from '../modal/AddTaskModal';
 import PlusIcon from '../assets/images/PlusIcon.svg';
 import DownArrowIcon from '../assets/images/DownArrowIcon.svg';
 import UpArrowIcon from '../assets/images/UpArrowIcon.svg';
+import EditTaskModal from '../modal/EditTaskModal';
+import useModalStore from '../store/modalStore';
 
 const PageWrapper = styled.div`
   margin-top: 79px;
@@ -218,6 +220,7 @@ function OngoingTasks() {
   const [visibleTasksCount, setVisibleTasksCount] = useState(
     tasks.length <= 3 ? tasks.length : 3
   );
+  const { openModal, closeModal } = useModalStore(); // useModalStore 추가했어요요
 
   useEffect(() => {
     const updateRemainingTimes = () => {
@@ -280,6 +283,16 @@ function OngoingTasks() {
   const handleCompleteTask = (index: number) => {
     setTasks((prevTasks) => prevTasks.filter((_, i) => i !== index));
   };
+  const handleEditTask = (task: TaskData) => {
+    console.log('Edit Task Clicked:', task); // 디버깅용 로그
+    openModal(
+      <EditTaskModal
+        task={task}
+        onClose={closeModal}
+        onComplete={() => handleCompleteTask(tasks.indexOf(task))}
+      />
+    ); // EditTaskModal 열기
+  };
 
   return (
     <PageWrapper>
@@ -324,6 +337,7 @@ function OngoingTasks() {
             name={task.name}
             remainingTime={task.remainingTime || ''}
             onComplete={() => handleCompleteTask(index)}
+            onEdit={() => handleEditTask(task)}
           />
         ))}
       </TaskBox>
@@ -347,17 +361,27 @@ interface TaskProps {
   name: string;
   remainingTime: string;
   onComplete: () => void;
+  onEdit: () => void; // 수정 버튼 이벤트 추가
 }
 
-function Task({ color, name, remainingTime, onComplete }: TaskProps) {
+function Task({ color, name, remainingTime, onComplete, onEdit }: TaskProps) {
   return (
-    <TaskBlockContainer>
-      <TaskBlock color={color}>
-        <TaskInfo>{name}</TaskInfo>
-        <TaskInfo>{remainingTime}</TaskInfo>
-      </TaskBlock>
-      <TaskCompleteButton onClick={onComplete}>과제 완료</TaskCompleteButton>
-    </TaskBlockContainer>
+    <>
+      <TaskBlockContainer onClick={onEdit}>
+        <TaskBlock color={color}>
+          <TaskInfo>{name}</TaskInfo>
+          <TaskInfo>{remainingTime}</TaskInfo>
+        </TaskBlock>
+        <TaskCompleteButton
+          onClick={(e) => {
+            e.stopPropagation(); // 이벤트 버블링 방지
+            onComplete();
+          }}
+        >
+          과제 완료
+        </TaskCompleteButton>
+      </TaskBlockContainer>
+    </>
   );
 }
 
