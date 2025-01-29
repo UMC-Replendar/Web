@@ -1,18 +1,19 @@
 import MenuSection from '../components/CommuComponents/menuSection';
 import styled from 'styled-components';
 import CommuModal from '../modal/commuModal';
+import useModalStore from '../store/modalStore';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  margin: 68px 0px 68px 0px;
   width: 100%;
+  gap: 59px;
   padding: 0 50px;
 `;
 const Community = () => {
   return (
     <>
-      <CommuModal />
       <Container>
         <MenuSection
           title="친구"

@@ -6,6 +6,7 @@ import NavBar from './Navbar';
 import { useLocation } from 'react-router-dom';
 // import OngoingTasks from './OngoingTasks';
 import Modal from '../modal/Modal';
+
 function App() {
   const location = useLocation();
 
@@ -15,6 +16,7 @@ function App() {
   return (
     <PageWrapper>
       <Modal />
+
       {!hideLayout && <Sidebar />}
 
       <MainWrapper>

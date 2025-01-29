@@ -6,7 +6,7 @@ const CommuModalContent: React.FC = () => {
   return (
     <>
       <FlexGroup>
-        /<Label>과제명</Label>
+        <Label>과제명</Label>
         <TransparentInput placeholder="과제 이름을 입력하세요"></TransparentInput>
       </FlexGroup>
       <FlexGroup>
@@ -63,7 +63,7 @@ const TransparentInput = styled.input`
 
 const Label = styled.label`
   text-align: right;
-  width: 100px;
+  width: 80px;
 `;
 const FlexGroup = styled.div`
   display: flex;
@@ -71,7 +71,8 @@ const FlexGroup = styled.div`
   padding: 5px;
 `;
 const FlexEndGroup = styled.label`
-  justify-content: flex-end;
-  display: flex;
-  padding: 5px;
+justify-content: flex-end;
+ display: flex;
+ padding: 5px;
+  }
 `;

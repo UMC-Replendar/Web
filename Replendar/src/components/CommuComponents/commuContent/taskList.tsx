@@ -8,30 +8,50 @@ import useModalStore from '../../../store/modalStore';
 import CommuModalContent from '../modalContents/commuModalContent';
 
 const Container = styled.div`
-  width: 95%;
-  background-color: white;
-  display: flex;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  flex-direction: column;
-  justify-content: spae-around;
-  padding: 10px 20px 10px 20px;
-  gap: 15px;
-  box-sizing: border-box;
-  border-collapse: collapse;
+  width: 100%;
 
+  display: flex;
+
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 20px;
+  box-sizing: border-box;
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0px 2.5px; /* 셀 간격 */
+  }
+  th {
+    color: #666;
+  }
   th,
   td {
+    height: 67px;
     text-align: center;
     vertical-align: middle;
     padding: 12px 15px;
     font-size: 19px;
+    background-color: white;
+  }
+  tr th:first-child,
+  tr td:first-child {
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+  }
+
+  /* 각 행(tr)의 마지막 셀을 오른쪽 둥글게 */
+  tr th:last-child,
+  tr td:last-child {
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
   }
 `;
 const SpaceBtwDiv = styled.div`
   div {
     gap: 20px;
     display: flex;
+    width: 200px;
   }
   img {
     vertical-align: middle; /* 이미지 정렬 */
@@ -44,8 +64,14 @@ const SpaceBtwDiv = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  height: 67px;
+`;
+const AddButtonDiv = styled.div`
+  display: flex;
+  justify-content: start;
+  align-items: center;
   width: 95%;
-  margin: 30px 0px 0px 0px;
 `;
 
 const TaskList: React.FC<{ expanded: string }> = ({ expanded }) => {
@@ -57,58 +83,59 @@ const TaskList: React.FC<{ expanded: string }> = ({ expanded }) => {
     openModal(<CommuModalContent />);
   };
   return (
-    <>
+    <Container>
       <SpaceBtwDiv>
-        <AddButton onClick={handleOpenModal}>
-          과제 추가하기
-          <img src={PlusIcon} alt="Plus Icon" />
-        </AddButton>
+        <AddButtonDiv>
+          {' '}
+          <AddButton onClick={handleOpenModal}>
+            과제 추가하기
+            <img src={PlusIcon} alt="Plus Icon" />
+          </AddButton>
+        </AddButtonDiv>
+
         <div>
           <span>2학년</span>
           <span>정렬</span>
-          <span>교수명</span>
           <span>
             교수명 <img src={DownArrow} alt="DownArrow Icon" />
           </span>
         </div>
       </SpaceBtwDiv>
 
-      <Container>
-        <table>
-          <thead>
-            <tr>
-              <th>학년</th>
-              <th>등록일</th>
-              <th>교수</th>
-              <th>강좌</th>
-              <th>과제명</th>
-              <th>마감일</th>
-              <th>과제등록</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.slice(0, visibleItems).map((item, index) => (
-              <tr key={index}>
-                <td>{item.grade}</td>
-                <td>{item.registrationDate}</td>
-                <td>{item.professor}</td>
-                <td>{item.course}</td>
-                <td>{item.assignment}</td>
-                <td>{item.deadline}</td>
+      <table>
+        <thead>
+          <tr>
+            <th>학년</th>
+            <th>등록일</th>
+            <th>교수</th>
+            <th>강좌</th>
+            <th>과제명</th>
+            <th>마감일</th>
+            <th>과제등록</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.slice(0, visibleItems).map((item, index) => (
+            <tr key={index}>
+              <td>{item.grade}</td>
+              <td>{item.registrationDate}</td>
+              <td>{item.professor}</td>
+              <td>{item.course}</td>
+              <td>{item.assignment}</td>
+              <td>{item.deadline}</td>
 
-                <td>
-                  {item.isRegistered ? (
-                    <BlueButton status="등록됨">등록됨</BlueButton>
-                  ) : (
-                    <BlueButton>내 일정에 등록</BlueButton>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Container>
-    </>
+              <td>
+                {item.isRegistered ? (
+                  <BlueButton status="등록됨">등록됨</BlueButton>
+                ) : (
+                  <BlueButton>내 일정에 등록</BlueButton>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Container>
   );
 };
 

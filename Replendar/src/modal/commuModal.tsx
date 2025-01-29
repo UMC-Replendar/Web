@@ -8,7 +8,7 @@ const Overlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  /*background: rgba(0, 0, 0, 0.5);*/
+  background: transparent;!important
   display: flex;
   align-items: center;
   justify-content: center;
@@ -34,7 +34,7 @@ const CloseButton = styled.button`
   color: #333;
 `;
 
-const commuModal: React.FC = () => {
+const CommuModal: React.FC = () => {
   const { isOpen, content, closeModal } = useModalStore();
 
   if (!isOpen) return null;
@@ -43,10 +43,10 @@ const commuModal: React.FC = () => {
     <Overlay onClick={closeModal}>
       <ModalContent onClick={(e) => e.stopPropagation()}>
         <CloseButton onClick={closeModal}>X</CloseButton>
-        {content}
+        {content}tq rmslrK dlrp ansirh
       </ModalContent>
     </Overlay>
   );
 };
 
-export default commuModal;
+export default CommuModal;

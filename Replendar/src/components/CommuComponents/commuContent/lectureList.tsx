@@ -5,7 +5,7 @@ import PlusIcon from '../../../assets/images/PlusIcon.svg';
 const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const visibleItems = expanded === 'true' ? 10 : 3;
   return (
-    <>
+    <Container>
       <AddButtonDiv>
         <AddButton>
           과제 추가하기
@@ -13,50 +13,67 @@ const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
         </AddButton>
       </AddButtonDiv>
 
-      <Container>
-        <table>
-          <thead>
-            <tr>
-              <th>학년</th>
-              <th>교수</th>
-              <th>강좌</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.slice(0, visibleItems).map((item, index) => (
-              <tr key={index}>
-                <td>{item.grade}</td>
+      <table>
+        <thead>
+          <tr>
+            <th>학년</th>
+            <th>교수</th>
+            <th>강좌</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.slice(0, visibleItems).map((item, index) => (
+            <tr key={index}>
+              <td>{item.grade}</td>
 
-                <td>{item.professor}</td>
-                <td>{item.course}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Container>
-    </>
+              <td>{item.professor}</td>
+              <td>{item.course}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Container>
   );
 };
 
 export default LectureList;
 const Container = styled.div`
-  width: 95%;
-  background-color: white;
-  display: flex;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  flex-direction: column;
-  justify-content: flex-start;
-  padding: 10px 20px 10px 20px;
-  gap: 15px;
-  box-sizing: border-box;
+  width: 100%;
 
+  display: flex;
+
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 20px;
+  box-sizing: border-box;
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0px 2.5px; /* 셀 간격 */
+  }
+  th {
+    color: #666;
+  }
   th,
   td {
+    height: 67px;
     text-align: center;
     vertical-align: middle;
     padding: 12px 15px;
     font-size: 19px;
+    background-color: white;
+  }
+  tr th:first-child,
+  tr td:first-child {
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+  }
+
+  /* 각 행(tr)의 마지막 셀을 오른쪽 둥글게 */
+  tr th:last-child,
+  tr td:last-child {
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
   }
 `;
 const AddButtonDiv = styled.div`
@@ -64,7 +81,7 @@ const AddButtonDiv = styled.div`
   justify-content: start;
   align-items: center;
   width: 95%;
-  margin: 30px 0px 0px 0px;
+  height: 67px;
 `;
 
 //임시데이터

@@ -2,15 +2,14 @@ import styled from 'styled-components';
 import { NineDots } from '../commuIcons';
 
 const Container = styled.div`
-  width: 95%;
-  background-color: white;
+  width: 100%;
+
   display: flex;
-  margin-top: 20px;
-  margin-bottom: 20px;
+
   flex-direction: column;
-  justify-content: spae-around;
-  padding: 10px 20px 10px 20px;
-  gap: 15px;
+  justify-content: space-around;
+  padding: 20px;
+  gap: 2px;
   box-sizing: border-box;
 `;
 
@@ -19,11 +18,18 @@ const SpaceBtwDiv = styled.div`
   justify-content: space-between;
   gap: 100px; /* 갭 조정 */
   width: 100%;
-  font-size: 12px;
+  font-size: 19px;
+  height: 67px;
+  background: white;
+  border-radius: 20px;
+  padding: 0px 30px;
 `;
 
 const RightAlignedItem = styled.div`
   margin-left: auto; /* 오른쪽 끝에 배치 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const CenterDiv = styled.div<{ width?: string }>`
@@ -40,11 +46,13 @@ const FlexDiv = styled.div`
     object-fit: cover;
   }
   display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 20px;
 `;
 
 const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
-  const visibleItems = expanded === 'true' ? 10 : 5;
+  const visibleItems = expanded === 'true' ? 12 : 5;
 
   return (
     <Container>
@@ -94,6 +102,12 @@ const data = [
   },
   {
     id: 5,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
     image: 'src/assets/images/프로필 사진.png',
     nickname: 'BugHunter',
     ongoingTaskNum: 1,
