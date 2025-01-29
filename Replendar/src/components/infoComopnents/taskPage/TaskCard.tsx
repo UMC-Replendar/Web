@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import BlueButton from '../../blueButton';
 import { Task } from '../../../types';
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -37,22 +38,20 @@ const Text = styled.div`
   font-size: 28px;
   font-family: Pretendard, sans-serif;
 `;
-const WhiteBox = styled.div<{ showDetails: boolean }>`
+
+const WhiteBox = styled.div`
   background-color: white;
   border-radius: 20px;
   width: 100%;
-  height: ${({ showDetails }) =>
-    showDetails ? '90%' : '100%'}; //보였을 때 안보였을 때 높이 차이
+  padding: 20px;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1px; //항목 별 간격 유지
 `;
 
 const TaskItem = styled.div`
-  width: 100%;
-  padding: 20px;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
 `;
 
 const TaskDetails = styled.div`
@@ -73,6 +72,7 @@ const DelayMessage = styled.div<{ isEarly: boolean }>`
   font-weight: 500;
   margin-top: 5px;
 `;
+
 const TaskText = styled.div`
   color: black;
   font-size: 19px;
@@ -113,7 +113,7 @@ interface TaskCardProps {
   imageSrc: string;
   title: string;
   tasks: Task[];
-  showDetails?: boolean; // (기본값: true)
+  showDetails?: boolean;
 }
 
 const TaskCard = ({
@@ -130,41 +130,42 @@ const TaskCard = ({
       </Wrapper>
 
       <Box>
-        {showDetails && ( // showDetails가 true일 때만 렌더링 보관된 vs 완료된 차이를 위하여
+        {showDetails && (
           <StoreContainer>
             <StoreText>마감일</StoreText>
             <StoreText>만료여부</StoreText>
             <StoreText>과제명</StoreText>
           </StoreContainer>
         )}
-        <WhiteBox showDetails={showDetails}>
-          {tasks.map((task, index) => {
-            const isEarly = task.delay.includes('빨랐습니다');
-            const isValid = task.delay === '유효';
-            return (
-              <div key={index}>
-                <TaskItem>
-                  <TaskDetails>
-                    <TaskText>{task.date}</TaskText>
-                    {!showDetails && <TaskText>{task.time}</TaskText>}
-                    {showDetails && (
-                      <TaskStatus isValid={isValid}>{task.delay}</TaskStatus>
-                    )}
-                    <TaskText>{task.description}</TaskText>
-                  </TaskDetails>
-                  {!showDetails && (
-                    <BlueButton status={task.status}>{task.status}</BlueButton>
+
+        {tasks.map((task, index) => {
+          const isEarly = task.delay.includes('빨랐습니다');
+          const isValid = task.delay === '유효';
+          return (
+            <WhiteBox key={index}>
+              {' '}
+              <TaskItem>
+                <TaskDetails>
+                  <TaskText>{task.date}</TaskText>
+                  {!showDetails && <TaskText>{task.time}</TaskText>}
+                  {showDetails && (
+                    <TaskStatus isValid={isValid}>{task.delay}</TaskStatus>
                   )}
-                </TaskItem>
+                  <TaskText>{task.description}</TaskText>
+                </TaskDetails>
                 {!showDetails && (
-                  <DelayMessage isEarly={isEarly}>{task.delay}</DelayMessage>
+                  <BlueButton status={task.status}>{task.status}</BlueButton>
                 )}
-              </div>
-            );
-          })}
-        </WhiteBox>
+              </TaskItem>
+              {!showDetails && (
+                <DelayMessage isEarly={isEarly}>{task.delay}</DelayMessage>
+              )}
+            </WhiteBox>
+          );
+        })}
       </Box>
     </Container>
   );
 };
+
 export default TaskCard;

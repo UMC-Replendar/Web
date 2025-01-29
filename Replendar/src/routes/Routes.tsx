@@ -18,7 +18,6 @@ import Redirect from '../components/LoginComponents/Redirect';
 import NotCompletedTaskPage from '../components/infoComopnents/taskPage/NotCompletedTaskPage';
 import ImportantTaskPage from '../components/infoComopnents/taskPage/ImportantTaskPage';
 
-
 function Router() {
   return (
     <Routes>
