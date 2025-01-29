@@ -4,6 +4,7 @@ import Router from '../routes/Routes';
 import Sidebar from './Sidebar';
 import NavBar from './Navbar';
 import { useLocation } from 'react-router-dom';
+
 import Modal from '../modal/Modal';
 
 function App() {
