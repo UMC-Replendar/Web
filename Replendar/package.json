@@ -7,16 +7,17 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist",
+    "predeploy": "yarn build"
   },
   "dependencies": {
     "@types/axios": "^0.14.4",
     "@types/react-router-dom": "^5.3.3",
     "@types/styled-components": "^5.1.34",
     "axios": "^1.7.9",
-
     "dayjs": "^1.11.13",
-
+    "gh-pages": "^6.3.0",
     "react": "^19.0.0",
     "react-calendar": "^5.1.0",
     "react-dom": "^19.0.0",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@types/node": "^22.12.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
@@ -37,5 +39,6 @@
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.18.2",
     "vite": "^6.0.5"
-  }
+  },
+  "homepage": "https://UMC-Replendar.github.io/Web/"
 }

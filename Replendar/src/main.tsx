@@ -7,9 +7,12 @@ import { ThemeProvider } from 'styled-components';
 import theme from './assets/css/Theme.tsx';
 import { GlobalStyle } from './assets/css/GlobalStyle.ts';
 
+const basename =
+  process.env.NODE_ENV === 'production' ? process.env.PUBLIC_URL : '/';
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <ThemeProvider theme={theme}>
         <GlobalStyle />
         <App />
