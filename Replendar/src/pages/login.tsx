@@ -109,7 +109,6 @@ function Login() {
     const REDIRECT_URI: string = import.meta.env.VITE_REDIRECT_URI_KAKAO; // Callback URL
     const KAKAO_AUTH_URL: string = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}`;
     window.location.href = KAKAO_AUTH_URL;
-    // 예: window.Kakao.Auth.login({...});
   };
 
   return (
