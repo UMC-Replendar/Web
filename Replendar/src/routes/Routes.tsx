@@ -35,7 +35,7 @@ function Router() {
       <Route path="/history" element={<HistoryPage />}></Route>
       <Route path="/signup" element={<SignUp />}></Route>
 
-      <Route path="/auth" element={<Redirect />}></Route>
+      <Route path="/callback" element={<Redirect />}></Route>
 
       <Route path="/notcompleted" element={<NotCompletedTaskPage />}></Route>
       <Route path="/important" element={<ImportantTaskPage />}></Route>
