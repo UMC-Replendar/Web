@@ -16,6 +16,7 @@ function App() {
   return (
     <PageWrapper>
       <Modal />
+
       {!hideLayout && <Sidebar />}
 
       <MainWrapper>

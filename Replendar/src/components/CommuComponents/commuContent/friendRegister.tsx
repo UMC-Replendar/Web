@@ -44,7 +44,7 @@ const friendRegister = () => {
     }
   };
   return (
-    <>
+    <Container>
       <InputContainer>
         <SearchIcon src="src/assets/images/search.svg" alt="Search Icon" />
         <SearchInput
@@ -52,7 +52,7 @@ const friendRegister = () => {
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder="등록할 친구의 이름을 입력해주세요"
-        />
+        ></SearchInput>
         <SearchBtn onClick={handleSearch}>검색</SearchBtn>
       </InputContainer>
       <EmptyDiv>
@@ -72,12 +72,12 @@ const friendRegister = () => {
               </FlexAlignStart>
             </ProfileContainer>
             <FlexDiv>
-              <SearchBtn width={'90px'}>친구요청</SearchBtn>
+              <SearchBtn width={'134px'}>친구요청</SearchBtn>
             </FlexDiv>
           </>
         ) : null}
       </EmptyDiv>
-    </>
+    </Container>
   );
 };
 
@@ -100,6 +100,13 @@ const userData = [
 ];
 
 export default friendRegister;
+
+const Container = styled.div`
+  width: 100%;
+
+  height: 383px;
+`;
+
 const FlexAlignStart = styled.div`
   display: flex;
   flex-direction: column;
@@ -109,75 +116,80 @@ const FlexAlignStart = styled.div`
 
 const NoMarginH3 = styled.h3`
   margin: 0px;
+  font-size: 19px;
 `;
 const NoMarginP = styled.p`
   margin: 10px 0px 0px 0px;
   color: #666;
-  font-size: 13px;
+  font-size: 16px;
 `;
 
 const FlexDiv = styled.div<{ width?: string }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100px;
+  height: 130px;
   width: ${(props) => props.width || 'auto'};
 `;
 const ProfileContainer = styled.div`
   background-color: white;
   border-radius: 20px;
-  width: 900px;
-  margin-left: 20px;
+  width: 75%;
+  margin-left: 40px;
   display: flex;
   gap: 40px;
   padding: 20px;
+  border: 1px solid rgba(232, 232, 232, 1);
+  height: 132px;
 `;
 const SearchIcon = styled.img`
   position: absolute;
   top: 50%;
-  left: 10px;
+  left: 20px;
   transform: translateY(-50%);
-  z-index: 1; /* 인풋보다 위에 배치 */
-  margin-left: 20px;
+  z-index: 1;
+  margin-left: 40px;
 `;
 
 const SearchInput = styled.input`
-  width: 900px;
-  padding-left: 50px; /* 이미지가 겹치지 않도록 왼쪽 패딩 추가 */
-  margin-left: 20px;
-  height: 40px;
+  width: 75%;
+  padding-left: 50px; 
+  margin-left: 40px;
+  height:100%;
   border-radius: 50px;
   border: 1px solid rgba(232, 232, 232, 1);
-  font-size: 12px;
+  font-size: 19px;
   &:focus {
     outline: none;
-  } /* 기본 focus outline을 제거 */
+
 `;
 const SearchBtn = styled.button<{ width?: string }>`
   color: rgba(102, 102, 102, 1);
-  border-radius: 15px;
+  border-radius: 20px;
 
-  border: 1px solid #ccc;
+  border: 1px solid #e8e8e8;
   margin-left: 40px;
   background-color: white;
-  height: 40px;
-  width: ${(props) => props.width || '60px'};
-  font-size: 12px;
+  height: 60px;
+  width: ${(props) => props.width || '97px'};
+  font-size: 19px;
 `;
 
 const InputContainer = styled.div`
   position: relative;
-  margin: 20px;
+  margin: 30px 0px;
+
   align-items: center;
   width: 100%;
-  height: 40px;
+  height: 60px;
   box-sizing: border-box;
 `;
 
 const EmptyDiv = styled.div`
   width: 100%;
-  height: 197px;
+  height: 230px;
   display: flex;
   justify-content: start;
   align-items: start;
+  margin-top: 10px;
 `;
