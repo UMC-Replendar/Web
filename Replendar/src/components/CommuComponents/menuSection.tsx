@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { MoreIcon } from './commuIcons';
-import { CloseIcon } from './commuIcons';
+
 import MenuContent from './menuContent';
 import DownArrowIcon from '../../assets/images/DownArrowIcon.svg';
 import UpArrowIcon from '../../assets/images/UpArrowIcon.svg';
-import More from '../../pages/OngoingTasks';
 
 interface MenuSectionProps {
   title: string;

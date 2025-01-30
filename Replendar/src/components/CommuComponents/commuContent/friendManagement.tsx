@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { PlusFriendsButton } from '../../../modal/AddTaskModal';
 import DownArrow from '../../../assets/images/downArrow.svg';
 import UpArrow from '../../../assets/images/upArrow.svg';
 import { AddButton } from '../../../pages/OngoingTasks';
