@@ -1,7 +1,5 @@
 import MenuSection from '../components/CommuComponents/menuSection';
 import styled from 'styled-components';
-import CommuModal from '../modal/commuModal';
-import useModalStore from '../store/modalStore';
 
 const Container = styled.div`
   display: flex;
