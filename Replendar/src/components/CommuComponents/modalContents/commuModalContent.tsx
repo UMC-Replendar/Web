@@ -6,7 +6,7 @@ const CommuModalContent: React.FC = () => {
   return (
     <>
       <FlexGroup>
-        /<Label>과제명</Label>
+        <Label>과제명</Label>
         <TransparentInput placeholder="과제 이름을 입력하세요"></TransparentInput>
       </FlexGroup>
       <FlexGroup>
@@ -49,7 +49,7 @@ const CommuModalContent: React.FC = () => {
 export default CommuModalContent;
 
 const MemoDiv = styled.div`
-  backgroud-color: white;
+  background-color: white;
   width: 300px;
   height: 200px;
   border: solid 1px black;
@@ -63,7 +63,7 @@ const TransparentInput = styled.input`
 
 const Label = styled.label`
   text-align: right;
-  width: 100px;
+  width: 80px;
 `;
 const FlexGroup = styled.div`
   display: flex;

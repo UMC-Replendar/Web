@@ -18,7 +18,6 @@ import Redirect from '../components/LoginComponents/Redirect';
 import NotCompletedTaskPage from '../components/infoComopnents/taskPage/NotCompletedTaskPage';
 import ImportantTaskPage from '../components/infoComopnents/taskPage/ImportantTaskPage';
 
-
 function Router() {
   return (
     <Routes>
@@ -36,7 +35,7 @@ function Router() {
       <Route path="/history" element={<HistoryPage />}></Route>
       <Route path="/signup" element={<SignUp />}></Route>
 
-      <Route path="/auth" element={<Redirect />}></Route>
+      <Route path="/callback" element={<Redirect />}></Route>
 
       <Route path="/notcompleted" element={<NotCompletedTaskPage />}></Route>
       <Route path="/important" element={<ImportantTaskPage />}></Route>

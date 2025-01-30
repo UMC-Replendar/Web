@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Characters from '../assets/images/SideBarIcons/Characters.svg';
-import HomeImg from '../assets/images/HomeIcon.png';
-import CommunityIcon from '../assets/images/CommunityIcon.png';
-import InfoIcon from '../assets/images/InfoIcon.png';
-import SettingsIcon from '../assets/images/SettingsIcon.png';
+import HomeImg from '../assets/images/SideBarIcons/Home.svg';
+import CommunityIcon from '../assets/images/SideBarIcons/Community.svg';
+import InfoIcon from '../assets/images/SideBarIcons/Profile.svg';
+import SettingsIcon from '../assets/images/SideBarIcons/Settings.svg';
 import { Link, useLocation } from 'react-router-dom';
 import { useThemeStore, themeColors } from '../store/ThemeStore';
 

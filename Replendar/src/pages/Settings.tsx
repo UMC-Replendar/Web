@@ -53,8 +53,8 @@ const SettingsWrapper = styled.div`
   flex-direction: column;
   display: flex;
   justify-content: center;
-  align-items: center;
-  margin-left: 50px;
+  align-items: flex-start;
+  margin-left: 100px;
   margin-top: 70px;
   /* width: 100%; */
   gap: 20px;

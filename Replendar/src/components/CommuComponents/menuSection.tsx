@@ -3,6 +3,9 @@ import styled from 'styled-components';
 import { MoreIcon } from './commuIcons';
 import { CloseIcon } from './commuIcons';
 import MenuContent from './menuContent';
+import DownArrowIcon from '../../assets/images/DownArrowIcon.svg';
+import UpArrowIcon from '../../assets/images/UpArrowIcon.svg';
+import More from '../../pages/OngoingTasks';
 
 interface MenuSectionProps {
   title: string;
@@ -25,7 +28,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, menuItems }) => {
     }));
 
   return (
-    <>
+    <div>
       <Gaph2>{title}</Gaph2>
       <SpaceBtwDiv>
         <BtnContainer>
@@ -35,11 +38,13 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, menuItems }) => {
             </CustomBtn>
           ))}
         </BtnContainer>
-        {menuState.expanded ? (
-          <CloseIcon onClick={handleExpandClick} />
-        ) : (
-          <MoreIcon onClick={handleExpandClick} />
-        )}
+        <FlexDiv onClick={handleExpandClick}>
+          {menuState.expanded ? '닫기' : '더보기'}
+          <img
+            src={menuState.expanded ? UpArrowIcon : DownArrowIcon}
+            alt={menuState.expanded ? 'Up Arrow' : 'Down Arrow'}
+          />
+        </FlexDiv>
       </SpaceBtwDiv>
       <StyledDiv>
         <MenuContent
@@ -47,19 +52,26 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, menuItems }) => {
           expanded={menuState.expanded.toString()}
         ></MenuContent>
       </StyledDiv>
-    </>
+    </div>
   );
 };
 
 export default MenuSection;
 
+const FlexDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #666;
+  font-size: 16px;
+  gap: 6px;
+`;
 const StyledDiv = styled.div`
   background: rgba(252, 246, 245, 1);
-  width: 100%;
+  width: 95%;
 
   border-radius: 20px;
   box-shadow: 0px 5px 15.7px 0px rgba(177, 198, 187, 0.4);
-  margin-bottom: 10px;
 
   display: flex;
   flex-direction: column;
@@ -69,14 +81,15 @@ const StyledDiv = styled.div`
 
 const CustomBtn = styled.button`
   background: rgba(243, 243, 243, 1);
-  width: 100px;
-  height: 30px;
-  border-radius: 50px;\
-border:none;
-font-size:10px;
-color:rgba(102, 102, 102, 1);
-padding:0px;
-box-shadow: 0px 5px 15.7px 0px rgba(177, 198, 187, 0.4);
+  width: 135px;
+  height: 38px;
+  border-radius: 50px;
+  border: none;
+  font-size: 16px;
+  color: rgba(102, 102, 102, 1);
+  padding: 0px;
+  box-shadow: 0px 5px 15.7px 0px rgba(177, 198, 187, 0.4);
+  margin-bottom: 15px;
 `;
 
 const BtnContainer = styled.div`
@@ -85,10 +98,10 @@ const BtnContainer = styled.div`
 `;
 
 const Gaph2 = styled.h2`
-  padding: 10px 0px;
-  margin: 0px;
+  margin: 0px 0px 30px 0px;
 `;
 const SpaceBtwDiv = styled.div`
+  width: 95%;
   display: flex;
   justify-content: space-between;
 `;

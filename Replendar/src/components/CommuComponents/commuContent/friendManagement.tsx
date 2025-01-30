@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { PlusFriendsButton } from '../../../modal/AddTaskModal';
 import DownArrow from '../../../assets/images/downArrow.svg';
 import UpArrow from '../../../assets/images/upArrow.svg';
-
+import { AddButton } from '../../../pages/OngoingTasks';
 import { useState } from 'react';
 import { PlusIcon } from '../commuIcons';
 import FriendList from './friendList';
@@ -15,7 +15,7 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
     new Array(data.length).fill(false)
   );
 
-  const visibleItems = expanded === 'true' ? 10 : 5;
+  const visibleItems = expanded === 'true' ? 10 : 4;
 
   const toggleGroup = (index: number) => {
     setShowGroups((prev) => {
@@ -32,10 +32,17 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
   };
   const handleMakeGroup = () => {
     openModal(<MakeGroup />);
-    console.log('그룹만들기');
   };
+
   return (
     <Container>
+      <AddButtonDiv>
+        <AddButton onClick={handleMakeGroup}>
+          친구 만들기
+          <PlusIcon />
+        </AddButton>
+      </AddButtonDiv>
+
       {data.slice(0, visibleItems).map((item, index) => (
         <div key={index}>
           <SpaceBtwDiv status={showGroups[index].toString()}>
@@ -49,9 +56,9 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
             </FlexDiv>
 
             {showGroups[index] && (
-              <div onClick={handleAddGroup}>
+              <FlexDiv onClick={handleAddGroup}>
                 그룹에 추가하기 <PlusIcon fill="white" />
-              </div>
+              </FlexDiv>
             )}
           </SpaceBtwDiv>
           {showGroups[index] && (
@@ -61,24 +68,28 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
           )}
         </div>
       ))}
-      <PlusFriendsButton onClick={handleMakeGroup}>
-        그룹 만들기
-      </PlusFriendsButton>
     </Container>
   );
 };
 
 export default FriendManagement;
-const Container = styled.div`
-  width: 95%;
-  background-color: white;
+
+const AddButtonDiv = styled.div`
   display: flex;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  justify-content: start;
+  align-items: center;
+  width: 95%;
+  height: 67px;
+`;
+const Container = styled.div`
+  width: 100%;
+
+  display: flex;
+
   flex-direction: column;
   justify-content: center;
-
-  gap: 15px;
+  padding: 20px;
+  gap: 2px;
   box-sizing: border-box;
 `;
 
@@ -87,13 +98,17 @@ const SpaceBtwDiv = styled.div<{ status: string }>`
   justify-content: space-between;
   background-color: ${(props) => (props.status === 'true' ? '#666' : 'white')};
   color: ${(props) => (props.status === 'true' ? 'white' : 'black')};
-  font-size: 19px;
-  padding: 10px 15px;
+  font-size: 23px;
+
+  height: 67px;
+  border-radius: 20px;
+  padding: 0px 30px;
 `;
 
 const FlexDiv = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
 `;
 //임시데이터
 const data = [
