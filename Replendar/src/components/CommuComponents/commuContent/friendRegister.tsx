@@ -3,12 +3,14 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import useGetData from '../../../hooks/useGetData';
+import { Register } from '../../../types';
+import axios from 'axios';
 
 const friendRegister = () => {
-  const [searchParams, setSearchParams] = useSearchParams({ mq: '' });
+  //const [searchParams, setSearchParams] = useSearchParams({ mq: '' });
 
   const navigate = useNavigate();
-  const mq = searchParams.get('mq');
+  //const mq = searchParams.get('mq');
   const [nickname, setNickname] = useState('');
 
   const [searchResult, setSearchResult] = useState<{
@@ -19,16 +21,35 @@ const friendRegister = () => {
     message: string;
   } | null>(null);
 
-  useEffect(() => {
+  /*useEffect(() => {
     setSearchParams({ mq: '' });
-  }, []);
+  }, []);*/
 
-  const {
+  const [token, setToken] = useState(null);
+
+  const getToken = async () => {
+    try {
+      const response = await axios.post(
+        'https://api.replendar.site//api/user/login',
+        {
+          email: '1',
+        }
+      );
+      setToken(response.data.token);
+      console.log('JWT 토큰:', response.data.token);
+    } catch (error) {
+      console.error('로그인 실패:', error);
+    }
+  };
+
+  /*const {
     data: movies,
     isLoading,
     isError,
-  } = useGetData(`/search/movie?query=${mq}`);
-
+  } = useGetData(
+    `https://api.replendar.site/api/friends/search?nickname=친구A&userId=1`
+  );
+  console.log(movies);
   if (isLoading) {
     return <div>스켈레톤 이미지</div>;
   }
@@ -36,6 +57,7 @@ const friendRegister = () => {
   if (isError) {
     return <h1>에러</h1>;
   }
+    */
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(e.target.value);
@@ -48,7 +70,11 @@ const friendRegister = () => {
   };
   const handleSearch = () => {
     const trimmedNickname = nickname.trim();
-    if (mq === trimmedNickname) return;
+    //if (mq === trimmedNickname) return;
+    /* {mq && searchResult === null ? (
+    <FlexDiv width="900px">검색 결과 '{nickname}'가 없습니다</FlexDiv>
+  ) : searchResult ? (
+    <>*/
     navigate(`/community?mq=${trimmedNickname}`);
 
     if (trimmedNickname !== '') {
@@ -69,9 +95,10 @@ const friendRegister = () => {
           placeholder="등록할 친구의 이름을 입력해주세요"
         ></SearchInput>
         <SearchBtn onClick={handleSearch}>검색</SearchBtn>
+        <button onClick={getToken}>여기다</button>
       </InputContainer>
       <EmptyDiv>
-        {mq && searchResult === null ? (
+        {searchResult === null ? (
           <FlexDiv width="900px">검색 결과 '{nickname}'가 없습니다</FlexDiv>
         ) : searchResult ? (
           <>
