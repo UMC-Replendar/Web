@@ -162,6 +162,7 @@ interface TaskData {
   deadline: string;
   remainingTime: string;
   isToggled: boolean;
+  isBookmarked: boolean;
 }
 
 function OngoingTasks() {
@@ -172,6 +173,7 @@ function OngoingTasks() {
       deadline: '2025-01-28T23:59:59',
       remainingTime: '',
       isToggled: false,
+      isBookmarked: false,
     },
     {
       color: '#2BAE66',
@@ -179,6 +181,7 @@ function OngoingTasks() {
       deadline: '2025-01-28T23:59:59',
       remainingTime: '',
       isToggled: false,
+      isBookmarked: false,
     },
     {
       color: '#25C26C',
@@ -186,6 +189,7 @@ function OngoingTasks() {
       deadline: '2025-01-28T23:59:59',
       remainingTime: '',
       isToggled: false,
+      isBookmarked: false,
     },
     {
       color: '#7AC19A',
@@ -193,6 +197,7 @@ function OngoingTasks() {
       deadline: '2025-01-28T23:59:59',
       remainingTime: '',
       isToggled: false,
+      isBookmarked: false,
     },
     {
       color: '#7AC19A',
@@ -200,6 +205,7 @@ function OngoingTasks() {
       deadline: '2025-01-30T23:59:59',
       remainingTime: '',
       isToggled: false,
+      isBookmarked: false,
     },
     {
       color: '#7AC19A',
@@ -207,6 +213,7 @@ function OngoingTasks() {
       deadline: '2025-01-30T23:59:59',
       remainingTime: '',
       isToggled: false,
+      isBookmarked: false,
     },
     {
       color: '#7AC19A',
@@ -214,6 +221,7 @@ function OngoingTasks() {
       deadline: '2025-01-30T23:59:59',
       remainingTime: '',
       isToggled: false,
+      isBookmarked: false,
     },
   ]);
 
@@ -263,6 +271,14 @@ function OngoingTasks() {
     setIsModalOpen(false);
   };
 
+  const [showBookmarked, setShowBookmarked] = useState(false); // 북마크 모드 여부
+  const filteredTasks = showBookmarked
+    ? tasks.filter((task) => task.isBookmarked)
+    : tasks;
+  const handleShowBookmarked = () => {
+    setShowBookmarked((prev) => !prev); // 북마크 모드 토글
+  };
+
   const handleAddTask = (name: string, deadline: string) => {
     const newTask: TaskData = {
       color: '#7AC19A',
@@ -270,6 +286,7 @@ function OngoingTasks() {
       deadline,
       remainingTime: '',
       isToggled: false,
+      isBookmarked: false,
     };
     setTasks((prevTasks) => {
       const updatedTasks = [...prevTasks, newTask];
@@ -301,7 +318,10 @@ function OngoingTasks() {
           <MainPageTitleBox>
             <MainPageTitle>진행 중인 과제</MainPageTitle>
           </MainPageTitleBox>
-          <MainPageTitleBox style={{ background: '#E8E8E8' }}>
+          <MainPageTitleBox
+            onClick={handleShowBookmarked}
+            style={{ background: showBookmarked ? '#FCF6F5' : '#E8E8E8' }}
+          >
             <MainPageTitle>중요한 과제</MainPageTitle>
           </MainPageTitleBox>
         </LeftTitles>

@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import LockIcon from '../assets/images/LockIcon.svg';
 import BookmarkIcon from '../assets/images/BookmarkIcon.svg';
+import ToggleSwitch from '../components/OngoingComponents/ToggleSwitch';
+
+const SmallToggleSwitch = styled(ToggleSwitch)`
+  transform: scale(0.8);
+`;
 
 interface TaskData {
   color: string;
@@ -75,47 +80,6 @@ const Input = styled.input`
   font-size: 16px;
   font-family: Pretendard;
   color: #666666;
-`;
-
-const ToggleSwitch = styled.label`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 12px;
-
-  input {
-    display: none;
-  }
-
-  .slider {
-    width: 40px;
-    height: 20px;
-    background: #ccc;
-    border-radius: 10px;
-    position: relative;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-
-  input:checked + .slider {
-    background: #2bae66;
-  }
-
-  .slider::before {
-    content: '';
-    width: 16px;
-    height: 16px;
-    background: white;
-    border-radius: 50%;
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    transition: 0.3s;
-  }
-
-  input:checked + .slider::before {
-    left: 22px;
-  }
 `;
 
 const AlarmContainer = styled.div`
@@ -215,34 +179,34 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         </TitleSection>
         <img src={BookmarkIcon} alt="Bookmark Icon" width={18} />
       </Header>
-      <GapBox>
-        {/* 과제 마감일 */}
-        <LabelGroup>
-          <Label>과제 마감일</Label>
-          <InputGroup>
-            <Input
-              type="date"
-              value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
-            />
-            <Input
-              type="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-            />
-          </InputGroup>
-        </LabelGroup>
 
-        {/* 알람 설정 */}
-        <ToggleSwitch>
-          <Label>알람 설정</Label>
-          <input
-            type="checkbox"
-            checked={isAlarmEnabled}
-            onChange={() => setIsAlarmEnabled(!isAlarmEnabled)}
+      {/* 과제 마감일 */}
+      <LabelGroup>
+        <Label>과제 마감일</Label>
+        <InputGroup>
+          <Input
+            type="date"
+            value={deadline}
+            onChange={(e) => setDeadline(e.target.value)}
           />
-          <span className="slider"></span>
-        </ToggleSwitch>
+          <Input
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+          />
+        </InputGroup>
+      </LabelGroup>
+      <GapBox>
+        {/* 알람 설정 */}
+        <AlarmContainer>
+          <Label>알람 설정</Label>
+          <div style={{ transform: 'scale(0.5)', display: 'inline-block' }}>
+            <SmallToggleSwitch
+              isOn={isAlarmEnabled}
+              onToggle={() => setIsAlarmEnabled(!isAlarmEnabled)}
+            />
+          </div>
+        </AlarmContainer>
 
         {/* 알람 주기 설정 */}
         <AlarmContainer>

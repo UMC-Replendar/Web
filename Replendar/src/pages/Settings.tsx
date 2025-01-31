@@ -1,9 +1,14 @@
 import styled from 'styled-components';
 import Setting from '../assets/images/Setting.png';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Settings() {
+  const navigate = useNavigate();
   const userId = '닉네임';
+
+  const LogoutClicked = () => {
+    navigate('/login');
+  };
 
   return (
     <SettingsWrapper>
@@ -14,10 +19,10 @@ function Settings() {
       <ComponentContainer>
         <SectionContainer>
           <SectionTitle>계정</SectionTitle>
-          <SectionLink>
-            <span>아이디</span>
-            <NicknameContainer> {userId}</NicknameContainer>
-          </SectionLink>
+          <FirstSectionLink>
+            <IdContainer>아이디</IdContainer>
+            <NicknameContainer>{userId}</NicknameContainer>
+          </FirstSectionLink>
         </SectionContainer>
         <SectionContainer>
           <SectionTitle>앱 설정</SectionTitle>
@@ -40,7 +45,7 @@ function Settings() {
         <SectionContainer>
           <SectionTitle>기타</SectionTitle>
           <SectionLink>회원 탈퇴</SectionLink>
-          <SectionLink>로그아웃</SectionLink>
+          <SectionLink onClick={LogoutClicked}>로그아웃</SectionLink>
         </SectionContainer>
       </ComponentContainer>
     </SettingsWrapper>
@@ -57,20 +62,23 @@ const SettingsWrapper = styled.div`
   margin-left: 100px;
   margin-top: 70px;
   /* width: 100%; */
-  gap: 20px;
+  gap: 50px;
 `;
 
 const ComponentContainer = styled.div`
   display: flex;
+  width: 431px;
+  height: 755px;
   flex-direction: column;
-  width: 50%;
-  gap: 60px;
   align-items: flex-start;
-  padding: 40px 163px 63px 39px;
+  gap: 60px;
+  flex-shrink: 0;
+  padding: 65px 30px 0px 30px;
   border-radius: 20px;
-  background: #fcf6f5;
+  background: var(--bg, #fcf6f5);
 
-  box-shadow: 0px 7px 22.3px -6px #cdcdcd;
+  /* bg 1 */
+  box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.25);
 `;
 
 const SettingsIcon = styled.img`
@@ -92,9 +100,15 @@ const TitleContainer = styled.div`
   align-items: center;
 `;
 
-const SectionContainer = styled.div``;
+const SectionContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  &:first-child {
+    width: 100%;
+  }
+`;
 
-const SectionTitle = styled.span`
+const SectionTitle = styled.div`
   color: var(--, #000);
 
   font-family: Pretendard;
@@ -102,19 +116,41 @@ const SectionTitle = styled.span`
   font-style: normal;
   font-weight: 700;
   line-height: 140%;
+  margin-bottom: 5px;
 `;
 
-const SectionLink = styled.div`
+const FirstSectionLink = styled.div`
   color: var(--, #666);
-
   font-family: Pretendard;
   font-size: 28px;
   font-style: normal;
   font-weight: 500;
   line-height: 140%;
+  padding-bottom: 3px;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease-in-out;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
 `;
 
-const NicknameContainer = styled.span`
+const SectionLink = styled.span`
+  color: var(--, #666);
+  font-family: Pretendard;
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 140%;
+  padding-bottom: 3px;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease-in-out;
+
+  &:hover {
+    box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.3); /* 밑줄 효과 */
+  }
+`;
+
+const NicknameContainer = styled.div`
   color: rgba(102, 102, 102, 0.7);
 
   font-family: Pretendard;
@@ -122,4 +158,12 @@ const NicknameContainer = styled.span`
   font-style: normal;
   font-weight: 500;
   line-height: 140%;
+`;
+
+const IdContainer = styled.div`
+  transition: box-shadow 0.3s ease-in-out;
+
+  &:hover {
+    box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.3); /* 밑줄 효과 */
+  }
 `;

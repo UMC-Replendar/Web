@@ -33,16 +33,14 @@ const HistoryContainer = styled.div`
   align-items: flex-start;
   cursor: pointer;
 `;
-const HistoryWhiteBox = styled.div`
-  background-color: white;
-  border-radius: 20px;
-  width: 100%;
-  height: 100%;
-`;
+
 const HistoryEntryContainer = styled.div`
   width: 100%;
   padding: 20px;
-
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -80,29 +78,25 @@ function HistoryList() {
   ];
 
   return (
-    <>
-      <div>
-        <Title onClick={() => navigate('/history')}>히스토리</Title>
-        <HistoryContainer onClick={() => navigate('/history')}>
-          <HistoryWhiteBox>
-            {historyEntries.map((entry, index) => (
-              <HistoryEntryContainer key={index}>
-                <HistoryDetails>
-                  <HistoryText>{entry.date}</HistoryText>
-                  <HistoryText>{entry.time}</HistoryText>
-                  <HistoryText>{entry.task}</HistoryText>
-                </HistoryDetails>
-                <BlueButton
-                  status={entry.status === '완료' ? '등록됨' : '내 일정에 등록'}
-                >
-                  {entry.status}
-                </BlueButton>
-              </HistoryEntryContainer>
-            ))}
-          </HistoryWhiteBox>
-        </HistoryContainer>
-      </div>
-    </>
+    <div>
+      <Title onClick={() => navigate('/history')}>히스토리</Title>
+      <HistoryContainer onClick={() => navigate('/history')}>
+        {historyEntries.map((entry, index) => (
+          <HistoryEntryContainer key={index}>
+            <HistoryDetails>
+              <HistoryText>{entry.date}</HistoryText>
+              <HistoryText>{entry.time}</HistoryText>
+              <HistoryText>{entry.task}</HistoryText>
+            </HistoryDetails>
+            <BlueButton
+              status={entry.status === '완료' ? '등록됨' : '내 일정에 등록'}
+            >
+              {entry.status}
+            </BlueButton>
+          </HistoryEntryContainer>
+        ))}
+      </HistoryContainer>
+    </div>
   );
 }
 

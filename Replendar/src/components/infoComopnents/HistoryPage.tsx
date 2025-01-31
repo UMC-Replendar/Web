@@ -52,16 +52,19 @@ const ContentBox = styled.div`
   width: calc(100% - 146px);
   display: flex;
   flex-direction: column;
-  gap: 5px;
+
   height: 100%;
 `;
+
 const HistoryWhiteBox = styled.div`
   background-color: white;
   border-radius: 20px;
-`;
-const HistoryItem = styled.div`
   padding: 20px;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1px; /* 각 항목 간 1px 간격 유지 */
+`;
 
+const HistoryItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -109,9 +112,10 @@ const HistoryPage: React.FC = () => {
         ))}
       </Menu>
       <ContentBox>
-        <HistoryWhiteBox>
-          {content.map((item, index) => (
-            <HistoryItem key={index}>
+        {content.map((item, index) => (
+          <HistoryWhiteBox key={index}>
+            {' '}
+            <HistoryItem>
               <HistoryDetails>
                 <div>{item.date}</div>
                 <div>{item.time}</div>
@@ -123,8 +127,8 @@ const HistoryPage: React.FC = () => {
                 {item.status}
               </BlueButton>
             </HistoryItem>
-          ))}
-        </HistoryWhiteBox>
+          </HistoryWhiteBox>
+        ))}
       </ContentBox>
     </Container>
   );
