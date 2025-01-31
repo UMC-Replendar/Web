@@ -6,11 +6,8 @@ import LockIcon from '../assets/images/LockIcon.svg';
 import UnLockIcon from '../assets/images/UnLockIcon.svg';
 import GrayPlusIcon from '../assets/images/GrayPlusIcon.svg';
 import ToggleSwitch from '../components/OngoingComponents/ToggleSwitch';
-
-interface AddTaskModalProps {
-  onClose: () => void;
-  onAddTask: (name: string, deadline: string, time: string) => void;
-}
+import useTaskStore from '../store/useTaskStore';
+import useModalStore from '../store/modalStore';
 
 const ModalOverlay = styled.div`
   position: absolute;
@@ -234,7 +231,9 @@ const ActionButtons = styled.div`
   width: 100%;
 `;
 
-function AddTaskModal({ onClose, onAddTask }: AddTaskModalProps) {
+function AddTaskModal() {
+  const { addTask } = useTaskStore();
+  const { closeModal } = useModalStore();
   const [taskName, setTaskName] = useState('');
   const [deadline, setDeadline] = useState('');
   const [time, setTime] = useState('');
@@ -262,7 +261,8 @@ function AddTaskModal({ onClose, onAddTask }: AddTaskModalProps) {
       alert('마감일을 선택해주세요.');
       return;
     }
-    onAddTask(taskName, deadline, time);
+    addTask(taskName, deadline);
+    closeModal();
   };
 
   return (
@@ -373,7 +373,7 @@ function AddTaskModal({ onClose, onAddTask }: AddTaskModalProps) {
 
       <ActionButtons>
         <ActionButton>임시저장</ActionButton>
-        <ActionButton onClick={onClose}>수정</ActionButton>
+        <ActionButton onClick={closeModal}>수정</ActionButton>
         <ActionButton onClick={handleComplete}>완료</ActionButton>
       </ActionButtons>
     </ModalOverlay>
