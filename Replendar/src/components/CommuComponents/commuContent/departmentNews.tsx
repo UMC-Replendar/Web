@@ -4,13 +4,13 @@ import BlueButton from '../../blueButton';
 
 const Container = styled.div`
   width: 100%;
+  height: 393px;
 
   display: flex;
-
   flex-direction: column;
-  justify-content: space-around;
+
   padding: 20px;
-  gap: 2px;
+  gap: 4px;
   box-sizing: border-box;
 `;
 
@@ -21,11 +21,9 @@ const FlexDiv = styled.div`
   width: 100%;
   font-size: 19px;
   height: 67px;
-  background:white;
-  border-radius:20px;
+  background: white;
+  border-radius: 20px;
   padding: 0px 30px;
-  &:last-child {
-  
 `;
 
 const RightAlignedItem = styled.div`

@@ -13,14 +13,14 @@ const Container = styled.div`
   display: flex;
 
   flex-direction: column;
-  justify-content: space-around;
+
   padding: 20px;
   box-sizing: border-box;
 
   table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0px 2.5px; /* 셀 간격 */
+    border-spacing: 0px 4px; /* 셀 간격 */
   }
   th {
     color: #666;

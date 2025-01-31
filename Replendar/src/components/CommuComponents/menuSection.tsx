@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { MoreIcon } from './commuIcons';
-import { CloseIcon } from './commuIcons';
+
 import MenuContent from './menuContent';
 import DownArrowIcon from '../../assets/images/DownArrowIcon.svg';
 import UpArrowIcon from '../../assets/images/UpArrowIcon.svg';
-import More from '../../pages/OngoingTasks';
 
 interface MenuSectionProps {
   title: string;
@@ -57,7 +55,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, menuItems }) => {
 };
 
 export default MenuSection;
-
 const FlexDiv = styled.div`
   display: flex;
   justify-content: center;

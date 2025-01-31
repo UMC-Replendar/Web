@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
+import useGetData from '../../../hooks/useGetData';
 
 const friendRegister = () => {
   const [searchParams, setSearchParams] = useSearchParams({ mq: '' });
@@ -21,6 +22,20 @@ const friendRegister = () => {
   useEffect(() => {
     setSearchParams({ mq: '' });
   }, []);
+
+  const {
+    data: movies,
+    isLoading,
+    isError,
+  } = useGetData(`/search/movie?query=${mq}`);
+
+  if (isLoading) {
+    return <div>스켈레톤 이미지</div>;
+  }
+
+  if (isError) {
+    return <h1>에러</h1>;
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(e.target.value);
@@ -104,7 +119,7 @@ export default friendRegister;
 const Container = styled.div`
   width: 100%;
 
-  height: 383px;
+  height: 391px;
 `;
 
 const FlexAlignStart = styled.div`

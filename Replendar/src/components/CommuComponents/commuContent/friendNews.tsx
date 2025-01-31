@@ -8,9 +8,9 @@ const Container = styled.div`
   display: flex;
 
   flex-direction: column;
-  justify-content: space-around;
+
   padding: 20px;
-  gap: 2px;
+  gap: 4px;
   box-sizing: border-box;
 `;
 

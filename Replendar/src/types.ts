@@ -11,3 +11,15 @@ export interface StoredTask {
   delay: '만료' | '유효'; // 만료 여부
   description: string; // 과제명
 }
+export interface RegisterResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: <Register>
+}
+export interface Register {
+  friendId: string;
+  nickname: string;
+  name: string;
+  statusMessage: string;
+}
