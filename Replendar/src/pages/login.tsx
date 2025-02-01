@@ -16,7 +16,15 @@ const Container = styled.div`
   background-color: white;
   width: 90%;
   margin: 0 auto;
-  gap: 120px;
+  gap: 10px;
+`;
+
+const TitleContainer = styled.div`
+  font-family: Pretendard;
+  font-size: 33px;
+  font-style: normal;
+  font-weight: 700;
+  margin-bottom: 100px;
 `;
 
 const KakaoButton = styled.button`
@@ -116,6 +124,7 @@ function Login() {
       <ImgWrapper>
         <Image src={AppIcon} alt="앱 아이콘" />
       </ImgWrapper>
+      <TitleContainer>REPLENDAR</TitleContainer>
       <KakaoButton onClick={handleKakaoLogin}>
         <img src={KakaoLogo} alt="Kakao Logo" />
         카카오로 로그인하기
