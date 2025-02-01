@@ -7,6 +7,7 @@ import DownArrowIcon from '../assets/images/DownArrowIcon.svg';
 import UpArrowIcon from '../assets/images/UpArrowIcon.svg';
 import EditTaskModal from '../modal/EditTaskModal';
 import useModalStore from '../store/modalStore';
+import useTaskStore from '../store/useTaskStore';
 
 const PageWrapper = styled.div`
   margin-top: 79px;
@@ -138,21 +139,23 @@ const TaskInfo = styled.div`
 `;
 
 const TaskCompleteButton = styled.button`
-  display: flex;
-  padding: 4px 16px;
-  justify-content: center;
-  align-items: center;
+  width: 100px;
+  height: 50px;
+  padding: 14px 30px;
+  background: linear-gradient(270deg, #18b9dd 0%, #63d8f2 100%);
   border-radius: 50px;
   border: none;
-  background: #73d5ff;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  display: flex;
   color: white;
   font-family: Pretendard;
-  font-size: 13px;
-  font-style: normal;
+  font-size: 16px;
   font-weight: 500;
-  line-height: 140%;
+  line-height: 22.4px;
   cursor: pointer;
-
+  word-wrap: break-word;
   white-space: nowrap;
 `;
 
@@ -162,84 +165,18 @@ interface TaskData {
   deadline: string;
   remainingTime: string;
   isToggled: boolean;
+  isBookmarked: boolean;
 }
 
 function OngoingTasks() {
-  const [tasks, setTasks] = useState<TaskData[]>([
-    {
-      color: '#2BAE66',
-      name: '과제 1',
-      deadline: '2025-01-28T23:59:59',
-      remainingTime: '',
-      isToggled: false,
-    },
-    {
-      color: '#2BAE66',
-      name: '과제 2',
-      deadline: '2025-01-28T23:59:59',
-      remainingTime: '',
-      isToggled: false,
-    },
-    {
-      color: '#25C26C',
-      name: '과제 3',
-      deadline: '2025-01-28T23:59:59',
-      remainingTime: '',
-      isToggled: false,
-    },
-    {
-      color: '#7AC19A',
-      name: '과제 4',
-      deadline: '2025-01-28T23:59:59',
-      remainingTime: '',
-      isToggled: false,
-    },
-    {
-      color: '#7AC19A',
-      name: '과제 5',
-      deadline: '2025-01-30T23:59:59',
-      remainingTime: '',
-      isToggled: false,
-    },
-    {
-      color: '#7AC19A',
-      name: '과제 6',
-      deadline: '2025-01-30T23:59:59',
-      remainingTime: '',
-      isToggled: false,
-    },
-    {
-      color: '#7AC19A',
-      name: '과제 7',
-      deadline: '2025-01-30T23:59:59',
-      remainingTime: '',
-      isToggled: false,
-    },
-  ]);
-
+  const { tasks, deleteTask, updateRemainingTimes } = useTaskStore(); // Zustand에서 상태 가져오기
+  const { isOpen, openModal, closeModal, modalContent } = useModalStore(); // useModalStore 추가했어요요
   const [visibleTasksCount, setVisibleTasksCount] = useState(
     tasks.length <= 3 ? tasks.length : 3
   );
-  const { openModal, closeModal } = useModalStore(); // useModalStore 추가했어요요
 
   useEffect(() => {
-    const updateRemainingTimes = () => {
-      setTasks((prevTasks) =>
-        prevTasks.map((task) => {
-          const deadlineDate = new Date(task.deadline);
-          const now = new Date();
-          const diffMs = deadlineDate.getTime() - now.getTime();
-          const hours = Math.floor(diffMs / (1000 * 60 * 60));
-          const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-          const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-          return {
-            ...task,
-            remainingTime: `${hours}h ${minutes}m ${seconds}s`,
-          };
-        })
-      );
-    };
-
+    //Zustand로 뺐음
     updateRemainingTimes();
     const interval = setInterval(updateRemainingTimes, 1000);
     return () => clearInterval(interval);
@@ -253,45 +190,21 @@ function OngoingTasks() {
     }
   };
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
+  const handleCompleteTask = (name: string) => {
+    deleteTask(name); // name을 직접 전달하도록 수정
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleAddTask = (name: string, deadline: string) => {
-    const newTask: TaskData = {
-      color: '#7AC19A',
-      name,
-      deadline,
-      remainingTime: '',
-      isToggled: false,
-    };
-    setTasks((prevTasks) => {
-      const updatedTasks = [...prevTasks, newTask];
-      const shouldExpand = updatedTasks.length > 3;
-      setVisibleTasksCount(shouldExpand ? updatedTasks.length : 3);
-      return updatedTasks;
-    });
-    setIsModalOpen(false);
-  };
-
-  const handleCompleteTask = (index: number) => {
-    setTasks((prevTasks) => prevTasks.filter((_, i) => i !== index));
-  };
   const handleEditTask = (task: TaskData) => {
-    console.log('Edit Task Clicked:', task); // 디버깅용 로그
-    openModal(
-      <EditTaskModal
-        task={task}
-        onClose={closeModal}
-        onComplete={() => handleCompleteTask(tasks.indexOf(task))}
-      />
-    ); // EditTaskModal 열기
+    const taskIndex = tasks.findIndex((t) => t.name === task.name);
+    if (taskIndex !== -1) {
+      openModal(
+        <EditTaskModal
+          task={task}
+          onClose={closeModal}
+          onComplete={() => handleCompleteTask(task.name)} //name 기준 중복 때문에 나중에 id 로 바꾸기
+        />
+      );
+    }
   };
 
   return (
@@ -307,7 +220,9 @@ function OngoingTasks() {
         </LeftTitles>
 
         <div style={{ display: 'flex', gap: '31px' }}>
-          <AddButton onClick={handleOpenModal}>
+          <AddButton onClick={() => openModal(<AddTaskModal />)}>
+            {' '}
+            {/* AddTaskModal에 정의함 */}
             과제 추가하기
             <img src={PlusIcon} alt="Plus Icon" />
           </AddButton>
@@ -328,30 +243,25 @@ function OngoingTasks() {
           )}
         </div>
       </MainPageTitleWrapper>
-
       <TaskBox isScrollable={tasks.length > 10}>
-        {tasks.slice(0, visibleTasksCount).map((task, index) => (
+        {tasks.slice(0, visibleTasksCount).map((task) => (
           <Task
-            key={index}
+            key={task.name} // `key`는 `name`을 사용해야 더 안전함
             color={task.color}
             name={task.name}
             remainingTime={task.remainingTime || ''}
-            onComplete={() => handleCompleteTask(index)}
-            onEdit={() => handleEditTask(task)}
+            onComplete={() => handleCompleteTask(task.name)} // ✅ `index` 대신 `task.name` 전달
+            onEdit={() => handleEditTask(task)} // ✅ task 객체 전체 전달
           />
         ))}
       </TaskBox>
-
       <CustomCalendar
         tasks={tasks.map((task) => ({
           name: task.name,
           deadline: task.deadline,
         }))}
       />
-
-      {isModalOpen && (
-        <AddTaskModal onClose={handleCloseModal} onAddTask={handleAddTask} />
-      )}
+      {isOpen && modalContent} {/* Modal정의 Content추가 */}
     </PageWrapper>
   );
 }
@@ -378,7 +288,7 @@ function Task({ color, name, remainingTime, onComplete, onEdit }: TaskProps) {
             onComplete();
           }}
         >
-          과제 완료
+          완료
         </TaskCompleteButton>
       </TaskBlockContainer>
     </>

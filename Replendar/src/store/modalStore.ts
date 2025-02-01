@@ -5,6 +5,7 @@ interface ModalState {
   isOpen: boolean;
   content: React.ReactNode | null;
   selectedSchool: string | null;
+  modalContent: React.ReactNode | null;
   openModal: (content: React.ReactNode) => void;
   closeModal: () => void;
   setSelectedSchool: (school: string) => void;
@@ -15,8 +16,9 @@ const useModalStore = create<ModalState>((set) => ({
   isOpen: false,
   content: null,
   selectedSchool: null,
-  openModal: (content) => set({ isOpen: true, content }),
-  closeModal: () => set({ isOpen: false, content: null }),
+  modalContent: null, //추가했습니다.
+  openModal: (content) => set({ isOpen: true, modalContent: content }),
+  closeModal: () => set({ isOpen: false, modalContent: null }),
   setSelectedSchool: (school) => set({ selectedSchool: school }),
 }));
 

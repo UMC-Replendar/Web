@@ -71,8 +71,7 @@ const FlexGroup = styled.div`
   padding: 5px;
 `;
 const FlexEndGroup = styled.label`
-justify-content: flex-end;
- display: flex;
- padding: 5px;
-  }
+  justify-content: flex-end;
+  display: flex;
+  padding: 5px;
 `;
