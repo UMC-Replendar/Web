@@ -11,7 +11,9 @@ function App() {
   const location = useLocation();
 
   const hideLayout =
-    location.pathname === '/login' || location.pathname === '/signup';
+    location.pathname === '/login' ||
+    location.pathname === '/signup' ||
+    location.pathname === '/callback';
 
   return (
     <PageWrapper>
