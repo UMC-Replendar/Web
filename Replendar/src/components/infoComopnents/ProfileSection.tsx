@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const ProfileContainer = styled.div`
   display: flex;
@@ -54,17 +54,40 @@ const InfoText = styled.p`
   font-size: 18px;
 `;
 
-const Message = styled.p``;
+const Message = styled.p`
+  font-size: 18px;
+  color: gray;
+`;
 
 function ProfileSection() {
   const [image, setImage] = useState<string | null>(null);
+  const [nickname, setNickname] = useState<string>('');
+  const [statusMessage, setStatusMessage] = useState<string>('');
+  const [school, setSchool] = useState<string>('');
+  const [department, setDepartment] = useState<string>('');
+  const [grade, setGrade] = useState<string>('');
 
+  // 🔹 localStorage에서 데이터 불러오기
+  useEffect(() => {
+    setImage(localStorage.getItem('profileImage'));
+    setNickname(localStorage.getItem('nickname') || '닉네임 없음');
+    setStatusMessage(
+      localStorage.getItem('statusMessage') || '상태 메시지 없음'
+    );
+    setSchool(localStorage.getItem('school') || '학교 정보 없음');
+    setDepartment(localStorage.getItem('department') || '학과 정보 없음');
+    setGrade(localStorage.getItem('grade') || '학년 정보 없음');
+  }, []);
+
+  // 🔹 프로필 사진 업로드 시 localStorage에 저장
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result as string);
+        const imageData = reader.result as string;
+        setImage(imageData);
+        localStorage.setItem('profileImage', imageData);
       };
       reader.readAsDataURL(file);
     }
@@ -72,11 +95,12 @@ function ProfileSection() {
 
   return (
     <ProfileContainer>
+      {/* 🔹 프로필 사진 */}
       <ProfilePicture htmlFor="file-upload">
         {image ? (
-          <UploadIcon src={image} alt="프로필 사진 미리보기" />
+          <UploadIcon src={image} alt="프로필 사진" />
         ) : (
-          <UploadText>프로필 사진 업로드 가능 해봐여</UploadText>
+          <UploadText>프로필 사진 업로드</UploadText>
         )}
       </ProfilePicture>
       <input
@@ -86,11 +110,14 @@ function ProfileSection() {
         style={{ display: 'none' }}
         onChange={handleImageUpload}
       />
+
+      {/* 🔹 사용자 정보 */}
       <InfoBox>
-        <Nickname>닉네임</Nickname>
-        <Message>상태 메시지 자리</Message>
-        <InfoText>친구</InfoText>
-        <InfoText>진행중인 과제</InfoText>
+        <Nickname>{nickname}</Nickname>
+        <Message>{statusMessage}</Message>
+        <InfoText>학교: {school}</InfoText>
+        <InfoText>학과: {department}</InfoText>
+        <InfoText>학년: {grade}</InfoText>
       </InfoBox>
     </ProfileContainer>
   );
