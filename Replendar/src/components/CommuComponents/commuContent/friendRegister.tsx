@@ -214,15 +214,15 @@ const SearchIcon = styled.img`
 
 const SearchInput = styled.input`
   width: 75%;
-  padding-left: 50px; 
+  padding-left: 50px;
   margin-left: 40px;
-  height:100%;
+  height: 100%;
   border-radius: 50px;
   border: 1px solid rgba(232, 232, 232, 1);
   font-size: 19px;
   &:focus {
     outline: none;
-
+  }
 `;
 const SearchBtn = styled.button<{ width?: string }>`
   color: rgba(102, 102, 102, 1);
