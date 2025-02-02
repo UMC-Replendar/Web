@@ -55,7 +55,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, menuItems }) => {
 };
 
 export default MenuSection;
-
 const FlexDiv = styled.div`
   display: flex;
   justify-content: center;

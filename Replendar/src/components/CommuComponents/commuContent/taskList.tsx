@@ -13,14 +13,14 @@ const Container = styled.div`
   display: flex;
 
   flex-direction: column;
-  justify-content: space-around;
+
   padding: 20px;
   box-sizing: border-box;
 
   table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0px 2.5px; /* 셀 간격 */
+    border-spacing: 0px 2px; /* 셀 간격 */
   }
   th {
     color: #666;
@@ -33,6 +33,11 @@ const Container = styled.div`
     padding: 12px 15px;
     font-size: 19px;
     background-color: white;
+  }
+  tr {
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
   }
   tr th:first-child,
   tr td:first-child {
