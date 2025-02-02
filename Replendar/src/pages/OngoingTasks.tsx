@@ -221,7 +221,6 @@ function OngoingTasks() {
 
         <div style={{ display: 'flex', gap: '31px' }}>
           <AddButton onClick={() => openModal(<AddTaskModal />)}>
-            {' '}
             {/* AddTaskModal에 정의함 */}
             과제 추가하기
             <img src={PlusIcon} alt="Plus Icon" />
