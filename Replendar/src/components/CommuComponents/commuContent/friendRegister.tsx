@@ -2,6 +2,8 @@ import styled from 'styled-components';
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
+//import useGetData from '../../../hooks/useGetData';
+//import axios from 'axios';
 
 const friendRegister = () => {
   const [searchParams, setSearchParams] = useSearchParams({ mq: '' });
@@ -22,6 +24,64 @@ const friendRegister = () => {
     setSearchParams({ mq: '' });
   }, []);
 
+  //로그인토큰얻기
+  /*const getToken = async () => {
+    try {
+      const response = await axios.post(
+        'https://api.replendar.site/api/user/login',
+        {
+          email: '1',
+        }
+      );
+      localStorage.setItem('token', response.data.result.accessToken);
+      console.log(
+        '로그인 성공! 얻은 JWT토큰: ',
+        response.data.result.accessToken
+      );
+    } catch (error) {
+      console.error('로그인 실패:', error);
+    }
+  };*/
+
+  //검색api호출
+  /*
+  const register = async () => {
+    const token = localStorage.getItem('token');
+    console.log('보내는 token: ', token);
+    try {
+      const response = await axios.post(
+        'https://api.replendar.site/api/user/login',
+        {
+          email: '1',
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log('검색api: ', response.data.result);
+    } catch (error) {
+      console.error('로그인 실패:', error);
+    }
+  };*/
+  /*const {
+    data: movies,
+    isLoading,
+    isError,
+  } = useGetData(
+    `https://api.replendar.site/api/friends/search?nickname=친구A`
+  );
+  console.log(movies);
+  if (isLoading) {
+    return <div>스켈레톤 이미지</div>;
+  }
+
+  if (isError) {
+    return <h1>에러</h1>;
+  }*/
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(e.target.value);
   };
@@ -34,6 +94,7 @@ const friendRegister = () => {
   const handleSearch = () => {
     const trimmedNickname = nickname.trim();
     if (mq === trimmedNickname) return;
+
     navigate(`/community?mq=${trimmedNickname}`);
 
     if (trimmedNickname !== '') {
@@ -104,7 +165,7 @@ export default friendRegister;
 const Container = styled.div`
   width: 100%;
 
-  height: 383px;
+  height: 380px;
 `;
 
 const FlexAlignStart = styled.div`

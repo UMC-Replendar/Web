@@ -86,9 +86,9 @@ const Container = styled.div`
   display: flex;
 
   flex-direction: column;
-  justify-content: center;
+
   padding: 20px;
-  gap: 2px;
+
   box-sizing: border-box;
 `;
 
@@ -102,6 +102,8 @@ const SpaceBtwDiv = styled.div<{ status: string }>`
   height: 67px;
   border-radius: 20px;
   padding: 0px 30px;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1px;
 `;
 
 const FlexDiv = styled.div`
