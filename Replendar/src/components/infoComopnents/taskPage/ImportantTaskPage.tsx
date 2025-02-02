@@ -27,10 +27,9 @@ const mappedTasks = storedTasks.map((task) => ({
 const ImportantTaskPage: React.FC = () => {
   return (
     <>
-      <h1 style={{ display: 'flex', justifyContent: 'center' }}>짬뽕 페이지</h1>
       <TaskCard
         imageSrc="src/assets/images/InfoIcons/Task.svg"
-        title="미완료 과제"
+        title="중요한 과제"
         tasks={mappedTasks}
         showDetails={false}
       />

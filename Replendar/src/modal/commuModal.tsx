@@ -35,7 +35,7 @@ const CloseButton = styled.button`
 `;
 
 const CommuModal: React.FC = () => {
-  const { isOpen, content, closeModal } = useModalStore();
+  const { isOpen, modalContent, closeModal } = useModalStore();
 
   if (!isOpen) return null;
 
@@ -43,7 +43,7 @@ const CommuModal: React.FC = () => {
     <Overlay onClick={closeModal}>
       <ModalContent onClick={(e) => e.stopPropagation()}>
         <CloseButton onClick={closeModal}>X</CloseButton>
-        {content}tq rmslrK dlrp ansirh
+        {modalContent}tq rmslrK dlrp ansirh
       </ModalContent>
     </Overlay>
   );
