@@ -6,11 +6,11 @@ import { useEffect } from 'react';
 //import axios from 'axios';
 
 const friendRegister = () => {
-  const [searchParams, setSearchParams] = useSearchParams({ mq: '' });
+  const [searchParams, setSearchParams] = useSearchParams({ nickname: '' });
 
   const navigate = useNavigate();
-  const mq = searchParams.get('mq');
-  const [nickname, setNickname] = useState('');
+  const nickname = searchParams.get('nickname');
+  const [searchNickname, setSearchNickname] = useState('');
 
   const [searchResult, setSearchResult] = useState<{
     id: number;
@@ -21,7 +21,7 @@ const friendRegister = () => {
   } | null>(null);
 
   useEffect(() => {
-    setSearchParams({ mq: '' });
+    setSearchParams({ nickname: '' });
   }, []);
 
   //로그인토큰얻기
@@ -67,11 +67,11 @@ const friendRegister = () => {
     }
   };*/
   /*const {
-    data: movies,
+    data: data1,
     isLoading,
     isError,
   } = useGetData(
-    `https://api.replendar.site/api/friends/search?nickname=친구A`
+    `https://api.replendar.site/api/friends/search?nickname=${debouncedNickname}`
   );
   console.log(movies);
   if (isLoading) {
@@ -83,7 +83,7 @@ const friendRegister = () => {
   }*/
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNickname(e.target.value);
+    setSearchNickname(e.target.value);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -92,10 +92,10 @@ const friendRegister = () => {
     }
   };
   const handleSearch = () => {
-    const trimmedNickname = nickname.trim();
-    if (mq === trimmedNickname) return;
+    const trimmedNickname = searchNickname.trim();
+    if (nickname === trimmedNickname) return;
 
-    navigate(`/community?mq=${trimmedNickname}`);
+    navigate(`/community?nickname=${trimmedNickname}`);
 
     if (trimmedNickname !== '') {
       const result = userData.find((user) => user.nickname === trimmedNickname);
@@ -104,12 +104,13 @@ const friendRegister = () => {
       setSearchResult(null);
     }
   };
+
   return (
     <Container>
       <InputContainer>
         <SearchIcon src="src/assets/images/search.svg" alt="Search Icon" />
         <SearchInput
-          value={nickname}
+          value={searchNickname}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder="등록할 친구의 이름을 입력해주세요"
@@ -117,9 +118,13 @@ const friendRegister = () => {
         <SearchBtn onClick={handleSearch}>검색</SearchBtn>
       </InputContainer>
       <EmptyDiv>
-        {mq && searchResult === null ? (
-          <FlexDiv width="900px">검색 결과 '{nickname}'가 없습니다</FlexDiv>
-        ) : searchResult ? (
+        {searchResult === null && nickname && (
+          <FlexDiv width="900px">
+            검색 결과 '{searchNickname}'가 없습니다
+          </FlexDiv>
+        )}
+
+        {searchResult ? (
           <>
             <ProfileContainer>
               <img

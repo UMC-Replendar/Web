@@ -37,7 +37,7 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
     <Container>
       <AddButtonDiv>
         <AddButton onClick={handleMakeGroup}>
-          친구 만들기
+          그룹 만들기
           <PlusIcon />
         </AddButton>
       </AddButtonDiv>
