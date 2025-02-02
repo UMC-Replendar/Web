@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+// import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 // import useModalStore from '../../store/modalStore';
 import ProfileUpload from './ProfileUpload';
 import SchoolInfoForm from './SchoolInfoForm';
 import StatusMessage from './StatusMessage';
-// import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 const FormContainer = styled.div`
   background: #fff;
@@ -65,87 +65,120 @@ const SubmitButton = styled.button`
   align-self: flex-end;
 `;
 
-const ErrorMessage = styled.p`
-  color: red;
+// 에러 메시지 색상 (isValid가 true면 녹색, 아닐 경우 빨간색)
+interface ErrorMessageProps {
+  isValid?: boolean;
+}
+
+const ErrorMessage = styled.p<ErrorMessageProps>`
+  color: ${(props) => (props.isValid ? 'green' : 'red')};
   font-size: 14px;
   margin-top: 5px;
   min-height: 20px;
 `;
 
-const SignupForm: React.FC = () => {
-  const navigate = useNavigate();
-  // const { openModal } = useModalStore();
-  const [nickname, setNickname] = useState('');
+/**
+ * 닉네임 중복확인 로직 (더미 API)
+ */
+export const validateNickname = async (
+  nickname: string
+): Promise<{ available: boolean }> => {
+  // 실제 API 연동 시 아래와 같이 사용합니다.
+  // const response = await axios.post('/api/check-nickname', { nickname });
+  // return response.data;
 
-  //isNicknameValid 추가해야함
+  // 더미 로직: 닉네임이 'taken'이면 사용 불가능, 그 외에는 사용 가능
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      if (nickname.toLowerCase() === 'taken') {
+        resolve({ available: false });
+      } else {
+        resolve({ available: true });
+      }
+    }, 1000);
+  });
+};
+
+const SignupForm: React.FC = () => {
+  // const { openModal } = useModalStore(); //임시로 alert사용
+  const navigate = useNavigate();
+
+  // 닉네임 관련 상태
+  const [nickname, setNickname] = useState('');
   const [isNicknameValid, setIsNicknameValid] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // 프로필 사진, 상태 메시지, 학교 정보 상태
+  const [profilePhoto, setProfilePhoto] = useState<string>(''); // 이미지 URL 또는 Base64
+  const [statusMessage, setStatusMessage] = useState<string>('');
+  const [selectedSchool, setSelectedSchool] = useState<string>('');
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('');
+  const [grade, setGrade] = useState<string>('1학년'); // 기본값
+
   const nicknameRegex = /^[a-zA-Z\uAC00-\uD7A3]+$/;
 
+  // 닉네임 입력 변경 시 처리
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(e.target.value);
     setIsNicknameValid(false);
     setErrorMessage('');
   };
 
-  //테스트용으로 제작
-  const checkNicknameTest = () => {
+  // 닉네임 중복 확인
+  const checkNicknameAvailability = async () => {
     if (!nicknameRegex.test(nickname)) {
-      setErrorMessage('중복 닉네임은 불가,영어 & 한글 조합');
+      setErrorMessage('영어와 한글만 사용 가능합니다.');
       return;
     }
+
     setIsChecking(true);
-    if (localStorage.getItem('nickname') !== nickname) {
-      setIsNicknameValid(true);
-      setErrorMessage('사용 가능한 닉네임입니다.');
+    try {
+      const result = await validateNickname(nickname);
+      if (result.available) {
+        setIsNicknameValid(true);
+        setErrorMessage('사용 가능한 닉네임입니다.');
+      } else {
+        setIsNicknameValid(false);
+        setErrorMessage('이미 사용 중인 닉네임입니다.');
+      }
+    } catch (error) {
+      setIsNicknameValid(false);
+      setErrorMessage('닉네임 확인 중 오류가 발생했습니다.');
+    } finally {
+      setIsChecking(false);
     }
   };
 
-  // const checkNicknameAvailability = async () => {
-  //   if (!nicknameRegex.test(nickname)) {
-  //     setErrorMessage('중복 닉네임은 불가,영어 & 한글 조합');
-  //     return;
-  //   }
-
-  //   setIsChecking(true);
-  //   try {
-  //     const response = await axios.post('/api/check-nickname', { nickname });
-  //     if (response.data.available) {
-  //       setIsNicknameValid(true);
-  //       setErrorMessage('사용 가능한 닉네임입니다.');
-  //     } else {
-  //       setErrorMessage('이미 사용 중인 닉네임입니다.');
-  //     }
-  //   } catch (error) {
-  //     setErrorMessage('api연동 전입니다.');
-  //   } finally {
-  //     setIsChecking(false);
-  //   }
-  // };
-
-  // const handleSubmit = async () => {
-  //   if (!isNicknameValid) {
-  //     alert('닉네임 중복 확인을 완료해주세요');
-  //     return;
-  //   }
-
-  //   try {
-  //     await axios.post('/api/signup', { nickname });
-  //     openModal(<p>회원가입이 완료되었습니다.</p>);
-  //   } catch (error) {
-  //     openModal(<p>회원가입 중 오류가 발생했습니다.</p>);
-  //   }
-  // };
-
-  const handleSubmitTest = () => {
+  // 회원가입 완료 시 로컬스토리지 저장 후 alert로 완료 메시지 출력 후 메인 페이지로 리다이렉션
+  const handleSubmit = async () => {
     if (!isNicknameValid) {
-      alert('닉네임 중복 확인을 완료해주세요');
+      alert('닉네임 중복 확인을 완료해주세요.');
       return;
     }
-    alert('회원가입 완료 되었습니다.');
+
+    // 모든 회원가입 데이터를 객체에 담아 로컬스토리지에 저장
+    const signupData = {
+      nickname,
+      profilePhoto,
+      statusMessage,
+      selectedSchool,
+      selectedDepartment,
+      grade,
+    };
+
+    localStorage.setItem('signupData', JSON.stringify(signupData));
+    alert('회원가입이 완료되었습니다.');
     navigate('/');
+
+    // 실제 API 연동 시 아래와 같이 사용합니다.
+    // try {
+    //   await axios.post('/api/signup', signupData);
+    //   alert('회원가입이 완료되었습니다.');
+    //   navigate('/');
+    // } catch (error) {
+    //   openModal(<p>회원가입 중 오류가 발생했습니다.</p>);
+    // }
   };
 
   return (
@@ -159,17 +192,41 @@ const SignupForm: React.FC = () => {
           value={nickname}
           onChange={handleNicknameChange}
         />
-        <ConformButton onClick={checkNicknameTest} disabled={isChecking}>
+        <ConformButton
+          onClick={checkNicknameAvailability}
+          disabled={isChecking}
+        >
           {isChecking ? '확인 중...' : '중복확인'}
         </ConformButton>
       </BoxWrapper>
-      <ErrorMessage>{errorMessage || ' '}</ErrorMessage>
+      {/* isNicknameValid가 true면 녹색, 아니면 빨간색 */}
+      <ErrorMessage isValid={isNicknameValid}>
+        {errorMessage || ' '}
+      </ErrorMessage>
 
-      <ProfileUpload />
-      <StatusMessage />
-      <SchoolInfoForm />
+      {/* 프로필 사진 컴포넌트 */}
+      <ProfileUpload
+        profilePhoto={profilePhoto}
+        onPhotoChange={setProfilePhoto}
+      />
 
-      <SubmitButton onClick={handleSubmitTest}>회원가입 완료</SubmitButton>
+      {/* 상태 메시지 컴포넌트 */}
+      <StatusMessage
+        message={statusMessage}
+        onMessageChange={setStatusMessage}
+      />
+
+      {/* 학교 정보 컴포넌트 */}
+      <SchoolInfoForm
+        selectedSchool={selectedSchool}
+        selectedDepartment={selectedDepartment}
+        grade={grade}
+        onSchoolChange={setSelectedSchool}
+        onDepartmentChange={setSelectedDepartment}
+        onGradeChange={setGrade}
+      />
+
+      <SubmitButton onClick={handleSubmit}>회원가입 완료</SubmitButton>
     </FormContainer>
   );
 };
