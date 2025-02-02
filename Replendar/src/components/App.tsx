@@ -4,23 +4,19 @@ import Router from '../routes/Routes';
 import Sidebar from './Sidebar';
 import NavBar from './Navbar';
 import { useLocation } from 'react-router-dom';
-
 import Modal from '../modal/Modal';
 
 function App() {
   const location = useLocation();
-
   const hideLayout =
     location.pathname === '/login' ||
     location.pathname === '/signup' ||
-    location.pathname === '/callback';
-
+    location.pathname === '/callback' ||
+    location.pathname === '/fakelogin';
   return (
     <PageWrapper>
       <Modal />
-
       {!hideLayout && <Sidebar />}
-
       <MainWrapper>
         {!hideLayout && <NavBar />}
         <Router />

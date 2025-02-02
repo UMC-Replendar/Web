@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import useModalStore from '../../store/modalStore';
+// import useModalStore from '../../store/modalStore';
 import ProfileUpload from './ProfileUpload';
 import SchoolInfoForm from './SchoolInfoForm';
 import StatusMessage from './StatusMessage';
-import axios from 'axios';
+// import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const FormContainer = styled.div`
   background: #fff;
@@ -72,8 +73,11 @@ const ErrorMessage = styled.p`
 `;
 
 const SignupForm: React.FC = () => {
-  const { openModal } = useModalStore();
+  const navigate = useNavigate();
+  // const { openModal } = useModalStore();
   const [nickname, setNickname] = useState('');
+
+  //isNicknameValid 추가해야함
   const [isNicknameValid, setIsNicknameValid] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -86,40 +90,62 @@ const SignupForm: React.FC = () => {
     setErrorMessage('');
   };
 
-  const checkNicknameAvailability = async () => {
+  //테스트용으로 제작
+  const checkNicknameTest = () => {
     if (!nicknameRegex.test(nickname)) {
       setErrorMessage('중복 닉네임은 불가,영어 & 한글 조합');
       return;
     }
-
     setIsChecking(true);
-    try {
-      const response = await axios.post('/api/check-nickname', { nickname });
-      if (response.data.available) {
-        setIsNicknameValid(true);
-        setErrorMessage('사용 가능한 닉네임입니다.');
-      } else {
-        setErrorMessage('이미 사용 중인 닉네임입니다.');
-      }
-    } catch (error) {
-      setErrorMessage('api연동 전입니다.');
-    } finally {
-      setIsChecking(false);
+    if (localStorage.getItem('nickname') !== nickname) {
+      setIsNicknameValid(true);
+      setErrorMessage('사용 가능한 닉네임입니다.');
     }
   };
 
-  const handleSubmit = async () => {
+  // const checkNicknameAvailability = async () => {
+  //   if (!nicknameRegex.test(nickname)) {
+  //     setErrorMessage('중복 닉네임은 불가,영어 & 한글 조합');
+  //     return;
+  //   }
+
+  //   setIsChecking(true);
+  //   try {
+  //     const response = await axios.post('/api/check-nickname', { nickname });
+  //     if (response.data.available) {
+  //       setIsNicknameValid(true);
+  //       setErrorMessage('사용 가능한 닉네임입니다.');
+  //     } else {
+  //       setErrorMessage('이미 사용 중인 닉네임입니다.');
+  //     }
+  //   } catch (error) {
+  //     setErrorMessage('api연동 전입니다.');
+  //   } finally {
+  //     setIsChecking(false);
+  //   }
+  // };
+
+  // const handleSubmit = async () => {
+  //   if (!isNicknameValid) {
+  //     alert('닉네임 중복 확인을 완료해주세요');
+  //     return;
+  //   }
+
+  //   try {
+  //     await axios.post('/api/signup', { nickname });
+  //     openModal(<p>회원가입이 완료되었습니다.</p>);
+  //   } catch (error) {
+  //     openModal(<p>회원가입 중 오류가 발생했습니다.</p>);
+  //   }
+  // };
+
+  const handleSubmitTest = () => {
     if (!isNicknameValid) {
       alert('닉네임 중복 확인을 완료해주세요');
       return;
     }
-
-    try {
-      await axios.post('/api/signup', { nickname });
-      openModal(<p>회원가입이 완료되었습니다.</p>);
-    } catch (error) {
-      openModal(<p>회원가입 중 오류가 발생했습니다.</p>);
-    }
+    alert('회원가입 완료 되었습니다.');
+    navigate('/');
   };
 
   return (
@@ -133,10 +159,7 @@ const SignupForm: React.FC = () => {
           value={nickname}
           onChange={handleNicknameChange}
         />
-        <ConformButton
-          onClick={checkNicknameAvailability}
-          disabled={isChecking}
-        >
+        <ConformButton onClick={checkNicknameTest} disabled={isChecking}>
           {isChecking ? '확인 중...' : '중복확인'}
         </ConformButton>
       </BoxWrapper>
@@ -146,7 +169,7 @@ const SignupForm: React.FC = () => {
       <StatusMessage />
       <SchoolInfoForm />
 
-      <SubmitButton onClick={handleSubmit}>회원가입 완료</SubmitButton>
+      <SubmitButton onClick={handleSubmitTest}>회원가입 완료</SubmitButton>
     </FormContainer>
   );
 };

@@ -104,9 +104,9 @@ const P = styled.p`
 
 const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const visibleItems = expanded === 'true' ? 12 : 5;
-  const url = expanded
-    ? `https://api.replendar.site/api/friends`
-    : `https://api.replendar.site/api/friends?limit=5`;
+  // const url = expanded
+  //   ? `https://api.replendar.site/api/friends`
+  //   : `https://api.replendar.site/api/friends?limit=5`;
 
   const [modalState, setModalState] = useState<{
     isOpen: boolean;

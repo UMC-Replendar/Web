@@ -1,12 +1,15 @@
 import styled from 'styled-components';
 import Setting from '../assets/images/Setting.png';
 import { Link, useNavigate } from 'react-router-dom';
+import useAuthStore from '../store/authStore';
 
 function Settings() {
   const navigate = useNavigate();
+  const { clearAuth } = useAuthStore();
   const userId = '닉네임';
 
   const LogoutClicked = () => {
+    clearAuth();
     navigate('/login');
   };
 
