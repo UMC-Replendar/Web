@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import useModalStore from '../../store/modalStore';
 import SchoolSearchModal from '../../modal/SchoolSearchModal';
@@ -58,29 +58,42 @@ const Select = styled.select`
   margin-left: 30px;
 `;
 
-const SchoolInfoForm: React.FC = () => {
+interface SchoolInfoFormProps {
+  selectedSchool: string;
+  selectedDepartment: string;
+  grade: string;
+  onSchoolChange: (school: string) => void;
+  onDepartmentChange: (dept: string) => void;
+  onGradeChange: (grade: string) => void;
+}
+
+const SchoolInfoForm: React.FC<SchoolInfoFormProps> = ({
+  selectedSchool,
+  selectedDepartment,
+  grade,
+  onSchoolChange,
+  onDepartmentChange,
+  onGradeChange,
+}) => {
   const { openModal } = useModalStore();
-  const [selectedSchool, setSelectedSchool] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState('');
 
   // 학교 모달 열기 및 선택 처리
   const handleOpenSchoolModal = () => {
     openModal(
-      <SchoolSearchModal onSelect={(school) => setSelectedSchool(school)} />
+      <SchoolSearchModal onSelect={(school) => onSchoolChange(school)} />
     );
   };
 
-  // 학과 모달 열기 및 선택 처리, 선택된 학교 전달
+  // 학과 모달 열기 및 선택 처리 (선택된 학교가 있어야 함)
   const handleOpenDepartmentModal = () => {
     if (!selectedSchool) {
       alert('먼저 학교를 선택해주세요.');
       return;
     }
-
     openModal(
       <DepartmentSearchModal
         selectedSchool={selectedSchool}
-        onSelect={(dept) => setSelectedDepartment(dept)}
+        onSelect={(dept) => onDepartmentChange(dept)}
       />
     );
   };
@@ -114,11 +127,11 @@ const SchoolInfoForm: React.FC = () => {
 
         <RowWrapper>
           <Title>학년 *</Title>
-          <Select>
-            <option>1학년</option>
-            <option>2학년</option>
-            <option>3학년</option>
-            <option>4학년</option>
+          <Select value={grade} onChange={(e) => onGradeChange(e.target.value)}>
+            <option value="1학년">1학년</option>
+            <option value="2학년">2학년</option>
+            <option value="3학년">3학년</option>
+            <option value="4학년">4학년</option>
           </Select>
         </RowWrapper>
       </BoxWrapper>

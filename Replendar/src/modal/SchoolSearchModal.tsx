@@ -64,9 +64,11 @@ const RegisterButton = styled.button`
   margin-left: 10px;
 `;
 
-const SchoolSearchModal: React.FC<{ onSelect: (school: string) => void }> = ({
-  onSelect,
-}) => {
+interface SchoolSearchModalProps {
+  onSelect: (school: string) => void;
+}
+
+const SchoolSearchModal: React.FC<SchoolSearchModalProps> = ({ onSelect }) => {
   const { closeModal } = useModalStore();
   const [searchTerm, setSearchTerm] = useState('');
   const schools = ['룡산머학교', '서울대학교', '부산대학교'];
