@@ -135,8 +135,9 @@ import React, { useEffect, useState } from 'react';
 import useAuthStore from '../../../store/authStore'; // ✅ Zustand에서 토큰 가져오기
 
 const CompletedTasksPage: React.FC = () => {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  //setLoading, setError 추가하기(배포때문에 빨간줄 없애려고 잠시 제거한겁니다 추가하세요)
+  const [loading] = useState<boolean>(true);
+  const [error] = useState<string | null>(null);
   const { token } = useAuthStore(); // ✅ Zustand에서 토큰 가져오기
 
   useEffect(() => {

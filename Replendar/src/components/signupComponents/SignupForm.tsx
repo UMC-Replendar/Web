@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 // import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import useModalStore from '../../store/modalStore';
+// import useModalStore from '../../store/modalStore';
 import ProfileUpload from './ProfileUpload';
 import SchoolInfoForm from './SchoolInfoForm';
 import StatusMessage from './StatusMessage';
@@ -65,16 +65,20 @@ const SubmitButton = styled.button`
   align-self: flex-end;
 `;
 
-const ErrorMessage = styled.p`
-  color: red;
+// 에러 메시지 색상 (isValid가 true면 녹색, 아닐 경우 빨간색)
+interface ErrorMessageProps {
+  isValid?: boolean;
+}
+
+const ErrorMessage = styled.p<ErrorMessageProps>`
+  color: ${(props) => (props.isValid ? 'green' : 'red')};
   font-size: 14px;
   margin-top: 5px;
   min-height: 20px;
 `;
 
 /**
- * 닉네임 중복확인 로직을 별도의 함수로 추출
- * API 연동 부분은 주석 처리하고, 더미 로직으로 처리합니다.
+ * 닉네임 중복확인 로직 (더미 API)
  */
 export const validateNickname = async (
   nickname: string
@@ -96,17 +100,17 @@ export const validateNickname = async (
 };
 
 const SignupForm: React.FC = () => {
-  const { openModal } = useModalStore();
+  // const { openModal } = useModalStore(); //임시로 alert사용
   const navigate = useNavigate();
 
-  // 기존 닉네임 상태
+  // 닉네임 관련 상태
   const [nickname, setNickname] = useState('');
   const [isNicknameValid, setIsNicknameValid] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // 추가: 프로필 사진, 상태 메시지, 학교 정보(학교명, 학과, 학년)
-  const [profilePhoto, setProfilePhoto] = useState<string>(''); // 예: 이미지 URL 또는 Base64
+  // 프로필 사진, 상태 메시지, 학교 정보 상태
+  const [profilePhoto, setProfilePhoto] = useState<string>(''); // 이미지 URL 또는 Base64
   const [statusMessage, setStatusMessage] = useState<string>('');
   const [selectedSchool, setSelectedSchool] = useState<string>('');
   const [selectedDepartment, setSelectedDepartment] = useState<string>('');
@@ -114,12 +118,14 @@ const SignupForm: React.FC = () => {
 
   const nicknameRegex = /^[a-zA-Z\uAC00-\uD7A3]+$/;
 
+  // 닉네임 입력 변경 시 처리
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(e.target.value);
     setIsNicknameValid(false);
     setErrorMessage('');
   };
 
+  // 닉네임 중복 확인
   const checkNicknameAvailability = async () => {
     if (!nicknameRegex.test(nickname)) {
       setErrorMessage('영어와 한글만 사용 가능합니다.');
@@ -133,22 +139,25 @@ const SignupForm: React.FC = () => {
         setIsNicknameValid(true);
         setErrorMessage('사용 가능한 닉네임입니다.');
       } else {
+        setIsNicknameValid(false);
         setErrorMessage('이미 사용 중인 닉네임입니다.');
       }
     } catch (error) {
+      setIsNicknameValid(false);
       setErrorMessage('닉네임 확인 중 오류가 발생했습니다.');
     } finally {
       setIsChecking(false);
     }
   };
 
+  // 회원가입 완료 시 로컬스토리지 저장 후 alert로 완료 메시지 출력 후 메인 페이지로 리다이렉션
   const handleSubmit = async () => {
     if (!isNicknameValid) {
       alert('닉네임 중복 확인을 완료해주세요.');
       return;
     }
 
-    // 모든 회원가입 데이터를 객체에 담아서 로컬스토리지에 저장
+    // 모든 회원가입 데이터를 객체에 담아 로컬스토리지에 저장
     const signupData = {
       nickname,
       profilePhoto,
@@ -159,15 +168,13 @@ const SignupForm: React.FC = () => {
     };
 
     localStorage.setItem('signupData', JSON.stringify(signupData));
-    openModal(<p>회원가입이 완료되었습니다.</p>);
-
-    // 리다이렉션: 회원가입 완료 후 메인 페이지로 이동 (예: '/')
+    alert('회원가입이 완료되었습니다.');
     navigate('/');
 
     // 실제 API 연동 시 아래와 같이 사용합니다.
     // try {
     //   await axios.post('/api/signup', signupData);
-    //   openModal(<p>회원가입이 완료되었습니다.</p>);
+    //   alert('회원가입이 완료되었습니다.');
     //   navigate('/');
     // } catch (error) {
     //   openModal(<p>회원가입 중 오류가 발생했습니다.</p>);
@@ -192,21 +199,24 @@ const SignupForm: React.FC = () => {
           {isChecking ? '확인 중...' : '중복확인'}
         </ConformButton>
       </BoxWrapper>
-      <ErrorMessage>{errorMessage || ' '}</ErrorMessage>
+      {/* isNicknameValid가 true면 녹색, 아니면 빨간색 */}
+      <ErrorMessage isValid={isNicknameValid}>
+        {errorMessage || ' '}
+      </ErrorMessage>
 
-      {/* 프로필 사진 컴포넌트: 선택한 사진이 변경되면 setProfilePhoto 호출 */}
+      {/* 프로필 사진 컴포넌트 */}
       <ProfileUpload
         profilePhoto={profilePhoto}
         onPhotoChange={setProfilePhoto}
       />
 
-      {/* 상태 메시지 컴포넌트: 입력된 메시지를 상위 상태로 올림 */}
+      {/* 상태 메시지 컴포넌트 */}
       <StatusMessage
         message={statusMessage}
         onMessageChange={setStatusMessage}
       />
 
-      {/* 학교 정보 컴포넌트: 학교, 학과, 학년 정보를 상위 상태로 올림 */}
+      {/* 학교 정보 컴포넌트 */}
       <SchoolInfoForm
         selectedSchool={selectedSchool}
         selectedDepartment={selectedDepartment}

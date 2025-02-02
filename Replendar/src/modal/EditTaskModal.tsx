@@ -4,7 +4,7 @@ import LockIcon from '../assets/images/LockIcon.svg';
 import BookmarkIcon from '../assets/images/BookmarkIcon.svg';
 import ToggleSwitch from '../components/OngoingComponents/ToggleSwitch';
 
-const SmallToggleSwitch = styled(ToggleSwitch)`
+export const SmallToggleSwitch = styled(ToggleSwitch)`
   transform: scale(0.8);
 `;
 
