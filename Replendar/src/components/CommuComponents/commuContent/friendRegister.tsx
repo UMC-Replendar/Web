@@ -71,7 +71,7 @@ const friendRegister = () => {
     isLoading,
     isError,
   } = useGetData(
-    `https://api.replendar.site/api/friends/search?nickname=${debouncedNickname}`
+    `https://api.replendar.site/api/friends/search?nickname=${nickname}`
   );
   console.log(movies);
   if (isLoading) {
