@@ -90,7 +90,7 @@ const AddButtonDiv = styled.div`
   width: 95%;
   height: 67px;
 `;
-const RadiusDiv = styled.div``;
+// const RadiusDiv = styled.div``;
 
 //임시데이터
 const data = [

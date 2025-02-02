@@ -20,11 +20,16 @@ export default function Redirect() {
     if (!isRequestSent) {
       isRequestSent = true;
       axios
-        .get(`${import.meta.env.VITE_BACKEND_API_URL}/code=${AUTHORIZE_CODE}`)
+        .post(`${import.meta.env.VITE_BACKEND_API_URL}/code=${AUTHORIZE_CODE}`)
+        // .post('https://api.replendar.site/api/user/login', {
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        //   body: JSON.stringify(1),
+        // })
         .then((response) => {
           console.log(response);
 
-          // JWT 토큰 저장
           const JWT_TOKEN: string = response.data?.token;
           if (JWT_TOKEN) {
             localStorage.setItem('token', JWT_TOKEN);
@@ -33,7 +38,6 @@ export default function Redirect() {
             throw new Error('토큰이 없습니다.');
           }
 
-          // 회원가입 여부 확인 후 이동
           if (!response.data?.userID) {
             navigate('/signup');
           } else {
@@ -43,7 +47,7 @@ export default function Redirect() {
         .catch((error) => {
           console.error('로그인 실패:', error);
           alert('로그인에 실패했습니다.');
-          navigate('/login');
+          // navigate('/login');
         });
     }
   }, [navigate, AUTHORIZE_CODE]); // useEffect 의존성 배열

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { NineDots } from '../commuIcons';
-import useGetData from '../../../hooks/useGetData';
+// import useGetData from '../../../hooks/useGetData';
 
 const Container = styled.div`
   width: 100%;
@@ -56,9 +56,9 @@ const FlexDiv = styled.div`
 
 const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const visibleItems = expanded === 'true' ? 12 : 5;
-  const url = expanded
-    ? `https://api.replendar.site/api/friends`
-    : `https://api.replendar.site/api/friends?limit=5`;
+  // const url = expanded
+  //   ? `https://api.replendar.site/api/friends`
+  //   : `https://api.replendar.site/api/friends?limit=5`;
 
   /*const { data: data1, isLoading, isError } = useGetData(url);
 

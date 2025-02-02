@@ -6,6 +6,7 @@ import AppIcon from '../assets/images/logoCapture.png';
 import Blue from '../assets/images/loginImage/Blue.svg';
 import Orange from '../assets/images/loginImage/Orange.svg';
 import Pink from '../assets/images/loginImage/Pink.svg';
+import { Link } from 'react-router-dom';
 
 const Container = styled.div`
   display: flex;
@@ -92,6 +93,8 @@ const movingLeaves = keyframes`
   }
 `;
 
+const FakeLogin = styled.span``;
+
 const Leaf = styled.div<{
   top: string;
   size: string;
@@ -129,6 +132,9 @@ function Login() {
         <img src={KakaoLogo} alt="Kakao Logo" />
         카카오로 로그인하기
       </KakaoButton>
+      <Link to={'/fakelogin'}>
+        <FakeLogin>테스트 로그인</FakeLogin>
+      </Link>
       <CharacterImage src={Pink} alt="Character 1" top="85%" left="25%" />
       <CharacterImage src={Orange} alt="Character 2" top="85%" left="70%" />
       <CharacterImage src={Blue} alt="Character 3" top="70%" left="80%" />

@@ -3,19 +3,35 @@ import { create } from 'zustand';
 // ✅ Zustand를 사용하여 토큰 저장
 interface AuthState {
   token: string | null;
-  setToken: (token: string) => void;
-  clearToken: () => void;
+  email: string | null;
+  id: number | null;
+  nickname: string | null;
+  setAuth: (token: string, email: string, id: number, nickname: string) => void;
+  clearAuth: () => void;
 }
 
 const useAuthStore = create<AuthState>((set) => ({
-  token: localStorage.getItem('token') || null, // 초기 상태를 localStorage에서 가져오기
-  setToken: (token) => {
-    localStorage.setItem('token', token); // ✅ 토큰 저장
-    set({ token });
+  token: localStorage.getItem('token') || null,
+  email: localStorage.getItem('email') || null,
+  id: localStorage.getItem('id') ? Number(localStorage.getItem('id')) : null,
+  nickname: localStorage.getItem('nickname') || null,
+
+  setAuth: (token, email, id, nickname) => {
+    localStorage.setItem('token', token);
+    localStorage.setItem('email', email);
+    localStorage.setItem('id', id.toString());
+    localStorage.setItem('nickname', nickname);
+
+    set({ token, email, id, nickname });
   },
-  clearToken: () => {
-    localStorage.removeItem('token'); // ✅ 로그아웃 시 토큰 삭제
-    set({ token: null });
+
+  clearAuth: () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('email');
+    localStorage.removeItem('id');
+    localStorage.removeItem('nickname');
+
+    set({ token: null, email: null, id: null, nickname: null });
   },
 }));
 
