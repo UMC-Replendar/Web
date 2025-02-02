@@ -17,6 +17,7 @@ import Redirect from '../components/LoginComponents/Redirect';
 
 import NotCompletedTaskPage from '../components/infoComopnents/taskPage/NotCompletedTaskPage';
 import ImportantTaskPage from '../components/infoComopnents/taskPage/ImportantTaskPage';
+import Fakelogin from '../components/infoComopnents/taskPage/Fakelogin';
 
 function Router() {
   return (
@@ -39,6 +40,7 @@ function Router() {
 
       <Route path="/notcompleted" element={<NotCompletedTaskPage />}></Route>
       <Route path="/important" element={<ImportantTaskPage />}></Route>
+      <Route path="/Fakelogin" element={<Fakelogin />}></Route>
     </Routes>
   );
 }

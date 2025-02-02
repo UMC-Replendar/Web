@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { NineDots } from '../commuIcons';
+import useGetData from '../../../hooks/useGetData';
 
 const Container = styled.div`
   width: 100%;
@@ -7,9 +8,9 @@ const Container = styled.div`
   display: flex;
 
   flex-direction: column;
-  justify-content: space-around;
+
   padding: 20px;
-  gap: 2px;
+
   box-sizing: border-box;
 `;
 
@@ -23,6 +24,8 @@ const SpaceBtwDiv = styled.div`
   background: white;
   border-radius: 20px;
   padding: 0px 30px;
+  margin-bottom: 1px;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
 `;
 
 const RightAlignedItem = styled.div`
@@ -53,6 +56,19 @@ const FlexDiv = styled.div`
 
 const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const visibleItems = expanded === 'true' ? 12 : 5;
+  const url = expanded
+    ? `https://api.replendar.site/api/friends`
+    : `https://api.replendar.site/api/friends?limit=5`;
+
+  /*const { data: data1, isLoading, isError } = useGetData(url);
+
+  if (isLoading) {
+    return <div>스켈레톤 이미지</div>;
+  }
+
+  if (isError) {
+    return <h1>에러</h1>;
+  }*/
 
   return (
     <Container>

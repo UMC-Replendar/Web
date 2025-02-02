@@ -37,7 +37,7 @@ const CloseButton = styled.button`
 `;
 
 const Modal: React.FC = () => {
-  const { isOpen, content, closeModal } = useModalStore();
+  const { isOpen, modalContent, closeModal } = useModalStore();
 
   if (!isOpen) return null;
 
@@ -45,7 +45,7 @@ const Modal: React.FC = () => {
     <Overlay onClick={closeModal}>
       <ModalContent onClick={(e) => e.stopPropagation()}>
         <CloseButton onClick={closeModal}>X</CloseButton>
-        {content}
+        {modalContent}
       </ModalContent>
     </Overlay>
   );

@@ -8,9 +8,9 @@ const Container = styled.div`
   display: flex;
 
   flex-direction: column;
-  justify-content: space-around;
+
   padding: 20px;
-  gap: 2px;
+
   box-sizing: border-box;
 `;
 
@@ -25,6 +25,8 @@ const FlexDiv = styled.div`
   border-radius: 20px;
   padding: 0px 30px;
   background: white;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1px;
 `;
 
 const RightAlignedItem = styled.div`
