@@ -10,6 +10,8 @@ function NavBar() {
   const [currentTime, setCurrentTime] = useState(
     dayjs().format('YYYY/MM/DD HH:mm:ss')
   );
+  const profilePhoto = localStorage.getItem('profilePhoto'); // Base64 이미지
+  const nickname = localStorage.getItem('nickname') || '닉네임'; // 기본 닉네임 설정
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -30,22 +32,6 @@ function NavBar() {
         </Link>
       </IconWrapper>
       <ProfileWrapper>
-        {/* <UserContainer>
-          <Link to={'/login'}>
-            <ProfileImg src={KakaoLogo} />
-          </Link>
-          <Link to={'/login'}>
-            <ProfileStatus>임시 로그인</ProfileStatus>
-          </Link>
-        </UserContainer> */}
-        {/* <UserContainer>
-          <Link to={'/signup'}>
-            <ProfileImg src={ChillChillGuy} />
-          </Link>
-          <Link to={'/signup'}>
-            <ProfileStatus>회원가입</ProfileStatus>
-          </Link>
-        </UserContainer> */}
         <UserContainer>
           <ProfileStatus>
             <TimeDisplay>{currentTime}</TimeDisplay>
@@ -53,10 +39,11 @@ function NavBar() {
         </UserContainer>
         <UserContainer>
           <Link to={'/info'}>
-            <ProfileImg src={ProfileImage} />
+            {/* ✅ 프로필 이미지가 존재하면 표시, 없으면 기본 이미지 */}
+            <ProfileImg src={profilePhoto || ProfileImage} alt="Profile" />
           </Link>
           <Link to={'/info'}>
-            <ProfileStatus>닉네임</ProfileStatus>
+            <ProfileStatus>{nickname}</ProfileStatus>
           </Link>
         </UserContainer>
       </ProfileWrapper>
