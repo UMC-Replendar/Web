@@ -2,15 +2,14 @@ import styled from 'styled-components';
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
-import useGetData from '../../../hooks/useGetData';
-import { Register } from '../../../types';
-import axios from 'axios';
+//import useGetData from '../../../hooks/useGetData';
+//import axios from 'axios';
 
 const friendRegister = () => {
-  //const [searchParams, setSearchParams] = useSearchParams({ mq: '' });
+  const [searchParams, setSearchParams] = useSearchParams({ mq: '' });
 
   const navigate = useNavigate();
-  //const mq = searchParams.get('mq');
+  const mq = searchParams.get('mq');
   const [nickname, setNickname] = useState('');
 
   const [searchResult, setSearchResult] = useState<{
@@ -21,33 +20,58 @@ const friendRegister = () => {
     message: string;
   } | null>(null);
 
-  /*useEffect(() => {
+  useEffect(() => {
     setSearchParams({ mq: '' });
-  }, []);*/
+  }, []);
 
-  const [token, setToken] = useState(null);
-
-  const getToken = async () => {
+  //로그인토큰얻기
+  /*const getToken = async () => {
     try {
       const response = await axios.post(
-        'https://api.replendar.site//api/user/login',
+        'https://api.replendar.site/api/user/login',
         {
           email: '1',
         }
       );
-      setToken(response.data.token);
-      console.log('JWT 토큰:', response.data.token);
+      localStorage.setItem('token', response.data.result.accessToken);
+      console.log(
+        '로그인 성공! 얻은 JWT토큰: ',
+        response.data.result.accessToken
+      );
     } catch (error) {
       console.error('로그인 실패:', error);
     }
-  };
+  };*/
 
+  //검색api호출
+  /*
+  const register = async () => {
+    const token = localStorage.getItem('token');
+    console.log('보내는 token: ', token);
+    try {
+      const response = await axios.post(
+        'https://api.replendar.site/api/user/login',
+        {
+          email: '1',
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log('검색api: ', response.data.result);
+    } catch (error) {
+      console.error('로그인 실패:', error);
+    }
+  };*/
   /*const {
     data: movies,
     isLoading,
     isError,
   } = useGetData(
-    `https://api.replendar.site/api/friends/search?nickname=친구A&userId=1`
+    `https://api.replendar.site/api/friends/search?nickname=친구A`
   );
   console.log(movies);
   if (isLoading) {
@@ -56,8 +80,7 @@ const friendRegister = () => {
 
   if (isError) {
     return <h1>에러</h1>;
-  }
-    */
+  }*/
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(e.target.value);
@@ -70,11 +93,8 @@ const friendRegister = () => {
   };
   const handleSearch = () => {
     const trimmedNickname = nickname.trim();
-    //if (mq === trimmedNickname) return;
-    /* {mq && searchResult === null ? (
-    <FlexDiv width="900px">검색 결과 '{nickname}'가 없습니다</FlexDiv>
-  ) : searchResult ? (
-    <>*/
+    if (mq === trimmedNickname) return;
+
     navigate(`/community?mq=${trimmedNickname}`);
 
     if (trimmedNickname !== '') {
@@ -95,10 +115,9 @@ const friendRegister = () => {
           placeholder="등록할 친구의 이름을 입력해주세요"
         ></SearchInput>
         <SearchBtn onClick={handleSearch}>검색</SearchBtn>
-        <button onClick={getToken}>여기다</button>
       </InputContainer>
       <EmptyDiv>
-        {searchResult === null ? (
+        {mq && searchResult === null ? (
           <FlexDiv width="900px">검색 결과 '{nickname}'가 없습니다</FlexDiv>
         ) : searchResult ? (
           <>
@@ -146,7 +165,7 @@ export default friendRegister;
 const Container = styled.div`
   width: 100%;
 
-  height: 391px;
+  height: 380px;
 `;
 
 const FlexAlignStart = styled.div`

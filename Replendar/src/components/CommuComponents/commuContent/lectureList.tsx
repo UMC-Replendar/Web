@@ -21,6 +21,7 @@ const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
             <th>강좌</th>
           </tr>
         </thead>
+
         <tbody>
           {data.slice(0, visibleItems).map((item, index) => (
             <tr key={index}>
@@ -49,7 +50,7 @@ const Container = styled.div`
   table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0px 4px; /* 셀 간격 */
+    border-spacing: 0px 2px;
   }
   th {
     color: #666;
@@ -63,6 +64,12 @@ const Container = styled.div`
     font-size: 19px;
     background-color: white;
   }
+  tr {
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  }
+
   tr th:first-child,
   tr td:first-child {
     border-top-left-radius: 20px;
@@ -83,6 +90,7 @@ const AddButtonDiv = styled.div`
   width: 95%;
   height: 67px;
 `;
+const RadiusDiv = styled.div``;
 
 //임시데이터
 const data = [
