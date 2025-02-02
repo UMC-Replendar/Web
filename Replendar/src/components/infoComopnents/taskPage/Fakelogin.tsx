@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import useAuthStore from '../../../store/authStore';
@@ -56,7 +56,7 @@ const Fakelogin = () => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { setToken } = useAuthStore();
+  const { setAuth } = useAuthStore();
 
   const handleLogin = async () => {
     if (!email) {
@@ -80,9 +80,14 @@ const Fakelogin = () => {
       console.log('로그인 응답:', data);
 
       if (data.isSuccess && data.result.accessToken) {
-        localStorage.setItem('token', data.result.accessToken); // ✅ JWT 저장
-        setToken(data.result.accessToken); // ✅ Zustand에 토큰 저장
-        navigate('/'); // 로그인 후 홈으로 이동
+        const { accessToken, email, id, nickname } = data.result;
+        // localStorage.setItem('token', data.result.accessToken); // ✅ JWT 저장
+        console.log(data);
+        setAuth(accessToken, email, id, nickname); // ✅ Zustand에 토큰 저장
+        if (nickname == null) {
+          alert('Replendar에 처음이시군요! 회원가입을 진행해 주세요');
+          navigate('/signup'); // 로그인 후 회원가입으로 이동
+        }
       } else {
         setError(data.message || '로그인 실패');
       }

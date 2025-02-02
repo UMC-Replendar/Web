@@ -11,8 +11,8 @@ function App() {
   const hideLayout =
     location.pathname === '/login' ||
     location.pathname === '/signup' ||
-    location.pathname === '/callback';
-
+    location.pathname === '/callback' ||
+    location.pathname === '/fakelogin';
   return (
     <PageWrapper>
       <Modal />

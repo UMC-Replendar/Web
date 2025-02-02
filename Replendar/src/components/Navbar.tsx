@@ -2,18 +2,18 @@ import styled, { keyframes } from 'styled-components';
 import AppIcon from '../assets/images/AppIcon.png';
 import ProfileImage from '../assets/images/ProfileImg.png';
 import { Link } from 'react-router-dom';
-import KakaoLogo from '../assets/images/KakaoTalk_logo.png';
+// import KakaoLogo from '../assets/images/KakaoTalk_logo.png';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-import ChillChillGuy from '../assets/images/ChillGuy.png';
+// import ChillChillGuy from '../assets/images/ChillGuy.png';
 function NavBar() {
   const [currentTime, setCurrentTime] = useState(
-    dayjs().format('YYYY:MM:DD HH:mm:ss')
+    dayjs().format('YYYY/MM/DD HH:mm:ss')
   );
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTime(dayjs().format('YYYY:MM:DD HH:mm:ss'));
+      setCurrentTime(dayjs().format('YYYY/MM/DD HH:mm:ss'));
     }, 1000);
 
     return () => clearInterval(interval);
@@ -30,22 +30,22 @@ function NavBar() {
         </Link>
       </IconWrapper>
       <ProfileWrapper>
-        <UserContainer>
+        {/* <UserContainer>
           <Link to={'/login'}>
             <ProfileImg src={KakaoLogo} />
           </Link>
           <Link to={'/login'}>
             <ProfileStatus>임시 로그인</ProfileStatus>
           </Link>
-        </UserContainer>
-        <UserContainer>
+        </UserContainer> */}
+        {/* <UserContainer>
           <Link to={'/signup'}>
             <ProfileImg src={ChillChillGuy} />
           </Link>
           <Link to={'/signup'}>
             <ProfileStatus>회원가입</ProfileStatus>
           </Link>
-        </UserContainer>
+        </UserContainer> */}
         <UserContainer>
           <ProfileStatus>
             <TimeDisplay>{currentTime}</TimeDisplay>

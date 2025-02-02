@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import Info from '../pages/Info';
 import Community from '../pages/community';
 import Login from '../pages/login';
@@ -18,11 +18,18 @@ import Redirect from '../components/LoginComponents/Redirect';
 import NotCompletedTaskPage from '../components/infoComopnents/taskPage/NotCompletedTaskPage';
 import ImportantTaskPage from '../components/infoComopnents/taskPage/ImportantTaskPage';
 import Fakelogin from '../components/infoComopnents/taskPage/Fakelogin';
+import useAuthStore from '../store/authStore';
 
 function Router() {
+  const { token } = useAuthStore();
+
   return (
     <Routes>
-      <Route path="/" element={<OngoingTasks />}></Route>
+      <Route
+        path="/"
+        element={token ? <OngoingTasks /> : <Navigate to="/login" replace />}
+      />
+      {/* <Route path="/" element={<OngoingTasks />}></Route> */}
       <Route path="/info" element={<Info />}></Route>
       <Route path="/community" element={<Community />}></Route>
       <Route path="/login" element={<Login />}></Route>
