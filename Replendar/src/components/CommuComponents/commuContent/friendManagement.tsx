@@ -14,7 +14,7 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
     new Array(data.length).fill(false)
   );
 
-  const visibleItems = expanded === 'true' ? 10 : 4;
+  const visibleItems = expanded === 'true' ? 20 : 4;
 
   const toggleGroup = (index: number) => {
     setShowGroups((prev) => {
@@ -43,8 +43,8 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
       </AddButtonDiv>
 
       {data.slice(0, visibleItems).map((item, index) => (
-        <div key={index}>
-          <SpaceBtwDiv status={showGroups[index].toString()}>
+        <>
+          <SpaceBtwDiv key={index} status={showGroups[index].toString()}>
             <FlexDiv>
               {item.groupName}
               <img
@@ -65,7 +65,7 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
               <FriendList expanded="false" />
             </FlexDiv>
           )}
-        </div>
+        </>
       ))}
     </Container>
   );
@@ -82,14 +82,9 @@ const AddButtonDiv = styled.div`
 `;
 const Container = styled.div`
   width: 100%;
-
-  display: flex;
-
-  flex-direction: column;
-
+  height: 855px;
   padding: 20px;
-
-  box-sizing: border-box;
+  overflow-y: auto;
 `;
 
 const SpaceBtwDiv = styled.div<{ status: string }>`
@@ -104,6 +99,10 @@ const SpaceBtwDiv = styled.div<{ status: string }>`
   padding: 0px 30px;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 1px;
+  &:nth-child(10),
+  &:nth-child(11) {
+    margin-bottom: 1.5px; /* 얼탱없네 얘네 */
+  }
 `;
 
 const FlexDiv = styled.div`
@@ -117,6 +116,12 @@ const data = [
   { groupName: '그룹2' },
   { groupName: '그룹3' },
   { groupName: '그룹4' },
+  { groupName: '그룹5' },
+  { groupName: '그룹6' },
+  { groupName: '그룹7' },
+  { groupName: '그룹8' },
+  { groupName: '그룹9' },
+  { groupName: '그룹10' },
   { groupName: '그룹5' },
   { groupName: '그룹6' },
   { groupName: '그룹7' },

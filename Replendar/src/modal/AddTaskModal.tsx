@@ -8,6 +8,7 @@ import GrayPlusIcon from '../assets/images/GrayPlusIcon.svg';
 import ToggleSwitch from '../components/OngoingComponents/ToggleSwitch';
 import useTaskStore from '../store/useTaskStore';
 import useModalStore from '../store/modalStore';
+import ModalPortal from './modalPortal';
 
 const ModalOverlay = styled.div`
   position: absolute;

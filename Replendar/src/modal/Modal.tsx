@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import useModalStore from '../store/modalStore';
+import ModalPortal from './modalPortal';
 
 const Overlay = styled.div`
   position: fixed;
@@ -42,12 +43,14 @@ const Modal: React.FC = () => {
   if (!isOpen) return null;
 
   return (
-    <Overlay onClick={closeModal}>
-      <ModalContent onClick={(e) => e.stopPropagation()}>
-        <CloseButton onClick={closeModal}>X</CloseButton>
-        {modalContent}
-      </ModalContent>
-    </Overlay>
+    <ModalPortal>
+      <Overlay onClick={closeModal}>
+        <ModalContent onClick={(e) => e.stopPropagation()}>
+          <CloseButton onClick={closeModal}>X</CloseButton>
+          {modalContent}
+        </ModalContent>
+      </Overlay>
+    </ModalPortal>
   );
 };
 

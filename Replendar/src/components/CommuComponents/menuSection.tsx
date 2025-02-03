@@ -31,7 +31,11 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, menuItems }) => {
       <SpaceBtwDiv>
         <BtnContainer>
           {menuItems.map((menu) => (
-            <CustomBtn key={menu} onClick={() => handleMenuClick(menu)}>
+            <CustomBtn
+              key={menu}
+              isSelected={menuState.activeMenu === menu}
+              onClick={() => handleMenuClick(menu)}
+            >
               {menu}
             </CustomBtn>
           ))}
@@ -44,7 +48,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, menuItems }) => {
           />
         </FlexDiv>
       </SpaceBtwDiv>
-      <StyledDiv>
+      <StyledDiv expanded={menuState.expanded.toString()}>
         <MenuContent
           menuState={menuState.activeMenu}
           expanded={menuState.expanded.toString()}
@@ -63,7 +67,7 @@ const FlexDiv = styled.div`
   font-size: 16px;
   gap: 6px;
 `;
-const StyledDiv = styled.div`
+const StyledDiv = styled.div<{ expanded: string }>`
   background: rgba(252, 246, 245, 1);
   width: 95%;
 
@@ -74,16 +78,21 @@ const StyledDiv = styled.div`
   flex-direction: column;
   justify-content: start;
   align-items: center;
+
+  height: ${(props) => (props.expanded === 'true' ? '855px' : '380px')};
+
+transition: height 0.3s ease-out;>
 `;
 
-const CustomBtn = styled.button`
-  background: rgba(243, 243, 243, 1);
+const CustomBtn = styled.button<{ isSelected: boolean }>`
+  background: ${(props) =>
+    props.isSelected ? 'rgba(102, 102, 102, 1)' : 'rgba(243, 243, 243, 1)'};
   width: 135px;
   height: 38px;
   border-radius: 50px;
   border: none;
   font-size: 16px;
-  color: rgba(102, 102, 102, 1);
+  color: ${(props) => (props.isSelected ? 'white' : 'rgba(102, 102, 102, 1)')};
   padding: 0px;
   box-shadow: 0px 5px 15.7px 0px rgba(177, 198, 187, 0.4);
   margin-bottom: 15px;

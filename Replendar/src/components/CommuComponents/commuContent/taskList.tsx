@@ -3,19 +3,15 @@ import { AddButton } from '../../../pages/OngoingTasks';
 import PlusIcon from '../../../assets/images/PlusIcon.svg';
 import BlueButton from '../../blueButton';
 import DownArrow from '../../../assets/images/downArrow.svg';
-
+import { useState } from 'react';
 import useModalStore from '../../../store/modalStore';
 import CommuModalContent from '../modalContents/commuModalContent';
 
-const Container = styled.div`
+const Container = styled.div<{ expanded?: string }>`
   width: 100%;
-
-  display: flex;
-
-  flex-direction: column;
-
+  height: 855px;
   padding: 20px;
-  box-sizing: border-box;
+  overflow-y: ${({ expanded }) => (expanded === 'true' ? 'auto' : 'hidden')};
 
   table {
     width: 100%;
@@ -79,16 +75,40 @@ const AddButtonDiv = styled.div`
   width: 95%;
 `;
 
+const Modal = styled.div`
+  position: absolute;
+  /*top: 830px;
+  left: 430px;*/
+  top: 400px;
+  left: 430px;
+  width: 600px;
+  height: 650px;
+  background-color: rgba(255, 255, 255, 1);
+  border: 1px solid #ccc;
+
+  border-radius: 10px;
+  padding: 30px;
+  flex-direction: column;
+  z-index:;
+`;
+const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+`;
+
 const TaskList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const visibleItems = expanded === 'true' ? 10 : 3;
-
-  const { openModal } = useModalStore();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleOpenModal = () => {
-    openModal(<CommuModalContent />);
+    setIsOpen(!isOpen);
   };
   return (
-    <Container>
+    <Container expanded={expanded}>
       <SpaceBtwDiv>
         <AddButtonDiv>
           {' '}
@@ -140,6 +160,13 @@ const TaskList: React.FC<{ expanded: string }> = ({ expanded }) => {
           ))}
         </tbody>
       </table>
+      {isOpen && (
+        <Overlay onClick={() => setIsOpen(!isOpen)}>
+          <Modal onClick={(e) => e.stopPropagation()}>
+            <CommuModalContent></CommuModalContent>
+          </Modal>
+        </Overlay>
+      )}
     </Container>
   );
 };
