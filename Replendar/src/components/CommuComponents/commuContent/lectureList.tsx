@@ -1,13 +1,21 @@
 import styled from 'styled-components';
 import { AddButton } from '../../../pages/OngoingTasks';
 import PlusIcon from '../../../assets/images/PlusIcon.svg';
+import { useState } from 'react';
+import CommuModalContent from '../modalContents/commuModalContent';
 
 const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const visibleItems = expanded === 'true' ? 20 : 3;
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
     <Container expanded={expanded}>
       <AddButtonDiv>
-        <AddButton>
+        <AddButton onClick={handleOpenModal}>
           과제 추가하기
           <img src={PlusIcon} alt="Plus Icon" />
         </AddButton>
@@ -33,6 +41,13 @@ const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
           ))}
         </tbody>
       </table>
+      {isOpen && (
+        <Overlay onClick={() => setIsOpen(!isOpen)}>
+          <Modal onClick={(e) => e.stopPropagation()}>
+            <CommuModalContent></CommuModalContent>
+          </Modal>
+        </Overlay>
+      )}
     </Container>
   );
 };
@@ -87,7 +102,30 @@ const AddButtonDiv = styled.div`
   width: 95%;
   height: 67px;
 `;
+const Modal = styled.div`
+  position: absolute;
+  /*top: 830px;
+  left: 430px;*/
+  top: 400px;
+  left: 430px;
+  width: 600px;
+  height: 650px;
+  background-color: rgba(255, 255, 255, 1);
+  border: 1px solid #ccc;
 
+  border-radius: 10px;
+  padding: 30px;
+  flex-direction: column;
+  z-index:;
+`;
+const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+`;
 //임시데이터
 const data = [
   { grade: '1학년', professor: '김철수', course: '컴퓨터 과학 기초' },

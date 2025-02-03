@@ -43,8 +43,8 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
       </AddButtonDiv>
 
       {data.slice(0, visibleItems).map((item, index) => (
-        <>
-          <SpaceBtwDiv key={index} status={showGroups[index].toString()}>
+        <div key={index}>
+          <SpaceBtwDiv status={showGroups[index].toString()}>
             <FlexDiv>
               {item.groupName}
               <img
@@ -65,7 +65,7 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
               <FriendList expanded="false" />
             </FlexDiv>
           )}
-        </>
+        </div>
       ))}
     </Container>
   );

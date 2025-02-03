@@ -1,9 +1,8 @@
 import styled from 'styled-components';
 import { useState } from 'react';
-import { useEffect } from 'react';
 import useDebounce from '../../../hooks/useDebounce';
 import SearchIcon from '../../../assets/images/search.svg';
-//import useGetData from '../../../hooks/useGetData';
+import useGetData from '../../../hooks/useGetData';
 //import axios from 'axios';
 import { ProfileImage } from '../commuIcons';
 
@@ -22,25 +21,6 @@ const friendRegister = () => {
 
   const debouncedNickname = useDebounce(searchNickname, 500);
 
-  //로그인토큰얻기
-  /*const getToken = async () => {
-    try {
-      const response = await axios.post(
-        'https://api.replendar.site/api/user/login',
-        {
-          email: '1',
-        }
-      );
-      localStorage.setItem('token', response.data.result.accessToken);
-      console.log(
-        '로그인 성공! 얻은 JWT토큰: ',
-        response.data.result.accessToken
-      );
-    } catch (error) {
-      console.error('로그인 실패:', error);
-    }
-  };*/
-
   /*const {
     data: data1,
     isLoading,
@@ -48,7 +28,7 @@ const friendRegister = () => {
   } = useGetData(
     `https://api.replendar.site/api/friends/search?nickname=${debouncedNickname}`
   );
-  console.log(movies);
+  console.log(data1);
   if (isLoading) {
     return <div>스켈레톤 이미지</div>;
   }
