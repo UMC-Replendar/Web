@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { ChangeEvent } from 'react';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -43,13 +43,20 @@ const CharCounter = styled.p<CharCounterProps>`
   margin-top: 5px;
 `;
 
-const StatusMessage: React.FC = () => {
-  const [message, setMessage] = useState<string>('');
+interface StatusMessageProps {
+  message: string;
+  onMessageChange: (message: string) => void;
+}
+
+const StatusMessage: React.FC<StatusMessageProps> = ({
+  message,
+  onMessageChange,
+}) => {
   const maxLength: number = 40;
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.length <= maxLength) {
-      setMessage(e.target.value);
+      onMessageChange(e.target.value);
     }
   };
 

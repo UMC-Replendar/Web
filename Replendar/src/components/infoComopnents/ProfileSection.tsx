@@ -61,25 +61,32 @@ const Message = styled.p`
 
 function ProfileSection() {
   const [image, setImage] = useState<string | null>(null);
-  const [nickname, setNickname] = useState<string>('');
-  const [statusMessage, setStatusMessage] = useState<string>('');
-  const [school, setSchool] = useState<string>('');
-  const [department, setDepartment] = useState<string>('');
-  const [grade, setGrade] = useState<string>('');
+  const [nickname, setNickname] = useState<string>('닉네임 없음');
+  const [statusMessage, setStatusMessage] =
+    useState<string>('상태 메시지 없음');
+  const [school, setSchool] = useState<string>('학교 정보 없음');
+  const [department, setDepartment] = useState<string>('학과 정보 없음');
+  const [grade, setGrade] = useState<string>('학년 정보 없음');
 
-  // 🔹 localStorage에서 데이터 불러오기
+  // 🔹 localStorage에서 signupData를 파싱하여 상태 업데이트
   useEffect(() => {
-    setImage(localStorage.getItem('profileImage'));
-    setNickname(localStorage.getItem('nickname') || '닉네임 없음');
-    setStatusMessage(
-      localStorage.getItem('statusMessage') || '상태 메시지 없음'
-    );
-    setSchool(localStorage.getItem('school') || '학교 정보 없음');
-    setDepartment(localStorage.getItem('department') || '학과 정보 없음');
-    setGrade(localStorage.getItem('grade') || '학년 정보 없음');
+    const storedData = localStorage.getItem('signupData');
+    if (storedData) {
+      try {
+        const data = JSON.parse(storedData);
+        setImage(data.profilePhoto || null);
+        setNickname(data.nickname || '닉네임 없음');
+        setStatusMessage(data.statusMessage || '상태 메시지 없음');
+        setSchool(data.selectedSchool || '학교 정보 없음');
+        setDepartment(data.selectedDepartment || '학과 정보 없음');
+        setGrade(data.grade || '학년 정보 없음');
+      } catch (error) {
+        console.error('로컬스토리지 데이터 파싱 오류:', error);
+      }
+    }
   }, []);
 
-  // 🔹 프로필 사진 업로드 시 localStorage에 저장
+  // 🔹 프로필 사진 업로드 시 localStorage에 저장(추가 수정 가능)
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -87,7 +94,15 @@ function ProfileSection() {
       reader.onloadend = () => {
         const imageData = reader.result as string;
         setImage(imageData);
-        localStorage.setItem('profileImage', imageData);
+        // 기존 signupData에 profilePhoto만 업데이트하는 예시
+        const storedData = localStorage.getItem('signupData');
+        if (storedData) {
+          const data = JSON.parse(storedData);
+          data.profilePhoto = imageData;
+          localStorage.setItem('signupData', JSON.stringify(data));
+        } else {
+          localStorage.setItem('profileImage', imageData);
+        }
       };
       reader.readAsDataURL(file);
     }

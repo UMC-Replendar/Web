@@ -1,11 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useState } from 'react';
+
 const UploadContainer = styled.div`
   display: flex;
   flex-direction: column;
   text-align: center;
-
   align-items: center;
   margin: 20px 0;
 `;
@@ -16,10 +15,10 @@ const Title = styled.h3`
   color: #333;
   margin-bottom: 16px;
 `;
+
 const UploadWrapper = styled.div`
   width: 250px;
   height: 250px;
-
   margin-top: 10px;
   background: #e8e8e8;
   border-radius: 50%;
@@ -38,6 +37,7 @@ const UploadIcon = styled.img`
   border-radius: 50%;
   object-fit: cover;
 `;
+
 const UploadText = styled.div`
   font-size: 17px;
   font-family: 'Pretendard', sans-serif;
@@ -47,15 +47,23 @@ const UploadText = styled.div`
   user-select: none;
 `;
 
-const ProfileUpload: React.FC = () => {
-  const [image, setImage] = useState<string | null>(null);
+// ProfileUpload 컴포넌트가 받을 prop의 타입 정의
+interface ProfileUploadProps {
+  profilePhoto: string;
+  onPhotoChange: (photo: string) => void;
+}
 
+const ProfileUpload: React.FC<ProfileUploadProps> = ({
+  profilePhoto,
+  onPhotoChange,
+}) => {
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // 파일을 Base64 문자열로 변환하여 onPhotoChange를 호출
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result as string); // 미리보기용 Base64 저장
+        onPhotoChange(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -66,8 +74,8 @@ const ProfileUpload: React.FC = () => {
       <Title>프로필 사진 설정</Title>
       <label htmlFor="file-upload">
         <UploadWrapper>
-          {image ? (
-            <UploadIcon src={image} alt="프로필 사진 미리보기" />
+          {profilePhoto ? (
+            <UploadIcon src={profilePhoto} alt="프로필 사진 미리보기" />
           ) : (
             <>
               <img
