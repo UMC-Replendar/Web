@@ -161,15 +161,21 @@ const CompletedTasksPage: React.FC = () => {
           {
             method: 'GET',
             headers: {
-              Accept: '*/*',
-              Authorization: `Bearer ${token}`,
+              Accept: 'application/json', // 📌 MIME 타입 명확하게 지정
+              Authorization: `${token}`, // 📌 Bearer 토큰 앞에 공백 제거
             },
           }
         );
 
+        const text = await response.text();
+        console.log('Raw Response:', text); // 📌 응답 내용 출력
+
         if (!response.ok) {
-          console.log(error);
-          console.log(token);
+          throw new Error(`HTTP 오류! 상태 코드: ${response.status}`);
+        }
+
+        if (!text) {
+          throw new Error('응답이 비어 있습니다.');
         }
 
         const data = await response.json();

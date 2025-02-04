@@ -4,12 +4,9 @@ import BlueButton from '../../blueButton';
 
 const Container = styled.div`
   width: 100%;
-  display: flex;
-  flex-direction: column;
-
+  height: 855px;
   padding: 20px;
-
-  box-sizing: border-box;
+  overflow-y: auto;
 `;
 
 const FlexDiv = styled.div`
@@ -23,7 +20,11 @@ const FlexDiv = styled.div`
   border-radius: 20px;
   padding: 0px 30px;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1px;
+  margin-top: 1px;
+  &:nth-child(10),
+  &:nth-child(7) {
+    margin-top: 1.5px; /* 얼탱없네 얘네 */
+  }
 `;
 
 const RightAlignedItem = styled.div`
@@ -40,7 +41,7 @@ const CenterDiv = styled.div`
 `;
 
 const DepartmentList: React.FC<{ expanded: string }> = ({ expanded }) => {
-  const visibleItems = expanded === 'true' ? 10 : 5;
+  const visibleItems = expanded === 'true' ? 30 : 5;
   const [registerStates, setRegisterStates] = useState<boolean[]>(
     Array(data.length).fill(false)
   );
@@ -85,6 +86,37 @@ const data = [
   { time: '35분 전', message: '강감찬님이 배열 메소드 과제를 완료하였습니다' },
   { time: '40분 전', message: '윤봉길님이 DOM 조작 과제를 완료하였습니다' },
   { time: '45분 전', message: '홍정호님이 웹 접근성 과제를 완료하였습니다' },
+  { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
+  { time: '35분 전', message: '강감찬님이 배열 메소드 과제를 완료하였습니다' },
+  { time: '40분 전', message: '윤봉길님이 DOM 조작 과제를 완료하였습니다' },
+  { time: '45분 전', message: '홍정호님이 웹 접근성 과제를 완료하였습니다' },
+  { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
+  { time: '55분 전', message: '유관순님이 비동기 처리 과제를 완료하였습니다' },
+  { time: '55분 전', message: '유관순님이 비동기 처리 과제를 완료하였습니다' },
+  { time: '25분 전', message: '박문수님이 HTML 마크업 과제를 완료하였습니다' },
+  { time: '30분 전', message: '정약용님이 API 호출 과제를 완료하였습니다' },
+  { time: '35분 전', message: '강감찬님이 배열 메소드 과제를 완료하였습니다' },
+  { time: '40분 전', message: '윤봉길님이 DOM 조작 과제를 완료하였습니다' },
+  { time: '45분 전', message: '홍정호님이 웹 접근성 과제를 완료하였습니다' },
+  { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
+  { time: '35분 전', message: '강감찬님이 배열 메소드 과제를 완료하였습니다' },
+  { time: '40분 전', message: '윤봉길님이 DOM 조작 과제를 완료하였습니다' },
+  { time: '45분 전', message: '홍정호님이 웹 접근성 과제를 완료하였습니다' },
+  { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
+  { time: '55분 전', message: '유관순님이 비동기 처리 과제를 완료하였습니다' },
+  { time: '55분 전', message: '유관순님이 비동기 처리 과제를 완료하였습니다' },
+  { time: '25분 전', message: '박문수님이 HTML 마크업 과제를 완료하였습니다' },
+  { time: '30분 전', message: '정약용님이 API 호출 과제를 완료하였습니다' },
+  { time: '35분 전', message: '강감찬님이 배열 메소드 과제를 완료하였습니다' },
+  { time: '40분 전', message: '윤봉길님이 DOM 조작 과제를 완료하였습니다' },
+  { time: '45분 전', message: '홍정호님이 웹 접근성 과제를 완료하였습니다' },
+  { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
+  { time: '35분 전', message: '강감찬님이 배열 메소드 과제를 완료하였습니다' },
+  { time: '40분 전', message: '윤봉길님이 DOM 조작 과제를 완료하였습니다' },
+  { time: '45분 전', message: '홍정호님이 웹 접근성 과제를 완료하였습니다' },
+  { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
+  { time: '55분 전', message: '유관순님이 비동기 처리 과제를 완료하였습니다' },
+  { time: '55분 전', message: '유관순님이 비동기 처리 과제를 완료하였습니다' },
   { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
   { time: '35분 전', message: '강감찬님이 배열 메소드 과제를 완료하였습니다' },
   { time: '40분 전', message: '윤봉길님이 DOM 조작 과제를 완료하였습니다' },

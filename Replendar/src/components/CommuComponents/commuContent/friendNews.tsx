@@ -4,33 +4,29 @@ import BlueButton from '../../blueButton';
 
 const Container = styled.div`
   width: 100%;
-
-  display: flex;
-
-  flex-direction: column;
-
+  height: 855px;
   padding: 20px;
-
-  box-sizing: border-box;
+  overflow-y: auto;
 `;
 
 const FlexDiv = styled.div`
   display: flex;
-  justify-content: space-between;
-  gap: 100px; /* 갭 조정 */
+  gap: 100px;
   width: 100%;
   font-size: 19px;
-  height: 40px;
-  height: 67px;
+  margin-bottom: 1px;
   border-radius: 20px;
   padding: 0px 30px;
   background: white;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1px;
+  &:nth-child(7),
+  &:nth-child(8) {
+    margin-bottom: 1.5px; /* 얼탱없네 얘네 */
+  }
 `;
 
 const RightAlignedItem = styled.div`
-  margin-left: auto; /* 오른쪽 끝에 배치 */
+  margin-left: auto;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -40,10 +36,11 @@ const CenterDiv = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 67px;
 `;
 
 const FriendNews: React.FC<{ expanded: string }> = ({ expanded }) => {
-  const visibleItems = expanded === 'true' ? 12 : 5;
+  const visibleItems = expanded === 'true' ? 20 : 5;
 
   //임시데이터
   const [registerStates, setRegisterStates] = useState<boolean[]>(
@@ -91,6 +88,22 @@ const data = [
   { time: '35분 전', message: '강감찬님이 배열 메소드 과제를 완료하였습니다' },
   { time: '40분 전', message: '윤봉길님이 DOM 조작 과제를 완료하였습니다' },
   { time: '45분 전', message: '홍정호님이 웹 접근성 과제를 완료하였습니다' },
+  { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
+  { time: '35분 전', message: '강감찬님이 배열 메소드 과제를 완료하였습니다' },
+  { time: '40분 전', message: '윤봉길님이 DOM 조작 과제를 완료하였습니다' },
+  { time: '45분 전', message: '홍정호님이 웹 접근성 과제를 완료하였습니다' },
+  { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
+  { time: '55분 전', message: '유관순님이 비동기 처리 과제를 완료하였습니다' },
+  { time: '55분 전', message: '유관순님이 비동기 처리 과제를 완료하였습니다' },
+
+  { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
+  { time: '35분 전', message: '강감찬님이 배열 메소드 과제를 완료하였습니다' },
+  { time: '40분 전', message: '윤봉길님이 DOM 조작 과제를 완료하였습니다' },
+  { time: '45분 전', message: '홍정호님이 웹 접근성 과제를 완료하였습니다' },
+  { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
+  { time: '55분 전', message: '유관순님이 비동기 처리 과제를 완료하였습니다' },
+  { time: '55분 전', message: '유관순님이 비동기 처리 과제를 완료하였습니다' },
+
   { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
   { time: '35분 전', message: '강감찬님이 배열 메소드 과제를 완료하였습니다' },
   { time: '40분 전', message: '윤봉길님이 DOM 조작 과제를 완료하였습니다' },

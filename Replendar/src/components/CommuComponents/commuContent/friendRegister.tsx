@@ -1,15 +1,14 @@
 import styled from 'styled-components';
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useEffect } from 'react';
-//import useGetData from '../../../hooks/useGetData';
+import useDebounce from '../../../hooks/useDebounce';
+import SearchIcon from '../../../assets/images/search.svg';
+import useGetData from '../../../hooks/useGetData';
 //import axios from 'axios';
+import { ProfileImage } from '../commuIcons';
 
 const friendRegister = () => {
-  const [searchParams, setSearchParams] = useSearchParams({ nickname: '' });
+  const [isFocus, setIsFocus] = useState(true);
 
-  const navigate = useNavigate();
-  const nickname = searchParams.get('nickname');
   const [searchNickname, setSearchNickname] = useState('');
 
   const [searchResult, setSearchResult] = useState<{
@@ -20,60 +19,16 @@ const friendRegister = () => {
     message: string;
   } | null>(null);
 
-  useEffect(() => {
-    setSearchParams({ nickname: '' });
-  }, []);
+  const debouncedNickname = useDebounce(searchNickname, 500);
 
-  //로그인토큰얻기
-  /*const getToken = async () => {
-    try {
-      const response = await axios.post(
-        'https://api.replendar.site/api/user/login',
-        {
-          email: '1',
-        }
-      );
-      localStorage.setItem('token', response.data.result.accessToken);
-      console.log(
-        '로그인 성공! 얻은 JWT토큰: ',
-        response.data.result.accessToken
-      );
-    } catch (error) {
-      console.error('로그인 실패:', error);
-    }
-  };*/
-
-  //검색api호출
-  /*
-  const register = async () => {
-    const token = localStorage.getItem('token');
-    console.log('보내는 token: ', token);
-    try {
-      const response = await axios.post(
-        'https://api.replendar.site/api/user/login',
-        {
-          email: '1',
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      console.log('검색api: ', response.data.result);
-    } catch (error) {
-      console.error('로그인 실패:', error);
-    }
-  };*/
   /*const {
     data: data1,
     isLoading,
     isError,
   } = useGetData(
-    `https://api.replendar.site/api/friends/search?nickname=${nickname}`
+    `https://api.replendar.site/api/friends/search?nickname=${debouncedNickname}`
   );
-  console.log(movies);
+  console.log(data1);
   if (isLoading) {
     return <div>스켈레톤 이미지</div>;
   }
@@ -88,14 +43,13 @@ const friendRegister = () => {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
+      const nextElement = document.getElementById('searchBtn') as HTMLElement;
+      nextElement?.focus();
       handleSearch();
     }
   };
   const handleSearch = () => {
     const trimmedNickname = searchNickname.trim();
-    if (nickname === trimmedNickname) return;
-
-    navigate(`/community?nickname=${trimmedNickname}`);
 
     if (trimmedNickname !== '') {
       const result = userData.find((user) => user.nickname === trimmedNickname);
@@ -108,17 +62,23 @@ const friendRegister = () => {
   return (
     <Container>
       <InputContainer>
-        <SearchIcon src="src/assets/images/search.svg" alt="Search Icon" />
+        <CustomSearchIcon src={SearchIcon} alt="searchIcon" />
         <SearchInput
           value={searchNickname}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder="등록할 친구의 이름을 입력해주세요"
+          onBlur={() => {
+            setIsFocus(false);
+          }}
+          onFocus={() => setIsFocus(true)}
         ></SearchInput>
-        <SearchBtn onClick={handleSearch}>검색</SearchBtn>
+        <SearchBtn id="searchBtn" onClick={handleSearch}>
+          검색
+        </SearchBtn>
       </InputContainer>
       <EmptyDiv>
-        {searchResult === null && nickname && (
+        {searchResult === null && searchNickname && !isFocus && (
           <FlexDiv width="900px">
             검색 결과 '{searchNickname}'가 없습니다
           </FlexDiv>
@@ -127,10 +87,7 @@ const friendRegister = () => {
         {searchResult ? (
           <>
             <ProfileContainer>
-              <img
-                src={searchResult.profileImage}
-                alt={`${searchResult.nickname} 프로필`}
-              />
+              <ProfileImage />
               <FlexAlignStart>
                 <NoMarginH3>{searchResult.nickname}</NoMarginH3>
                 <NoMarginH3>{searchResult.name}</NoMarginH3>
@@ -170,7 +127,7 @@ export default friendRegister;
 const Container = styled.div`
   width: 100%;
 
-  height: 380px;
+  height: 855px;
 `;
 
 const FlexAlignStart = styled.div`
@@ -208,7 +165,7 @@ const ProfileContainer = styled.div`
   border: 1px solid rgba(232, 232, 232, 1);
   height: 132px;
 `;
-const SearchIcon = styled.img`
+const CustomSearchIcon = styled.img`
   position: absolute;
   top: 50%;
   left: 20px;
@@ -239,6 +196,9 @@ const SearchBtn = styled.button<{ width?: string }>`
   height: 60px;
   width: ${(props) => props.width || '97px'};
   font-size: 19px;
+    &:focus {
+    outline: none;  
+    
 `;
 
 const InputContainer = styled.div`
