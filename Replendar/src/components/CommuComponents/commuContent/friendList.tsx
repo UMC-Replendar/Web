@@ -1,24 +1,20 @@
 import styled from 'styled-components';
 import { NineDots } from '../commuIcons';
 // import useGetData from '../../../hooks/useGetData';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SmallToggleSwitch } from '../../../modal/EditTaskModal';
+import { ProfileImage } from '../commuIcons';
 
 const Container = styled.div`
   width: 100%;
-
-  display: flex;
-
-  flex-direction: column;
-
+  height: 855px;
   padding: 20px;
-
-  box-sizing: border-box;
+  overflow-y: auto;
 `;
 
 const SpaceBtwDiv = styled.div`
   display: flex;
-  justify-content: space-between;
+  position: relative;
   gap: 100px; /* 갭 조정 */
   width: 100%;
   font-size: 19px;
@@ -28,6 +24,11 @@ const SpaceBtwDiv = styled.div`
   padding: 0px 30px;
   margin-bottom: 1px;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+
+  &:nth-child(7),
+  &:nth-child(8) {
+    margin-bottom: 1.5px;
+  }
 `;
 
 const RightAlignedItem = styled.div`
@@ -55,25 +56,26 @@ const FlexDiv = styled.div`
   align-items: center;
   gap: 20px;
 `;
-const Modal = styled.div<{ isOpen: boolean; top: string }>`
+const Modal = styled.div<{ top: string }>`
   position: absolute;
   top: ${(props) => props.top};
-  right: 170px;
+  left: 1700px;
   width: 300px;
-  background-color:rgba(255, 255, 255, 1);
+  background-color: rgba(255, 255, 255, 1);
   border: 1px solid #ccc;
 
   border-radius: 10px;
 
-  display: ${(props: { isOpen: boolean }) => (props.isOpen ? 'flex' : 'none')};\
-  flex-direction:column;
-
+  flex-direction: column;
+  z-index: 1;
 `;
 const ModalContent = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 8px 10px 8px 10px;
   height: 38px;
+  z-index: 2;
+
   span {
     font-family: Pretendard;
     font-size: 13px;
@@ -103,11 +105,6 @@ const P = styled.p`
 `;
 
 const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
-  const visibleItems = expanded === 'true' ? 12 : 5;
-  // const url = expanded
-  //   ? `https://api.replendar.site/api/friends`
-  //   : `https://api.replendar.site/api/friends?limit=5`;
-
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     selectedId: number | null;
@@ -117,6 +114,11 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
   });
 
   const [isOn, setIsOn] = useState(false);
+
+  const visibleItems = expanded === 'true' ? 30 : 5;
+  // const url = expanded
+  //   ? `https://api.replendar.site/api/friends`
+  //   : `https://api.replendar.site/api/friends?limit=5`;
 
   /*const { data: data1, isLoading, isError } = useGetData(url);
 
@@ -129,17 +131,18 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
   }*/
   const handleNineDotsClick = (id: number) => {
     setModalState((prev) => ({
-      isOpen: prev.selectedId !== id || !prev.isOpen, // 클릭한 아이템이 다르면 열기, 같으면 토글
-      selectedId: prev.selectedId === id ? null : id, // 같은 걸 클릭하면 닫기
+      isOpen: prev.selectedId !== id || !prev.isOpen,
+      selectedId: prev.selectedId === id ? null : id,
     }));
   };
   return (
     <Container>
       {data.slice(0, visibleItems).map((item, index) => (
-        <div key={index}>
-          <SpaceBtwDiv>
+        <>
+          <SpaceBtwDiv key={index}>
             <FlexDiv>
-              <img src={item.image} alt="프로필 사진" />
+              <ProfileImage width={'30'} height={'30'} />
+
               <CenterDiv width="100px">{item.nickname}</CenterDiv>
             </FlexDiv>
 
@@ -155,41 +158,43 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
               />
             </RightAlignedItem>
           </SpaceBtwDiv>
-          <Modal
-            top={`${index * 67 + 340}px`}
-            isOpen={modalState.isOpen && modalState.selectedId === item.id}
-          >
-            <ModalContent>
-              <span>진행중인 과제: ?개</span>
-              <div>일정확인</div>
-            </ModalContent>
+          {modalState.isOpen && modalState.selectedId === item.id && (
+            <Modal
+              onClick={(e) => e.stopPropagation()}
+              top={`${index * 67 + 320}px`}
+            >
+              <ModalContent>
+                <span>진행중인 과제: ?개</span>
+                <div>일정확인</div>
+              </ModalContent>
 
-            <P>과제공유</P>
+              <P>과제공유</P>
 
-            <ModalContent>
-              <div
-                style={{
-                  display: 'flex',
-                  transformOrigin: 'left',
-                  alignItems: 'center', // 수직 중앙 정렬
-                  transform: 'scale(0.5)', // 크기 조정
-                }}
-              >
-                <SmallToggleSwitch
-                  isOn={isOn}
-                  onToggle={() => setIsOn(!isOn)}
-                />
-              </div>
-              <div>친한친구설정</div>
-            </ModalContent>
-            <ModalContent>
-              <span>메모내용메모내용</span>
-              <div>메모수정</div>
-            </ModalContent>
+              <ModalContent>
+                <div
+                  style={{
+                    display: 'flex',
+                    transformOrigin: 'left',
+                    alignItems: 'center', // 수직 중앙 정렬
+                    transform: 'scale(0.5)', // 크기 조정
+                  }}
+                >
+                  <SmallToggleSwitch
+                    isOn={isOn}
+                    onToggle={() => setIsOn(!isOn)}
+                  />
+                </div>
+                <div>친한친구설정</div>
+              </ModalContent>
+              <ModalContent>
+                <span>메모내용메모내용</span>
+                <div>메모수정</div>
+              </ModalContent>
 
-            <P>친구삭제</P>
-          </Modal>
-        </div>
+              <P>친구삭제</P>
+            </Modal>
+          )}
+        </>
       ))}
     </Container>
   );
@@ -224,6 +229,144 @@ const data = [
   },
   {
     id: 5,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
+    image: 'src/assets/images/프로필 사진.png',
+    nickname: 'BugHunter',
+    ongoingTaskNum: 1,
+  },
+  {
+    id: 6,
     image: 'src/assets/images/프로필 사진.png',
     nickname: 'BugHunter',
     ongoingTaskNum: 1,

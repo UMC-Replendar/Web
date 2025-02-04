@@ -165,3 +165,33 @@ export const PlusIcon: React.FC<IconProps> = ({
     />
   </svg>
 );
+
+export const ProfileImage: React.FC<IconProps> = ({
+  width = '92',
+  height = '93',
+
+  onClick,
+}) => (
+  <svg
+    width={width}
+    height={height}
+    viewBox="0 0 92 93"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    onClick={onClick}
+  >
+    <circle cx="46" cy="46.5" r="46" fill="#EAEDFB" />
+    <path
+      d="M23.8625 42.9121C23.8625 30.6065 33.8382 20.6309 46.1438 20.6309C58.4494 20.6309 68.425 30.6065 68.425 42.9121V86.6707C68.425 86.6707 61.8125 92.5002 46.575 92.5002C31.3375 92.5002 23.8625 86.7502 23.8625 86.7502V42.9121Z"
+      fill="#7CD7EB"
+    />
+    <circle cx="37.6626" cy="36.7256" r="1.4375" fill="#666666" />
+    <circle cx="54.9126" cy="36.7256" r="1.4375" fill="#666666" />
+    <path
+      d="M38.2375 43.0508C42.4063 47.7945 50.025 47.6508 54.3375 43.0508"
+      stroke="#37AAC3"
+      strokeWidth="4"
+      strokeLinecap="round"
+    />
+  </svg>
+);
