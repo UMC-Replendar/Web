@@ -8,6 +8,7 @@ import UpArrowIcon from '../assets/images/UpArrowIcon.svg';
 import EditTaskModal from '../modal/EditTaskModal';
 import useModalStore from '../store/modalStore';
 import useTaskStore from '../store/useTaskStore';
+import axios from 'axios';
 
 const PageWrapper = styled.div`
   margin-top: 79px;
@@ -159,52 +160,67 @@ const TaskCompleteButton = styled.button`
   white-space: nowrap;
 `;
 
-interface TaskData {
-  color: string;
+// API 호출 함수
+const fetchTasksFromAPI = async (
+  userId: number,
+  setTasks: (tasks: any) => void
+) => {
+  try {
+    const response = await axios.get(`/api/assignment?userId=${userId}`);
+    if (response.data.isSuccess) {
+      const formattedTasks = response.data.result.map((task: any) => ({
+        id: Number(task.assignmentId),
+        name: task.title,
+        deadline: task.due_date,
+        remainingTime: task.due_time,
+        color: '#7AC19A',
+        isToggled: task.notification === 'ON',
+        isBookmarked: task.visibility === 'ON',
+      }));
+      setTasks(formattedTasks);
+    }
+  } catch (error) {
+    console.error('API Error:', error);
+  }
+};
+
+interface Task {
+  assignmentId: number;
   name: string;
   deadline: string;
   remainingTime: string;
+  color: string;
   isToggled: boolean;
   isBookmarked: boolean;
 }
 
 function OngoingTasks() {
-  const { tasks, deleteTask, updateRemainingTimes } = useTaskStore(); // Zustand에서 상태 가져오기
+  const { tasks, setTasks, deleteTask, updateRemainingTimes } = useTaskStore(); // Zustand에서 상태 가져오기
   const { isOpen, openModal, closeModal, modalContent } = useModalStore(); // useModalStore 추가했어요요
-  const [visibleTasksCount, setVisibleTasksCount] = useState(
-    tasks.length <= 3 ? tasks.length : 3
-  );
+  const [visibleTasksCount, setVisibleTasksCount] = useState(3);
 
   useEffect(() => {
-    //Zustand로 뺐음
-    updateRemainingTimes();
+    fetchTasksFromAPI(1, setTasks);
     const interval = setInterval(updateRemainingTimes, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [setTasks, updateRemainingTimes]);
 
   const handleShowMore = () => {
-    if (visibleTasksCount < tasks.length) {
-      setVisibleTasksCount(tasks.length);
-    } else {
-      setVisibleTasksCount(3);
-    }
+    setVisibleTasksCount((prev) => (prev < tasks.length ? tasks.length : 3));
   };
 
-  const handleCompleteTask = (name: string) => {
-    deleteTask(name); // name을 직접 전달하도록 수정
+  const handleCompleteTask = (assignmentId: number) => {
+    deleteTask(assignmentId);
   };
 
-  const handleEditTask = (task: TaskData) => {
-    const taskIndex = tasks.findIndex((t) => t.name === task.name);
-    if (taskIndex !== -1) {
-      openModal(
-        <EditTaskModal
-          task={task}
-          onClose={closeModal}
-          onComplete={() => handleCompleteTask(task.name)} //name 기준 중복 때문에 나중에 id 로 바꾸기
-        />
-      );
-    }
+  const handleEditTask = (task: Task) => {
+    openModal(
+      <EditTaskModal
+        task={task}
+        onClose={closeModal}
+        onComplete={() => handleCompleteTask(task.assignmentId)}
+      />
+    );
   };
 
   return (
@@ -244,12 +260,13 @@ function OngoingTasks() {
       </MainPageTitleWrapper>
       <TaskBox isScrollable={tasks.length > 10}>
         {tasks.slice(0, visibleTasksCount).map((task) => (
-          <Task
-            key={task.name} // `key`는 `name`을 사용해야 더 안전함
+          <TaskItem
+            key={task.assignmentId} // `key`는 `name`을 사용해야 더 안전함
+            assignmentId={task.assignmentId}
             color={task.color}
             name={task.name}
             remainingTime={task.remainingTime || ''}
-            onComplete={() => handleCompleteTask(task.name)} // ✅ `index` 대신 `task.name` 전달
+            onComplete={() => handleCompleteTask(task.assignmentId)} // ✅ `index` 대신 `task.name` 전달
             onEdit={() => handleEditTask(task)} // ✅ task 객체 전체 전달
           />
         ))}
@@ -266,6 +283,7 @@ function OngoingTasks() {
 }
 
 interface TaskProps {
+  assignmentId: number;
   color: string;
   name: string;
   remainingTime: string;
@@ -273,7 +291,13 @@ interface TaskProps {
   onEdit: () => void; // 수정 버튼 이벤트 추가
 }
 
-function Task({ color, name, remainingTime, onComplete, onEdit }: TaskProps) {
+function TaskItem({
+  color,
+  name,
+  remainingTime,
+  onComplete,
+  onEdit,
+}: TaskProps) {
   return (
     <>
       <TaskBlockContainer onClick={onEdit}>
