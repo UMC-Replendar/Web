@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 import { SmallToggleSwitch } from '../../../modal/EditTaskModal';
 import { ProfileImage } from '../commuIcons';
 import { IFriendList } from '../../../types';
+import { useMutation } from '@tanstack/react-query';
+import { respondToFriendRequest } from '../../../apis/commuApi';
 
 const Container = styled.div`
   width: 100%;
@@ -60,7 +62,7 @@ const FlexDiv = styled.div`
 const Modal = styled.div<{ top: string }>`
   position: absolute;
   top: ${(props) => props.top};
-  left: 1700px;
+  right: 250px;
   width: 300px;
   background-color: rgba(255, 255, 255, 1);
   border: 1px solid #ccc;
@@ -116,10 +118,32 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
 
   const [isOn, setIsOn] = useState(false);
 
+  /*const mutation = useMutation<
+  string,
+  Error,
+  { requestId: number; isAccepted: boolean }
+>({
+  mutationFn: ({ requestId, isAccepted }) =>
+    respondToFriendRequest({ requestId, isAccepted }),
+
+  onSuccess: () => {},
+  onError: (error: Error) => {
+    // 에러 시 처리 로직
+    alert('친구 요청을 보내는 데 실패했습니다.');
+    console.error(error);
+  },
+  onSettled: (data: string | undefined) => {
+    // 요청이 완료된 후 (성공, 실패 관계없이) 처리 로직
+    if (data) {
+      alert(data);
+    }
+  },
+});*/
+
   const url = expanded ? `/api/friends` : `/api/friends?limit=5`;
 
-  const { data: data1, isLoading, isError } = useGetData(url);
-  console.log(data1);
+  const { data, isLoading, isError } = useGetData(url);
+
   if (isLoading) {
     return <div>스켈레톤 이미지</div>;
   }
@@ -127,6 +151,7 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
   if (isError) {
     return <h1>에러</h1>;
   }
+
   const handleNineDotsClick = (id: number) => {
     setModalState((prev) => ({
       isOpen: prev.selectedId !== id || !prev.isOpen,
@@ -135,8 +160,8 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
   };
   return (
     <Container>
-      {data1.length === 0 && <div>친구 없음</div>}
-      {data1.map((item: IFriendList, index: number) => (
+      {data.length === 0 && <div>친구 없음</div>}
+      {data.map((item: IFriendList, index: number) => (
         <div key={index}>
           <SpaceBtwDiv>
             <FlexDiv>
