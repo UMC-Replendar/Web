@@ -1,14 +1,14 @@
-import { useState } from 'react';
 import styled from 'styled-components';
 import ThemeSettingIcon from '../../assets/images/SettingsPageIcons/ThemeSettingIcon.png';
+import { useThemeStore } from '../../store/useThemeStore';
+import GreenTheme from '../../assets/images/SettingsPageIcons/GreenTheme.svg';
+import BlueTheme from '../../assets/images/SettingsPageIcons/BlueTheme.svg';
+import PurpleTheme from '../../assets/images/SettingsPageIcons/PurpleTheme.svg';
 
 export default function ThemeSettingPage() {
-  const [selectedTheme, setSelectedTheme] = useState('기본테마');
+  const { selectedTheme, setTheme } = useThemeStore();
 
-  const handleThemeSelect = (theme: string) => {
-    setSelectedTheme(theme);
-  };
-
+  console.log(selectedTheme);
   return (
     <Container>
       <TitleContainer>
@@ -18,30 +18,30 @@ export default function ThemeSettingPage() {
       <OptionContainer>
         <SelectButton
           selected={selectedTheme === '기본테마'}
-          onClick={() => handleThemeSelect('기본테마')}
+          onClick={() => setTheme('기본테마')}
         />
-        <ThemeOption selected={selectedTheme === '기본테마'}>
-          <ThemeText>기본테마</ThemeText>
+        <ThemeOption src={GreenTheme} selected={selectedTheme === '기본테마'}>
+          <ThemeText></ThemeText>
         </ThemeOption>
       </OptionContainer>
 
       <OptionContainer>
         <SelectButton
-          selected={selectedTheme === '테마 1'}
-          onClick={() => handleThemeSelect('테마 1')}
+          selected={selectedTheme === '테마1'}
+          onClick={() => setTheme('테마1')}
         />
-        <ThemeOption selected={selectedTheme === '테마 1'}>
-          <ThemeText>테마 1</ThemeText>
+        <ThemeOption src={BlueTheme} selected={selectedTheme === '테마1'}>
+          <ThemeText></ThemeText>
         </ThemeOption>
       </OptionContainer>
 
       <OptionContainer>
         <SelectButton
           selected={selectedTheme === '테마2'}
-          onClick={() => handleThemeSelect('테마2')}
+          onClick={() => setTheme('테마2')}
         />
-        <ThemeOption selected={selectedTheme === '테마2'}>
-          <ThemeText>테마2</ThemeText>
+        <ThemeOption src={PurpleTheme} selected={selectedTheme === '테마2'}>
+          <ThemeText></ThemeText>
         </ThemeOption>
       </OptionContainer>
     </Container>
@@ -74,7 +74,7 @@ const TitleSpan = styled.span`
   font-size: 28px;
   font-style: normal;
   font-weight: 700;
-  line-height: 140%; /* 39.2px */
+  line-height: 140%;
 `;
 
 const OptionContainer = styled.div`
@@ -97,12 +97,14 @@ const SelectButton = styled.div<{ selected: boolean }>`
   }
 `;
 
-const ThemeOption = styled.div<{ selected: boolean }>`
+const ThemeOption = styled.div<{ selected: boolean; src: string }>`
   padding: 20px;
   width: 355px;
   height: 199.476px;
   border-radius: 10px;
   background: #fcf6f5;
+  background-image: url(${(props) => props.src});
+  background-position: center;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease-in-out;
 

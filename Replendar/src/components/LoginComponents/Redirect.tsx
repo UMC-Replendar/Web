@@ -15,42 +15,32 @@ export default function Redirect() {
       return;
     }
 
-    let isRequestSent = false; // 중복 실행 방지
-
-    if (!isRequestSent) {
-      isRequestSent = true;
-      axios
-        .post(`${import.meta.env.VITE_BACKEND_API_URL}/code=${AUTHORIZE_CODE}`)
-        // .post('https://api.replendar.site/api/user/login', {
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: JSON.stringify(1),
-        // })
-        .then((response) => {
-          console.log(response);
-
-          const JWT_TOKEN: string = response.data?.token;
-          if (JWT_TOKEN) {
-            localStorage.setItem('token', JWT_TOKEN);
-            alert('로그인에 성공했습니다');
-          } else {
-            throw new Error('토큰이 없습니다.');
-          }
-
-          if (!response.data?.userID) {
+    axios
+      .get(`${import.meta.env.VITE_BACKEND_API_URL}?code=${AUTHORIZE_CODE}`)
+      .then((response) => {
+        console.log(response);
+        const { accessToken, email, id, nickName, theme } =
+          response.data.result;
+        if (response.data.isSuccess) {
+          localStorage.setItem('token', accessToken);
+          alert('로그인에 성공했습니다');
+          if (nickName == null) {
+            alert('Replendar에 처음이시군요. 회원가입부터 진행해주세요!');
             navigate('/signup');
           } else {
+            alert('Replendar에 오신 것을 환영합니다. ' + nickName + '님');
             navigate('/');
           }
-        })
-        .catch((error) => {
-          console.error('로그인 실패:', error);
-          alert('로그인에 실패했습니다.');
-          // navigate('/login');
-        });
-    }
-  }, [navigate, AUTHORIZE_CODE]); // useEffect 의존성 배열
+        } else {
+          throw new Error('토큰이 없습니다.');
+        }
+      })
+      .catch((error) => {
+        console.error('로그인 실패:', error);
+        alert('로그인에 실패했습니다.');
+        navigate('/login');
+      });
+  }, []);
 
   return <h1>리다이렉트 중입니다.</h1>;
 }
