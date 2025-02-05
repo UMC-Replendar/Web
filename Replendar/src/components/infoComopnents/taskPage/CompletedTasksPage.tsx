@@ -119,7 +119,7 @@ const CompletedTasksPage: React.FC = () => {
           time: item.time || '미정',
           description: item.description || '설명 없음',
           delay: item.delay || '지연 정보 없음',
-          status: item.status || '미확인',
+          status: item.status === '' ? undefined : item.status,
         }));
 
         setTasks(fetchedTasks);
@@ -149,7 +149,10 @@ const CompletedTasksPage: React.FC = () => {
 
       <Box>
         {tasks.length === 0 ? (
-          <p>완료된 과제가 없습니다.</p>
+          <p>
+            완료된 과제가 없습니다. <br />
+            완료된 과제가 있을 때 넘겨받은 content 구조 보고 수정 필요할 듯
+          </p>
         ) : (
           tasks.map((task, index) => {
             const isEarly = task.delay.includes('빨랐습니다');
@@ -161,7 +164,9 @@ const CompletedTasksPage: React.FC = () => {
                     <TaskText>{task.time}</TaskText>
                     <TaskText>{task.description}</TaskText>
                   </TaskDetails>
-                  <BlueButton status={task.status}>{task.status}</BlueButton>
+                  <BlueButton status={task.status}>
+                    {task.status ?? '미확인'}
+                  </BlueButton>
                 </TaskItem>
                 <DelayMessage isEarly={isEarly}>{task.delay}</DelayMessage>
               </WhiteBox>

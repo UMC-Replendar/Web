@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import BlueButton from '../../blueButton';
 import { Task } from '../../../types';
+import useAuthStore from '../../../store/authStore';
+import { axiosInstance } from '../../../apis/axios-instance';
+import axios from 'axios';
 
 const Container = styled.div`
   display: flex;
@@ -48,7 +51,12 @@ const WhiteBox = styled.div`
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 1px;
 `;
-
+const TaskDetails = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+`;
 const TaskItem = styled.div`
   display: flex;
   justify-content: space-between;
@@ -56,49 +64,116 @@ const TaskItem = styled.div`
   padding: 10px 0;
 `;
 
-const TaskDetails = styled.div`
-  display: flex;
-  width: 40%;
-  justify-content: space-between;
-`;
-
 const TaskText = styled.div`
-  color: black;
   font-size: 19px;
   font-family: Pretendard, sans-serif;
   font-weight: 500;
   line-height: 26.6px;
   word-wrap: break-word;
-
   text-align: left;
-`;
 
-const DelayMessage = styled.div<{ isEarly: boolean }>`
-  width: 100%;
-  text-align: right;
-  color: ${({ isEarly }) => (isEarly ? '#4CAF50' : '#EB8A8A')};
-  font-size: 19px;
-  font-weight: 500;
-  margin-top: 5px;
+  /* 개별 요소 너비 설정 */
+  &:nth-child(1) {
+    /* 날짜 */
+    flex-basis: 10%;
+    text-align: center;
+  }
+
+  &:nth-child(2) {
+    /* 과제명 */
+    flex-basis: 60%;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; /* 너무 길 경우 한 줄로 */
+  }
 `;
 
 const NotCompletedTaskPage: React.FC = () => {
-  const tasks: Task[] = [
-    {
-      date: '11 / 02',
-      time: '23:55',
-      description: '000님이 ~~~~~~~하기 과제',
-      delay: '',
-      status: '미완료',
-    },
-    {
-      date: '11 / 03',
-      time: '22:30',
-      description: '000님이 ~~~~~~~하기 과제',
-      delay: '',
-      status: '미완료',
-    },
-  ];
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const { token } = useAuthStore();
+
+  useEffect(() => {
+    const fetchUnfinishedTasks = async () => {
+      if (!token) {
+        setError('로그인이 필요합니다.');
+        window.location.href = '/login';
+        return;
+      }
+
+      const queryParams = new URLSearchParams({
+        page: '1',
+        size: '5',
+        sort: 'updatedAt',
+      }).toString();
+
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await axiosInstance.get(
+          `/api/assignment/unfinished?${queryParams}`
+        );
+
+        console.log('API 응답:', response.data);
+
+        // ✅ API 응답 데이터 매핑
+        const fetchedTasks = response.data.result.content.map((item: any) => ({
+          date: item.deadline || '미정',
+          delay: item.isValid ? '유효' : '만료됨',
+          description: item.title || '과제 없음',
+        }));
+
+        setTasks(fetchedTasks);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          setError(error.response?.data?.message || '서버 오류 발생');
+        } else {
+          setError('예기치 않은 오류가 발생했습니다.');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUnfinishedTasks();
+  }, [token]);
+
+  useEffect(() => {
+    if (tasks.length === 0) {
+      console.log('예제 데이터 적용');
+      setTasks([
+        {
+          date: '2025-02-10',
+          StoredTaskdelay: undefined,
+          description: 'React 프로젝트 제출',
+          time: '23:59',
+          delay: '',
+          status: '미완료',
+        },
+        {
+          date: '2025-02-15',
+          StoredTaskdelay: undefined,
+          description: 'TypeScript 강의 듣기',
+          time: '23:59',
+          delay: '',
+          status: '미완료',
+        },
+        {
+          date: '2025-02-20',
+          StoredTaskdelay: undefined,
+          description: '스터디 리포트 작성',
+          time: '23:59',
+          delay: '',
+          status: '미완료',
+        },
+      ]);
+    }
+  }, [tasks]);
+
+  if (loading) return <p>로딩 중...</p>;
+  if (error) return <p>오류 발생: {error}</p>;
 
   return (
     <Container>
@@ -109,18 +184,16 @@ const NotCompletedTaskPage: React.FC = () => {
 
       <Box>
         {tasks.map((task, index) => {
-          const isEarly = task.delay.includes('빨랐습니다');
           return (
             <WhiteBox key={index}>
               <TaskItem>
                 <TaskDetails>
                   <TaskText>{task.date}</TaskText>
-                  <TaskText>{task.time}</TaskText>
+
                   <TaskText>{task.description}</TaskText>
                 </TaskDetails>
                 <BlueButton status={task.status}>{task.status}</BlueButton>
               </TaskItem>
-              <DelayMessage isEarly={isEarly}>{task.delay}</DelayMessage>
             </WhiteBox>
           );
         })}
