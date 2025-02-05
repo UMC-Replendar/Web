@@ -1,41 +1,19 @@
 import styled from 'styled-components';
 import { useState } from 'react';
-import useDebounce from '../../../hooks/useDebounce';
 import SearchIcon from '../../../assets/images/search.svg';
 import useGetData from '../../../hooks/useGetData';
-//import axios from 'axios';
 import { ProfileImage } from '../commuIcons';
 
 const friendRegister = () => {
-  const [isFocus, setIsFocus] = useState(true);
+  const [mq, setMq] = useState('');
 
   const [searchNickname, setSearchNickname] = useState('');
 
-  const [searchResult, setSearchResult] = useState<{
-    id: number;
-    nickname: string;
-    profileImage: string;
-    name: string;
-    message: string;
-  } | null>(null);
-
-  const debouncedNickname = useDebounce(searchNickname, 500);
-
-  /*const {
-    data: data1,
+  const {
+    data = [],
     isLoading,
     isError,
-  } = useGetData(
-    `https://api.replendar.site/api/friends/search?nickname=${debouncedNickname}`
-  );
-  console.log(data1);
-  if (isLoading) {
-    return <div>스켈레톤 이미지</div>;
-  }
-
-  if (isError) {
-    return <h1>에러</h1>;
-  }*/
+  } = useGetData(`/api/friends/search?nickname=${mq}`);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchNickname(e.target.value);
@@ -43,55 +21,43 @@ const friendRegister = () => {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      const nextElement = document.getElementById('searchBtn') as HTMLElement;
-      nextElement?.focus();
       handleSearch();
     }
   };
   const handleSearch = () => {
     const trimmedNickname = searchNickname.trim();
 
-    if (trimmedNickname !== '') {
-      const result = userData.find((user) => user.nickname === trimmedNickname);
-      setSearchResult(result || null);
-    } else {
-      setSearchResult(null);
-    }
+    if (!trimmedNickname || mq === trimmedNickname) return;
+    setMq(searchNickname);
   };
-
   return (
     <Container>
       <InputContainer>
         <CustomSearchIcon src={SearchIcon} alt="searchIcon" />
         <SearchInput
           value={searchNickname}
-          onChange={handleInputChange}
           onKeyDown={handleKeyDown}
+          onChange={handleInputChange}
           placeholder="등록할 친구의 이름을 입력해주세요"
-          onBlur={() => {
-            setIsFocus(false);
-          }}
-          onFocus={() => setIsFocus(true)}
         ></SearchInput>
         <SearchBtn id="searchBtn" onClick={handleSearch}>
           검색
         </SearchBtn>
       </InputContainer>
       <EmptyDiv>
-        {searchResult === null && searchNickname && !isFocus && (
-          <FlexDiv width="900px">
-            검색 결과 '{searchNickname}'가 없습니다
-          </FlexDiv>
+        {data.length === 0 && !!mq && !isLoading && (
+          <FlexDiv width="900px">검색 결과 '{mq}'가 없습니다</FlexDiv>
         )}
+        {!!mq && isLoading && <div>스켈레톤</div>}
 
-        {searchResult ? (
+        {data && data.length !== 0 ? (
           <>
             <ProfileContainer>
               <ProfileImage />
               <FlexAlignStart>
-                <NoMarginH3>{searchResult.nickname}</NoMarginH3>
-                <NoMarginH3>{searchResult.name}</NoMarginH3>
-                <NoMarginP>{searchResult.message}</NoMarginP>
+                <NoMarginH3>{data.nickname}</NoMarginH3>
+                <NoMarginH3>{data.name}</NoMarginH3>
+                <NoMarginP>{data.statusMessage}</NoMarginP>
               </FlexAlignStart>
             </ProfileContainer>
             <FlexDiv>
@@ -103,24 +69,6 @@ const friendRegister = () => {
     </Container>
   );
 };
-
-//임시데이터
-const userData = [
-  {
-    id: 1,
-    nickname: 'ㅁ',
-    profileImage: 'src/assets/images/프로필 사진.png',
-    name: '홍길동',
-    message: '야호',
-  },
-  {
-    id: 2,
-    nickname: 'ㅇ',
-    profileImage: 'src/assets/images/프로필 사진2.png',
-    name: '김철수',
-    message: '졸리다',
-  },
-];
 
 export default friendRegister;
 

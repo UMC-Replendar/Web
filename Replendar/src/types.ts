@@ -7,3 +7,11 @@ export interface Task {
   status: '완료' | '미완료' | undefined;
   StoredTaskdelay: '만료' | '유효' | undefined; // 만료 여부
 }
+
+export interface IFriendList {
+  friendId: number;
+  nickname: string;
+  name: string;
+  ongoingAssignments: number;
+  buddyStatus: 'YES' | 'NO';
+}
