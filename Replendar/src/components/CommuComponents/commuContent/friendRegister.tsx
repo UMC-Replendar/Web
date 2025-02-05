@@ -9,11 +9,9 @@ const friendRegister = () => {
 
   const [searchNickname, setSearchNickname] = useState('');
 
-  const {
-    data = [],
-    isLoading,
-    isError,
-  } = useGetData(`/api/friends/search?nickname=${mq}`);
+  const { data = [], isLoading } = useGetData(
+    `/api/friends/search?nickname=${mq}`
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchNickname(e.target.value);

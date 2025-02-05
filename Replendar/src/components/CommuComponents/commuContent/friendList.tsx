@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { NineDots } from '../commuIcons';
 import useGetData from '../../../hooks/useGetData';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { SmallToggleSwitch } from '../../../modal/EditTaskModal';
 import { ProfileImage } from '../commuIcons';
 import { IFriendList } from '../../../types';
@@ -149,15 +149,15 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
             <RightAlignedItem>
               <NineDots
                 fill={
-                  modalState.selectedId === item.friendshipId
+                  modalState.selectedId === item.friendId
                     ? 'rgba(74, 198, 226, 1)'
                     : 'black'
                 }
-                onClick={() => handleNineDotsClick(item.friendshipId)}
+                onClick={() => handleNineDotsClick(item.friendId)}
               />
             </RightAlignedItem>
           </SpaceBtwDiv>
-          {modalState.isOpen && modalState.selectedId === item.friendshipId && (
+          {modalState.isOpen && modalState.selectedId === item.friendId && (
             <Modal
               onClick={(e) => e.stopPropagation()}
               top={`${index * 67 + 320}px`}

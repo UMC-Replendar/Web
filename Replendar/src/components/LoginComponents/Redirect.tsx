@@ -19,12 +19,11 @@ export default function Redirect() {
       .get(`${import.meta.env.VITE_BACKEND_API_URL}?code=${AUTHORIZE_CODE}`)
       .then((response) => {
         console.log(response);
-        const { accessToken, email, id, nickName, theme } =
-          response.data.result;
+        const { accessToken, id, nickName } = response.data.result;
         if (response.data.isSuccess) {
           localStorage.setItem('token', accessToken);
           alert('로그인에 성공했습니다');
-          if (nickName == null) {
+          if (id == null) {
             alert('Replendar에 처음이시군요. 회원가입부터 진행해주세요!');
             navigate('/signup');
           } else {
