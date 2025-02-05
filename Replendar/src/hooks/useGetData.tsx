@@ -11,11 +11,11 @@ const useGetData = (url: string) => {
 
     const response = await axios.get(url, {
       headers: {
-        Authorization: token ? `Bearer ${token}` : '',
+        Authorization: token ? `${token}` : '',
       },
     });
 
-    return response.data;
+    return response.data.result;
   };
   const {
     data = [],

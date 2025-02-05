@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { NineDots } from '../commuIcons';
-// import useGetData from '../../../hooks/useGetData';
+import useGetData from '../../../hooks/useGetData';
 import { useState, useEffect } from 'react';
 import { SmallToggleSwitch } from '../../../modal/EditTaskModal';
 import { ProfileImage } from '../commuIcons';
@@ -104,6 +104,7 @@ const P = styled.p`
   height: 38px;
 `;
 
+//친구 추가 api 먼저 하는 걸로
 const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -115,20 +116,19 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
 
   const [isOn, setIsOn] = useState(false);
 
-  const visibleItems = expanded === 'true' ? 30 : 5;
-  // const url = expanded
-  //   ? `https://api.replendar.site/api/friends`
-  //   : `https://api.replendar.site/api/friends?limit=5`;
+  const url = expanded
+    ? `https://api.replendar.site/api/friends`
+    : `https://api.replendar.site/api/friends?limit=5`;
 
-  /*const { data: data1, isLoading, isError } = useGetData(url);
-
+  const { data: data1, isLoading, isError } = useGetData(url);
+  console.log(data1);
   if (isLoading) {
     return <div>스켈레톤 이미지</div>;
   }
 
   if (isError) {
     return <h1>에러</h1>;
-  }*/
+  }
   const handleNineDotsClick = (id: number) => {
     setModalState((prev) => ({
       isOpen: prev.selectedId !== id || !prev.isOpen,
@@ -137,16 +137,17 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
   };
   return (
     <Container>
-      {data.slice(0, visibleItems).map((item, index) => (
-        <>
-          <SpaceBtwDiv key={index}>
+      {data1.length === 0 && <div>친구 없음</div>}
+      {data1.map((item, index) => (
+        <div key={index}>
+          <SpaceBtwDiv>
             <FlexDiv>
               <ProfileImage width={'30'} height={'30'} />
 
               <CenterDiv width="100px">{item.nickname}</CenterDiv>
             </FlexDiv>
 
-            <CenterDiv>진행 중인 과제: {item.ongoingTaskNum}개</CenterDiv>
+            <CenterDiv>진행 중인 과제: {item.ongoingAssignments}개</CenterDiv>
             <RightAlignedItem>
               <NineDots
                 fill={
@@ -194,7 +195,7 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
               <P>친구삭제</P>
             </Modal>
           )}
-        </>
+        </div>
       ))}
     </Container>
   );
