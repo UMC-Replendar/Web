@@ -4,8 +4,8 @@ import BookmarkIcon from '../assets/images/BookmarkIcon.svg';
 import BookmarkFilledIcon from '../assets/images/BookmarkFilledIcon.svg';
 import LockIcon from '../assets/images/LockIcon.svg';
 import UnLockIcon from '../assets/images/UnLockIcon.svg';
-import GrayPlusIcon from '../assets/images/GrayPlusIcon.svg';
 import ToggleSwitch from '../components/OngoingComponents/ToggleSwitch';
+import GrayPlusIcon from '../assets/images/GrayPlusIcon.svg';
 import useTaskStore from '../store/useTaskStore';
 import useModalStore from '../store/modalStore';
 import SelectFriendsModal from './SelectFriendsModal';
@@ -109,10 +109,6 @@ const Input = styled.input`
   font-size: 19px;
   font-weight: 500;
   line-height: 140%;
-
-  &::-webkit-datetime-edit-ampm-field {
-    display: none;
-  }
 `;
 
 const TaskNameSection = styled.div`
@@ -152,11 +148,9 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isActive?: boolean;
 }
 
-const BaseButton: React.FC<ButtonProps> = ({ isActive, ...rest }) => (
-  <button {...rest} />
-);
-
-const OpenSettingButton = styled(BaseButton)`
+const OpenSettingButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isActive', // DOM 전달 방지
+})<ButtonProps>`
   display: flex;
   padding: 5px 15px;
   justify-content: center;
@@ -195,7 +189,9 @@ const AlertCycleSettingButtonGroup = styled.div`
   gap: 15px;
 `;
 
-const AlarmCycleSettingButton = styled(BaseButton)`
+const AlarmCycleSettingButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isActive',
+})<ButtonProps>`
   display: flex;
   padding: 0px 10px;
   justify-content: center;
@@ -241,7 +237,6 @@ const MemoSection = styled.div`
 `;
 
 const MemoInput = styled.textarea`
-  align-self: stretch;
   flex-grow: 1;
   height: 295px;
   padding: 10px;
@@ -260,19 +255,23 @@ const ActionButtons = styled.div`
   width: 100%;
 `;
 
-function AddTaskModal() {
+interface AddTaskModalProps {
+  onTaskAdded: () => void;
+}
+
+function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
   const { addTask } = useTaskStore();
   const { closeModal } = useModalStore();
+  const [isBookmarked, setIsBookmarked] = useState(false);
   const [taskName, setTaskName] = useState('');
   const [deadline, setDeadline] = useState('');
   const [time, setTime] = useState('');
-  const [placeholderDate, setPlaceholderDate] = useState('');
-  const [isPublic, setIsPublic] = useState<null | boolean>(null);
-  const [isOn, setIsOn] = useState(false);
-  const [alarmCount, setAlarmCount] = useState<number | null>(null);
-  const [showFriendsModal, setShowFriendsModal] = useState(false);
+  const [isPublic, setIsPublic] = useState(false); // 과제 공개 여부
+  const [isOn, setIsOn] = useState(false); // 알림 설정
+  const [alarmCount, setAlarmCount] = useState<number | null>(null); // 알림 주기 설정
   const [memo, setMemo] = useState('');
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [placeholderDate, setPlaceholderDate] = useState('');
+  const [showFriendsModal, setShowFriendsModal] = useState(false);
 
   const toggleBookmark = () => {
     setIsBookmarked((prev) => !prev);
@@ -286,13 +285,7 @@ function AddTaskModal() {
     setPlaceholderDate(`${year} / ${month} / ${day}`);
   }, []);
 
-  const formatTimeTo24Hour = (time: string) => {
-    if (!time) return '23:59';
-    const [hours, minutes] = time.split(':').map(Number);
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-  };
-
-  const handleComplete = () => {
+  const handleComplete = async () => {
     if (!taskName.trim()) {
       alert('과제명을 입력해주세요.');
       return;
@@ -301,8 +294,19 @@ function AddTaskModal() {
       alert('마감일을 선택해주세요.');
       return;
     }
-    const formattedTime = formatTimeTo24Hour(time);
-    addTask(taskName, `${deadline}T${formattedTime}:00`);
+
+    await addTask({
+      assignmentId: Date.now(),
+      name: taskName,
+      deadline,
+      remainingTime: '',
+      color: '#7AC19A',
+      isToggled: false,
+      isBookmarked,
+      memo,
+    });
+
+    onTaskAdded();
     closeModal();
   };
 
@@ -333,8 +337,9 @@ function AddTaskModal() {
           <TaskNameSection>
             <Label>과제명</Label>
             <Input
-              placeholder="과제 이름을 입력하세요"
+              type="text"
               value={taskName}
+              placeholder="과제 이름을 입력하세요"
               onChange={(e) => setTaskName(e.target.value)}
             />
           </TaskNameSection>
