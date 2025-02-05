@@ -13,3 +13,11 @@ export interface StoredTask {
   delay: '만료' | '유효'; // 만료 여부
   description: string; // 과제명
 }
+
+export interface IFriendList {
+  friendId: number;
+  nickname: string;
+  name: string;
+  ongoingAssignments: number;
+  buddyStatus: 'YES' | 'NO';
+}

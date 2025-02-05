@@ -4,6 +4,7 @@ import useGetData from '../../../hooks/useGetData';
 import { useState, useEffect } from 'react';
 import { SmallToggleSwitch } from '../../../modal/EditTaskModal';
 import { ProfileImage } from '../commuIcons';
+import { IFriendList } from '../../../types';
 
 const Container = styled.div`
   width: 100%;
@@ -104,7 +105,6 @@ const P = styled.p`
   height: 38px;
 `;
 
-//친구 추가 api 먼저 하는 걸로
 const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -116,9 +116,7 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
 
   const [isOn, setIsOn] = useState(false);
 
-  const url = expanded
-    ? `https://api.replendar.site/api/friends`
-    : `https://api.replendar.site/api/friends?limit=5`;
+  const url = expanded ? `/api/friends` : `/api/friends?limit=5`;
 
   const { data: data1, isLoading, isError } = useGetData(url);
   console.log(data1);
@@ -138,7 +136,7 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
   return (
     <Container>
       {data1.length === 0 && <div>친구 없음</div>}
-      {data1.map((item, index) => (
+      {data1.map((item: IFriendList, index: number) => (
         <div key={index}>
           <SpaceBtwDiv>
             <FlexDiv>
@@ -151,15 +149,15 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
             <RightAlignedItem>
               <NineDots
                 fill={
-                  modalState.selectedId === item.id
+                  modalState.selectedId === item.friendshipId
                     ? 'rgba(74, 198, 226, 1)'
                     : 'black'
                 }
-                onClick={() => handleNineDotsClick(item.id)}
+                onClick={() => handleNineDotsClick(item.friendshipId)}
               />
             </RightAlignedItem>
           </SpaceBtwDiv>
-          {modalState.isOpen && modalState.selectedId === item.id && (
+          {modalState.isOpen && modalState.selectedId === item.friendshipId && (
             <Modal
               onClick={(e) => e.stopPropagation()}
               top={`${index * 67 + 320}px`}
@@ -202,180 +200,3 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
 };
 
 export default FriendList;
-
-const data = [
-  {
-    id: 1,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'CodeMaster',
-    ongoingTaskNum: 2,
-  },
-  {
-    id: 2,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'DesignGuru',
-    ongoingTaskNum: 3,
-  },
-  {
-    id: 3,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 4,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 5,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-  {
-    id: 6,
-    image: 'src/assets/images/프로필 사진.png',
-    nickname: 'BugHunter',
-    ongoingTaskNum: 1,
-  },
-];
