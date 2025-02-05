@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import BookmarkIcon from '../assets/images/BookmarkIcon.svg';
+import BookmarkFilledIcon from '../assets/images/BookmarkFilledIcon.svg';
 import LockIcon from '../assets/images/LockIcon.svg';
 import UnLockIcon from '../assets/images/UnLockIcon.svg';
 import GrayPlusIcon from '../assets/images/GrayPlusIcon.svg';
@@ -14,15 +15,20 @@ const ModalOverlay = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  width: 50%;
+  max-width: 150vh;
+  height: auto;
+  max-height: 95vh;
+  overflow-y: auto;
   display: flex;
   padding: 40px 8px 8px 8px;
   align-items: center;
   gap: 8px;
-  height: auto;
   border-radius: 20px;
   background: #fcf6f5;
   box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.25);
   z-index: 1000;
+  box-sizing: border-box;
 `;
 
 const Modal = styled.div`
@@ -103,12 +109,17 @@ const Input = styled.input`
   font-size: 19px;
   font-weight: 500;
   line-height: 140%;
+
+  &::-webkit-datetime-edit-ampm-field {
+    display: none;
+  }
 `;
 
 const TaskNameSection = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 123px;
+  align-self: stretch;
 `;
 
 const TaskDeadlineSection = styled.div`
@@ -116,6 +127,12 @@ const TaskDeadlineSection = styled.div`
   align-items: flex-start;
   gap: 77px;
   align-self: stretch;
+`;
+
+const InputContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
 `;
 
 const OpenSettingSection = styled.div`
@@ -131,14 +148,21 @@ const OpenSettingButtonGroup = styled.div`
   gap: 12px;
 `;
 
-const OpenSettingButton = styled.button<{ isActive: boolean }>`
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  isActive?: boolean;
+}
+
+const BaseButton: React.FC<ButtonProps> = ({ isActive, ...rest }) => (
+  <button {...rest} />
+);
+
+const OpenSettingButton = styled(BaseButton)`
   display: flex;
   padding: 5px 15px;
   justify-content: center;
   align-items: center;
   gap: 6px;
   border-radius: 10px;
-  border: 1px solid #e8e8e8;
   border: 1px solid ${({ isActive }) => (isActive ? '#666666' : '#d5d5d5')};
   background: white;
   color: #666666;
@@ -171,7 +195,7 @@ const AlertCycleSettingButtonGroup = styled.div`
   gap: 15px;
 `;
 
-const AlarmCycleSettingButton = styled.button<{ isActive: boolean }>`
+const AlarmCycleSettingButton = styled(BaseButton)`
   display: flex;
   padding: 0px 10px;
   justify-content: center;
@@ -247,6 +271,12 @@ function AddTaskModal() {
   const [isOn, setIsOn] = useState(false);
   const [alarmCount, setAlarmCount] = useState<number | null>(null);
   const [showFriendsModal, setShowFriendsModal] = useState(false);
+  const [memo, setMemo] = useState('');
+  const [isBookmarked, setIsBookmarked] = useState(false);
+
+  const toggleBookmark = () => {
+    setIsBookmarked((prev) => !prev);
+  };
 
   useEffect(() => {
     const today = new Date();
@@ -255,6 +285,12 @@ function AddTaskModal() {
     const day = String(today.getDate()).padStart(2, '0');
     setPlaceholderDate(`${year} / ${month} / ${day}`);
   }, []);
+
+  const formatTimeTo24Hour = (time: string) => {
+    if (!time) return '23:59';
+    const [hours, minutes] = time.split(':').map(Number);
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  };
 
   const handleComplete = () => {
     if (!taskName.trim()) {
@@ -265,9 +301,17 @@ function AddTaskModal() {
       alert('마감일을 선택해주세요.');
       return;
     }
-    addTask(taskName, deadline);
+    const formattedTime = formatTimeTo24Hour(time);
+    addTask(taskName, `${deadline}T${formattedTime}:00`);
     closeModal();
   };
+
+  const alarmOptions = [
+    { label: '3회', value: 3 },
+    { label: '24시간 전', value: 24 },
+    { label: '10시간 전', value: 10 },
+    { label: '1시간 전', value: 1 },
+  ];
 
   return (
     <ModalOverlay onClick={closeModal}>
@@ -275,7 +319,11 @@ function AddTaskModal() {
         <Header>
           <TitleContainer>
             <Title>과제 추가하기</Title>
-            <img src={BookmarkIcon} alt="Bookmark Icon" />
+            <img
+              src={isBookmarked ? BookmarkFilledIcon : BookmarkIcon}
+              alt="Bookmark Icon"
+              onClick={toggleBookmark}
+            />
           </TitleContainer>
 
           <ActionButton>불러오기</ActionButton>
@@ -293,20 +341,24 @@ function AddTaskModal() {
 
           <TaskDeadlineSection>
             <Label>과제 마감일</Label>
-            <Input
-              type="text"
-              value={deadline}
-              placeholder={placeholderDate}
-              onChange={(e) => setDeadline(e.target.value)}
-              maxLength={10}
-            />
-            <Input
-              type="text"
-              value={time}
-              placeholder="23:55"
-              onChange={(e) => setTime(e.target.value)}
-              maxLength={5}
-            />
+            <InputContainer>
+              <Input
+                type="date"
+                value={deadline}
+                placeholder={placeholderDate}
+                onChange={(e) => setDeadline(e.target.value)}
+              />
+              <Input
+                type="time"
+                value={time}
+                step="60"
+                lang="en-GB" // 24시간 형식 적용
+                placeholder="23:59"
+                onChange={(e) => setTime(e.target.value)}
+                required
+                pattern="[0-9]{2}:[0-9]{2}" // 24시간 형식 강제
+              />
+            </InputContainer>
           </TaskDeadlineSection>
         </Section>
 
@@ -339,13 +391,13 @@ function AddTaskModal() {
           <AlertCycleSettingSection>
             <Label>알림 주기 설정</Label>
             <AlertCycleSettingButtonGroup>
-              {[3, 24, 10, 1].map((count) => (
+              {alarmOptions.map(({ label, value }) => (
                 <AlarmCycleSettingButton
-                  key={count}
-                  isActive={alarmCount === count}
-                  onClick={() => setAlarmCount(count)}
+                  key={value}
+                  isActive={alarmCount === value}
+                  onClick={() => setAlarmCount(value)}
                 >
-                  {count === 3 ? '3회' : `${count}시간 전`}
+                  {label}
                 </AlarmCycleSettingButton>
               ))}
             </AlertCycleSettingButtonGroup>
@@ -364,7 +416,7 @@ function AddTaskModal() {
 
         <MemoSection>
           <Label>메모</Label>
-          <MemoInput />
+          <MemoInput value={memo} onChange={(e) => setMemo(e.target.value)} />
         </MemoSection>
 
         <ActionButtons>
