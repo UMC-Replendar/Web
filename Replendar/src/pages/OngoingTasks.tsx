@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
-import CustomCalendar from '../components/OngoingComponents/CustomCalendar';
 import AddTaskModal from '../modal/AddTaskModal';
+import CustomCalendar from '../components/OngoingComponents/CustomCalendar';
 import PlusIcon from '../assets/images/PlusIcon.svg';
 import DownArrowIcon from '../assets/images/DownArrowIcon.svg';
 import UpArrowIcon from '../assets/images/UpArrowIcon.svg';
 import EditTaskModal from '../modal/EditTaskModal';
 import useModalStore from '../store/modalStore';
-import useTaskStore from '../store/useTaskStore';
-import axios from 'axios';
+// import useTaskStore from '../store/useTaskStore';
+import useGetData from '../hooks/useGetData';
 
 const PageWrapper = styled.div`
   margin-top: 79px;
@@ -92,12 +92,12 @@ const More = styled.div`
   }
 `;
 
-const TaskBox = styled.div<{ isScrollable: boolean }>`
+const TaskBox = styled.div<{ $isScrollable: boolean }>`
   border-radius: 0px 20px 20px 20px;
   background: #fcf6f5;
   padding: 52px 64px;
-  ${({ isScrollable }) =>
-    isScrollable
+  ${({ $isScrollable }) =>
+    $isScrollable
       ? `
     max-height: 744px;
     overflow-y: auto;
@@ -140,80 +140,81 @@ const TaskInfo = styled.div`
 `;
 
 const TaskCompleteButton = styled.button`
+  display: flex;
   width: 100px;
   height: 50px;
   padding: 14px 30px;
-  background: linear-gradient(270deg, #18b9dd 0%, #63d8f2 100%);
-  border-radius: 50px;
-  border: none;
   justify-content: center;
   align-items: center;
   gap: 8px;
-  display: flex;
+  border-radius: 50px;
+  border: none;
+  background: linear-gradient(270deg, #18b9dd 0%, #63d8f2 100%);
   color: white;
   font-family: Pretendard;
   font-size: 16px;
+  font-style: normal;
   font-weight: 500;
-  line-height: 22.4px;
+  line-height: 140%;
   cursor: pointer;
-  word-wrap: break-word;
   white-space: nowrap;
 `;
 
-// API 호출 함수
-const fetchTasksFromAPI = async (
-  userId: number,
-  setTasks: (tasks: any) => void
-) => {
-  try {
-    const response = await axios.get(`/api/assignment?userId=${userId}`);
-    if (response.data.isSuccess) {
-      const formattedTasks = response.data.result.map((task: any) => ({
-        id: Number(task.assignmentId),
-        name: task.title,
-        deadline: task.due_date,
-        remainingTime: task.due_time,
-        color: '#7AC19A',
-        isToggled: task.notification === 'ON',
-        isBookmarked: task.visibility === 'ON',
-      }));
-      setTasks(formattedTasks);
-    }
-  } catch (error) {
-    console.error('API Error:', error);
-  }
-};
-
-interface Task {
+interface TaskProps {
   assignmentId: number;
-  name: string;
-  deadline: string;
-  remainingTime: string;
   color: string;
-  isToggled: boolean;
-  isBookmarked: boolean;
+  name: string;
+  remainingTime: string;
+  memo: string;
+  onComplete: () => void;
+  onEdit: () => void; // 수정 버튼 이벤트 추가
+}
+
+function TaskItem({
+  color,
+  name,
+  remainingTime,
+  onComplete,
+  onEdit,
+}: TaskProps) {
+  return (
+    <TaskBlockContainer onClick={onEdit}>
+      <TaskBlock color={color}>
+        <TaskInfo>{name}</TaskInfo>
+        <TaskInfo>{remainingTime}</TaskInfo>
+      </TaskBlock>
+      <TaskCompleteButton
+        onClick={(e) => {
+          e.stopPropagation(); // 이벤트 버블링 방지
+          onComplete();
+        }}
+      >
+        완료
+      </TaskCompleteButton>
+    </TaskBlockContainer>
+  );
 }
 
 function OngoingTasks() {
-  const { tasks, setTasks, deleteTask, updateRemainingTimes } = useTaskStore(); // Zustand에서 상태 가져오기
+  // const { tasks, setTasks, deleteTask, updateRemainingTimes } = useTaskStore(); // Zustand에서 상태 가져오기
   const { isOpen, openModal, closeModal, modalContent } = useModalStore(); // useModalStore 추가했어요요
+  const userId = 4;
+  const {
+    data: tasks,
+    isLoading,
+    isError,
+  } = useGetData(`/api/assignment?userId=${userId}`);
   const [visibleTasksCount, setVisibleTasksCount] = useState(3);
-
-  useEffect(() => {
-    fetchTasksFromAPI(1, setTasks);
-    const interval = setInterval(updateRemainingTimes, 1000);
-    return () => clearInterval(interval);
-  }, [setTasks, updateRemainingTimes]);
 
   const handleShowMore = () => {
     setVisibleTasksCount((prev) => (prev < tasks.length ? tasks.length : 3));
   };
 
   const handleCompleteTask = (assignmentId: number) => {
-    deleteTask(assignmentId);
+    console.log(`Complete task with ID: ${assignmentId}`);
   };
 
-  const handleEditTask = (task: Task) => {
+  const handleEditTask = (task: any) => {
     openModal(
       <EditTaskModal
         task={task}
@@ -222,6 +223,9 @@ function OngoingTasks() {
       />
     );
   };
+
+  if (isLoading) return <div>로딩 중...</div>;
+  if (isError) return <div>데이터를 불러오는 데 실패했습니다.</div>;
 
   return (
     <PageWrapper>
@@ -236,11 +240,19 @@ function OngoingTasks() {
         </LeftTitles>
 
         <div style={{ display: 'flex', gap: '31px' }}>
-          <AddButton onClick={() => openModal(<AddTaskModal />)}>
-            {/* AddTaskModal에 정의함 */}
+          <AddButton
+            onClick={() =>
+              openModal(
+                <AddTaskModal
+                  onTaskAdded={() => console.log('과제가 추가되었습니다.')}
+                />
+              )
+            }
+          >
             과제 추가하기
             <img src={PlusIcon} alt="Plus Icon" />
           </AddButton>
+
           {tasks.length > 3 && (
             <More onClick={handleShowMore}>
               {visibleTasksCount === tasks.length ? '닫기' : '더보기'}
@@ -258,63 +270,30 @@ function OngoingTasks() {
           )}
         </div>
       </MainPageTitleWrapper>
-      <TaskBox isScrollable={tasks.length > 10}>
-        {tasks.slice(0, visibleTasksCount).map((task) => (
+
+      <TaskBox $isScrollable={tasks.length > 10}>
+        {tasks.slice(0, visibleTasksCount).map((task: any) => (
           <TaskItem
-            key={task.assignmentId} // `key`는 `name`을 사용해야 더 안전함
+            key={task.assignmentId}
             assignmentId={task.assignmentId}
-            color={task.color}
-            name={task.name}
-            remainingTime={task.remainingTime || ''}
-            onComplete={() => handleCompleteTask(task.assignmentId)} // ✅ `index` 대신 `task.name` 전달
-            onEdit={() => handleEditTask(task)} // ✅ task 객체 전체 전달
+            color={'#7AC19A'}
+            name={task.title}
+            remainingTime={task.due_time}
+            memo={task.memo}
+            onComplete={() => handleCompleteTask(task.assignmentId)}
+            onEdit={() => handleEditTask(task)}
           />
         ))}
       </TaskBox>
+
       <CustomCalendar
-        tasks={tasks.map((task) => ({
-          name: task.name,
-          deadline: task.deadline,
+        tasks={tasks.map((task: any) => ({
+          name: task.title,
+          deadline: task.due_date,
         }))}
       />
-      {isOpen && modalContent} {/* Modal정의 Content추가 */}
+      {isOpen && modalContent}
     </PageWrapper>
-  );
-}
-
-interface TaskProps {
-  assignmentId: number;
-  color: string;
-  name: string;
-  remainingTime: string;
-  onComplete: () => void;
-  onEdit: () => void; // 수정 버튼 이벤트 추가
-}
-
-function TaskItem({
-  color,
-  name,
-  remainingTime,
-  onComplete,
-  onEdit,
-}: TaskProps) {
-  return (
-    <>
-      <TaskBlockContainer onClick={onEdit}>
-        <TaskBlock color={color}>
-          <TaskInfo>{name}</TaskInfo>
-          <TaskInfo>{remainingTime}</TaskInfo>
-        </TaskBlock>
-        <TaskCompleteButton
-          onClick={(e) => {
-            e.stopPropagation(); // 이벤트 버블링 방지
-            onComplete();
-          }}
-        >
-          완료
-        </TaskCompleteButton>
-      </TaskBlockContainer>
-    </>
   );
 }
 
