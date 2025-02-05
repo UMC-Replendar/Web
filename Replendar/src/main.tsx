@@ -13,15 +13,15 @@ const basename =
   process.env.NODE_ENV === 'production' ? process.env.PUBLIC_URL : '/';
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <ThemeProvider theme={theme}>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter basename={basename}>
-          <GlobalStyle />
+  // <StrictMode>
+  <ThemeProvider theme={theme}>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter basename={basename}>
+        <GlobalStyle />
 
-          <App />
-        </BrowserRouter>
-      </QueryClientProvider>
-    </ThemeProvider>
-  </StrictMode>
+        <App />
+      </BrowserRouter>
+    </QueryClientProvider>
+  </ThemeProvider>
+  // </StrictMode>
 );

@@ -6,7 +6,7 @@ import useAuthStore from '../store/authStore';
 function Settings() {
   const navigate = useNavigate();
   const { clearAuth } = useAuthStore();
-  const userId = '닉네임';
+  const userId = localStorage.getItem('nickname') || null;
 
   const LogoutClicked = () => {
     clearAuth();
