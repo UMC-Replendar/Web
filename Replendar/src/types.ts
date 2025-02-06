@@ -16,17 +16,9 @@ export interface StoredTask {
 
 export interface IFriendList {
   friendshipId: number;
+  friendId: number;
   nickname: string;
   name: string;
   ongoingAssignments: number;
   buddyStatus: 'YES' | 'NO';
-}
-interface BaseResponse {
-  isSuccess: boolean; // 요청 성공 여부
-  code: string; // 오류 코드 또는 상태 코드
-  message: string; // 오류 메시지 또는 상태 메시지
-}
-
-export interface FriendRequestResponse extends BaseResponse {
-  result: number;
 }

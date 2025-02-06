@@ -5,32 +5,25 @@ import useGetData from '../../../hooks/useGetData';
 import { ProfileImage } from '../commuIcons';
 import { sendFriendRequest } from '../../../apis/commuApi';
 import { useMutation } from '@tanstack/react-query';
-import { FriendRequestResponse } from '../../../types';
 
 const friendRegister = () => {
   const [mq, setMq] = useState('');
   const [searchNickname, setSearchNickname] = useState('');
-  const [requestId, setRequestId] = useState<number | undefined>(undefined);
 
   //친구등록검색api호출
   const { data, isLoading, isError } = useGetData(
-    `/api/friends/search?nickname=${mq}`
+    mq ? `/api/friends/search?nickname=${mq}` : ''
   );
+
   //친구요청api호출
-  const mutation = useMutation<FriendRequestResponse, Error, number>({
+  const mutation = useMutation({
     mutationFn: (friendId: number) => sendFriendRequest(friendId),
-    onSuccess: (data: FriendRequestResponse) => {
-      setRequestId(data.result);
-      console.log(data.result);
+    onSuccess: () => {
+      alert('친구 요청이 성공적으로 보내졌습니다.');
     },
     onError: (error: Error) => {
       alert('친구 요청을 보내는 데 실패했습니다.');
       console.error(error);
-    },
-    onSettled: (data: FriendRequestResponse | undefined) => {
-      if (data) {
-        alert(data.message);
-      }
     },
   });
 

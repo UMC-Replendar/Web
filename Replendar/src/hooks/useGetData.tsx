@@ -17,6 +17,7 @@ const useGetData = (url: string) => {
   } = useQuery({
     queryKey: [url],
     queryFn: getData,
+    enabled: !!url,
   });
   return { data, isLoading, isError };
 };

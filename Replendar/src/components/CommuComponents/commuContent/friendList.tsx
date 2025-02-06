@@ -5,8 +5,206 @@ import { useState, useEffect } from 'react';
 import { SmallToggleSwitch } from '../../../modal/EditTaskModal';
 import { ProfileImage } from '../commuIcons';
 import { IFriendList } from '../../../types';
-import { useMutation } from '@tanstack/react-query';
-import { respondToFriendRequest } from '../../../apis/commuApi';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  setBestFriendStatus,
+  deleteFriend,
+  patchNote,
+} from '../../../apis/commuApi';
+
+const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
+  const queryClient = useQueryClient();
+
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    selectedId: number | null;
+    note: string; // 메모 상태를 관리
+  }>({
+    isOpen: false,
+    selectedId: null,
+    note: '',
+  });
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [updatedNote, setUpdatedNote] = useState<string>('');
+
+  const url = expanded ? `/api/friends` : `/api/friends?limit=5`;
+
+  const bestFriendmutation = useMutation({
+    mutationFn: ({
+      friendId,
+      buddyStatus,
+    }: {
+      friendId: number;
+      buddyStatus: string;
+    }) => setBestFriendStatus({ friendId, buddyStatus }),
+    onSuccess: (data) => {
+      alert(data);
+      queryClient.invalidateQueries({
+        queryKey: [url],
+      });
+    },
+    onError: (error: Error) => {
+      alert('친한 친구 설정하는 데 실패했습니다');
+      console.error(error);
+    },
+  });
+
+  const deleteFriendmutation = useMutation({
+    mutationFn: ({ friendId }: { friendId: number }) => deleteFriend(friendId),
+    onSuccess: (data) => {
+      alert(data);
+      queryClient.invalidateQueries({
+        queryKey: [url],
+      });
+    },
+    onError: (error: Error) => {
+      alert('친구 삭제하는 데 실패했습니다.');
+      console.error(error);
+    },
+  });
+
+  const patchNoteMutation = useMutation({
+    mutationFn: ({ friendId, note }: { friendId: number; note: string }) =>
+      patchNote({ friendId, note }), // 메모 업데이트를 위한 API 호출
+    onSuccess: (data) => {
+      alert(data); // 메모 업데이트 성공 메시지
+      queryClient.invalidateQueries({
+        queryKey: [`/api/friends/note?friendId=${modalState.selectedId}`], // 쿼리 캐시를 무효화하여 데이터를 최신 상태로 유지
+      });
+      setIsEditing(false); // 편집 종료
+    },
+    onError: (error: Error) => {
+      alert('메모 업데이트에 실패했습니다.'); // 메모 업데이트 실패 메시지
+      console.error(error);
+    },
+  });
+
+  const { data: noteData } = useGetData(
+    modalState.selectedId
+      ? `/api/friends/note?friendId=${modalState.selectedId}`
+      : ''
+  );
+
+  const { data, isLoading, isError } = useGetData(url);
+
+  if (isLoading) {
+    return <div>스켈레톤 이미지</div>;
+  }
+
+  if (isError) {
+    return <h1>에러</h1>;
+  }
+
+  const handleNoteClick = () => {
+    setIsEditing(true);
+    setUpdatedNote(noteData?.note || '');
+  };
+  const handleSaveNote = () => {
+    patchNoteMutation.mutate({
+      friendId: modalState.selectedId!,
+      note: updatedNote,
+    });
+  };
+
+  const handleNineDotsClick = (id: number) => {
+    setModalState((prev) => ({
+      isOpen: prev.selectedId !== id || !prev.isOpen,
+      selectedId: prev.selectedId === id ? null : id,
+      note: prev.selectedId === id ? prev.note : '', // 메모를 리셋
+    }));
+  };
+  return (
+    <Container>
+      {data.length === 0 && <div>친구 없음</div>}
+      {data.map((item: IFriendList, index: number) => (
+        <div key={item.friendId}>
+          <SpaceBtwDiv>
+            <FlexDiv>
+              <ProfileImage width={'30'} height={'30'} />
+
+              <CenterDiv width="100px">{item.nickname}</CenterDiv>
+            </FlexDiv>
+
+            <CenterDiv>진행 중인 과제: {item.ongoingAssignments}개</CenterDiv>
+            <RightAlignedItem>
+              <NineDots
+                fill={
+                  modalState.selectedId === item.friendId
+                    ? 'rgba(74, 198, 226, 1)'
+                    : 'black'
+                }
+                onClick={() => handleNineDotsClick(item.friendId)}
+              />
+            </RightAlignedItem>
+          </SpaceBtwDiv>
+          {modalState.isOpen && modalState.selectedId === item.friendId && (
+            <Modal
+              onClick={(e) => e.stopPropagation()}
+              top={`${index * 67 + 320}px`}
+            >
+              <ModalContent>
+                <span>진행중인 과제: {item.ongoingAssignments}개</span>
+                <div>일정확인</div>
+              </ModalContent>
+
+              <P>과제공유</P>
+
+              <ModalContent>
+                <div
+                  style={{
+                    display: 'flex',
+                    transformOrigin: 'left',
+                    alignItems: 'center', // 수직 중앙 정렬
+                    transform: 'scale(0.5)', // 크기 조정
+                  }}
+                >
+                  <SmallToggleSwitch
+                    isOn={item.buddyStatus === 'YES'}
+                    onToggle={() => {
+                      bestFriendmutation.mutate({
+                        friendId: item.friendId,
+                        buddyStatus: item.buddyStatus === 'YES' ? 'NO' : 'YES',
+                      });
+                    }}
+                  />
+                </div>
+                <div>친한친구설정</div>
+              </ModalContent>
+              <ModalContent>
+                {isEditing ? (
+                  <>
+                    <input
+                      type="text"
+                      onChange={(e) => setUpdatedNote(e.target.value)}
+                      value={updatedNote}
+                      placeholder="메모를 수정하세요"
+                    />
+                    <div onClick={handleSaveNote}>수정완료</div>
+                  </>
+                ) : (
+                  <>
+                    <span>{noteData.note}</span>
+                    <div onClick={handleNoteClick}>메모수정</div>
+                  </>
+                )}
+              </ModalContent>
+              <P
+                onClick={() =>
+                  deleteFriendmutation.mutate({ friendId: item.friendId })
+                }
+              >
+                친구삭제
+              </P>
+            </Modal>
+          )}
+        </div>
+      ))}
+    </Container>
+  );
+};
+
+export default FriendList;
 
 const Container = styled.div`
   width: 100%;
@@ -106,122 +304,3 @@ const P = styled.p`
   padding: 8px 10px 8px 10px;
   height: 38px;
 `;
-
-const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
-  const [modalState, setModalState] = useState<{
-    isOpen: boolean;
-    selectedId: number | null;
-  }>({
-    isOpen: false,
-    selectedId: null,
-  });
-
-  const [isOn, setIsOn] = useState(false);
-
-  /*const mutation = useMutation<
-  string,
-  Error,
-  { requestId: number; isAccepted: boolean }
->({
-  mutationFn: ({ requestId, isAccepted }) =>
-    respondToFriendRequest({ requestId, isAccepted }),
-
-  onSuccess: () => {},
-  onError: (error: Error) => {
-    // 에러 시 처리 로직
-    alert('친구 요청을 보내는 데 실패했습니다.');
-    console.error(error);
-  },
-  onSettled: (data: string | undefined) => {
-    // 요청이 완료된 후 (성공, 실패 관계없이) 처리 로직
-    if (data) {
-      alert(data);
-    }
-  },
-});*/
-
-  const url = expanded ? `/api/friends` : `/api/friends?limit=5`;
-
-  const { data, isLoading, isError } = useGetData(url);
-
-  if (isLoading) {
-    return <div>스켈레톤 이미지</div>;
-  }
-
-  if (isError) {
-    return <h1>에러</h1>;
-  }
-
-  const handleNineDotsClick = (id: number) => {
-    setModalState((prev) => ({
-      isOpen: prev.selectedId !== id || !prev.isOpen,
-      selectedId: prev.selectedId === id ? null : id,
-    }));
-  };
-  return (
-    <Container>
-      {data.length === 0 && <div>친구 없음</div>}
-      {data.map((item: IFriendList, index: number) => (
-        <div key={index}>
-          <SpaceBtwDiv>
-            <FlexDiv>
-              <ProfileImage width={'30'} height={'30'} />
-
-              <CenterDiv width="100px">{item.nickname}</CenterDiv>
-            </FlexDiv>
-
-            <CenterDiv>진행 중인 과제: {item.ongoingAssignments}개</CenterDiv>
-            <RightAlignedItem>
-              <NineDots
-                fill={
-                  modalState.selectedId === item.friendshipId
-                    ? 'rgba(74, 198, 226, 1)'
-                    : 'black'
-                }
-                onClick={() => handleNineDotsClick(item.friendshipId)}
-              />
-            </RightAlignedItem>
-          </SpaceBtwDiv>
-          {modalState.isOpen && modalState.selectedId === item.friendshipId && (
-            <Modal
-              onClick={(e) => e.stopPropagation()}
-              top={`${index * 67 + 320}px`}
-            >
-              <ModalContent>
-                <span>진행중인 과제: ?개</span>
-                <div>일정확인</div>
-              </ModalContent>
-
-              <P>과제공유</P>
-
-              <ModalContent>
-                <div
-                  style={{
-                    display: 'flex',
-                    transformOrigin: 'left',
-                    alignItems: 'center', // 수직 중앙 정렬
-                    transform: 'scale(0.5)', // 크기 조정
-                  }}
-                >
-                  <SmallToggleSwitch
-                    isOn={isOn}
-                    onToggle={() => setIsOn(!isOn)}
-                  />
-                </div>
-                <div>친한친구설정</div>
-              </ModalContent>
-              <ModalContent>
-                <span>메모내용메모내용</span>
-                <div>메모수정</div>
-              </ModalContent>
-
-              <P>친구삭제</P>
-            </Modal>
-          )}
-        </div>
-      ))}
-    </Container>
-  );
-};
-
-export default FriendList;

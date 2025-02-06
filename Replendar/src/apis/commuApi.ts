@@ -1,14 +1,11 @@
-import { FriendRequestResponse } from '../types';
 import { axiosInstance } from './axios-instance';
 
 // 친구 요청 보내기
-export const sendFriendRequest = async (
-  friendId: number
-): Promise<FriendRequestResponse> => {
+export const sendFriendRequest = async (friendId: number) => {
   const response = await axiosInstance.post(`/api/friends/request`, {
     friendId: friendId,
   });
-  return response.data;
+  return response.data.result;
 };
 
 // 친구 요청 응답
@@ -46,5 +43,20 @@ export const deleteFriend = async (friendId: number) => {
   const response = await axiosInstance.delete(
     `/api/friends?friendId=${friendId}`
   );
-  return response.data;
+  return response.data.result;
+};
+
+//메모 수정
+export const patchNote = async ({
+  friendId,
+  note,
+}: {
+  friendId: number;
+  note: string;
+}) => {
+  const response = await axiosInstance.patch('/api/friends/note', {
+    friendId,
+    note,
+  });
+  return response.data.result;
 };
