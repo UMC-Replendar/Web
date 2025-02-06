@@ -91,10 +91,7 @@ const SchoolInfoForm: React.FC<SchoolInfoFormProps> = ({
       return;
     }
     openModal(
-      <DepartmentSearchModal
-        selectedSchool={selectedSchool}
-        onSelect={(dept) => onDepartmentChange(dept)}
-      />
+      <DepartmentSearchModal onSelect={(dept) => onDepartmentChange(dept)} />
     );
   };
 

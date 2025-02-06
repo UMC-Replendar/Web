@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import useModalStore from '../store/modalStore';
+import { axiosInstance } from '../apis/axios-instance';
+import useSchoolStore from '../store/schoolStore';
+import DepartmentRegisterModal from './DepartmentRegisterModal';
 
 const ModalWrapper = styled.div`
   padding: 20px;
@@ -25,6 +28,7 @@ const SearchButton = styled.button`
   color: black;
   border: none;
   border-radius: 5px;
+  cursor: pointer;
 `;
 
 const DepartmentList = styled.ul`
@@ -49,23 +53,96 @@ const SelectButton = styled.button`
   cursor: pointer;
 `;
 
-const DepartmentSearchModal: React.FC<{
-  selectedSchool: string;
-  onSelect: (dept: string) => void;
-}> = ({ selectedSchool, onSelect }) => {
-  const { closeModal } = useModalStore();
-  const [searchTerm, setSearchTerm] = useState('');
+const RegisterOption = styled.p`
+  margin-top: 20px;
+  font-size: 14px;
+`;
 
-  // 선택한 학교에 따른 학과 리스트
-  const departments: Record<string, string[]> = {
-    룡산머학교: ['IT융합학과', '전자공학과', '경영학과'],
-    서울대학교: ['컴퓨터공학과', '화학공학과', '법학과'],
-    부산대학교: ['의과대학', '기계공학과', '국어국문학과'],
+const RegisterButton = styled.button`
+  background: #e8e8e8;
+  color: black;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 10px;
+`;
+
+interface Department {
+  id: number;
+  name: string;
+}
+
+const DepartmentSearchModal: React.FC<{ onSelect: (dept: string) => void }> = ({
+  onSelect,
+}) => {
+  const { openModal, closeModal } = useModalStore();
+  const { selectedSchool } = useSchoolStore(); // ✅ Zustand에서 선택된 학교 가져오기
+  const selectedSchoolId = selectedSchool?.id ?? null; // ✅ 선택된 학교 ID 추출
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    console.log('selectedSchoolId in useEffect:', selectedSchoolId); // 디버깅 로그 추가
+
+    if (!selectedSchoolId) {
+      console.warn('학교 ID가 없습니다. API 요청을 중단합니다.');
+      return;
+    }
+
+    const fetchDepartments = async () => {
+      setLoading(true);
+      try {
+        const response = await axiosInstance.get<{
+          isSuccess: boolean;
+          code: string;
+          message: string;
+          result: { id: number; majorName: string }[];
+        }>(`/api/majors?schoolId=${selectedSchoolId}`);
+
+        const formattedDepartments = response.data.result.map((dept) => ({
+          id: dept.id,
+          name: dept.majorName,
+        }));
+
+        setDepartments(formattedDepartments);
+      } catch (error) {
+        console.error('학과 목록 불러오기 오류:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDepartments();
+  }, [selectedSchoolId]);
+
+  const handleSearch = async () => {
+    if (!searchTerm.trim() || !selectedSchoolId) return;
+
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get<{
+        isSuccess: boolean;
+        code: string;
+        message: string;
+        result: { id: number; majorName: string }[];
+      }>(`/api/majors?schoolId=${selectedSchoolId}&keyword=${searchTerm}`);
+
+      const formattedDepartments = response.data.result.map((dept) => ({
+        id: dept.id,
+        name: dept.majorName,
+      }));
+
+      setDepartments(formattedDepartments);
+    } catch (error) {
+      console.error('학과 검색 중 오류 발생:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const availableDepartments = departments[selectedSchool] || [];
-
-  // 학과 선택 시 동작하는 함수
   const handleSelectDepartment = (dept: string) => {
     alert(`${dept}를 선택하였습니다.`);
     onSelect(dept);
@@ -74,26 +151,31 @@ const DepartmentSearchModal: React.FC<{
 
   return (
     <ModalWrapper>
-      <Title>{selectedSchool} 학과 검색하기</Title>
+      <Title>학과 검색하기</Title>
       <SearchInput
         type="text"
         placeholder="학과 이름 입력"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <SearchButton>검색</SearchButton>
+      <SearchButton onClick={handleSearch}>검색</SearchButton>
+      {loading && <p>검색 중...</p>}
       <DepartmentList>
-        {availableDepartments
-          .filter((dept) => dept.includes(searchTerm))
-          .map((dept, index) => (
-            <DepartmentItem key={index}>
-              {dept}
-              <SelectButton onClick={() => handleSelectDepartment(dept)}>
-                선택하기
-              </SelectButton>
-            </DepartmentItem>
-          ))}
+        {departments.map((dept) => (
+          <DepartmentItem key={dept.id}>
+            {dept.name}
+            <SelectButton onClick={() => handleSelectDepartment(dept.name)}>
+              선택하기
+            </SelectButton>
+          </DepartmentItem>
+        ))}
       </DepartmentList>
+      <RegisterOption>
+        찾으시는 학과가 없나요?
+        <RegisterButton onClick={() => openModal(<DepartmentRegisterModal />)}>
+          등록하기
+        </RegisterButton>
+      </RegisterOption>
     </ModalWrapper>
   );
 };

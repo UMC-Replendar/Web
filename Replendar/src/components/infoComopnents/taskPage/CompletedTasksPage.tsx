@@ -101,7 +101,7 @@ const CompletedTasksPage: React.FC = () => {
       const queryParams = new URLSearchParams({
         page: '1',
         size: '5',
-        sort: 'updatedAt',
+        sort: 'completionTime',
       }).toString();
 
       try {

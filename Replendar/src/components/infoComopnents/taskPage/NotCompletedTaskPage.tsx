@@ -106,7 +106,7 @@ const NotCompletedTaskPage: React.FC = () => {
       const queryParams = new URLSearchParams({
         page: '1',
         size: '5',
-        sort: 'updatedAt',
+        sort: 'dueDate',
       }).toString();
 
       try {

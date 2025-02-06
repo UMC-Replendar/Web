@@ -1,8 +1,6 @@
 import styled, { keyframes } from 'styled-components';
 import KakaoLogo from '../assets/images/KakaoTalk_logo.png';
 import AppIcon from '../assets/images/logoCapture.png';
-// import Character from '../components/Character'; 사진 대신 작성 할 캐릭터 컴포넌트
-
 import Blue from '../assets/images/loginImage/Blue.svg';
 import Orange from '../assets/images/loginImage/Orange.svg';
 import Pink from '../assets/images/loginImage/Pink.svg';
