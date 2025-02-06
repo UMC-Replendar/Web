@@ -5,8 +5,8 @@ import { axiosInstance } from '../../apis/axios-instance';
 import ProfileUpload from './ProfileUpload';
 import SchoolInfoForm from './SchoolInfoForm';
 import StatusMessage from './StatusMessage';
+import useDepartmentStore from '../../store/useDepartmentStore';
 
-// 닉네임 유효성 검사 정규식 (한글, 영어만 허용)
 const nicknameRegex = /^[a-zA-Z\uAC00-\uD7A3]+$/;
 
 // 스타일 정의
@@ -89,16 +89,14 @@ const SignupForm: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   // 기타 회원가입 정보 상태
-  const [profilePhoto, setProfilePhoto] = useState<string>('');
+  const [profilePhoto, setProfilePhoto] = useState<File | string | null>(null);
+
   const [statusMessage, setStatusMessage] = useState<string>('');
   const [selectedSchool, setSelectedSchool] = useState<{
     id: number;
     name: string;
   } | null>(null);
-  const [selectedDepartment, setSelectedDepartment] = useState<{
-    id: number;
-    name: string;
-  } | null>(null);
+  const { selectedDepartment, setSelectedDepartment } = useDepartmentStore();
 
   const [grade, setGrade] = useState<string>('1학년');
 
@@ -151,59 +149,42 @@ const SignupForm: React.FC = () => {
       setIsChecking(false);
     }
   };
-
   const handleSubmit = async () => {
     if (!isNicknameValid) {
       alert('닉네임 중복 확인을 완료해주세요.');
       return;
     }
-
     if (!selectedSchool || !selectedDepartment) {
       alert('학교와 학과를 선택해주세요.');
       return;
     }
 
     const academicYear = parseInt(grade.replace('학년', ''), 10);
+    console.log(selectedDepartment);
+    console.log('null아니지?', selectedDepartment?.id);
 
     try {
       const formData = new FormData();
-
-      // ✅ JSON 데이터를 Blob 객체로 변환하여 'userInfo'로 추가
       const userInfo = {
         nickname,
         statusMessage: statusMessage || '',
-        schoolId: selectedSchool.id, // ✅ ID 값을 정확하게 사용
-        majorId: selectedDepartment.id, // ✅ ID 값을 정확하게 사용
+        majorId: selectedDepartment.id,
         academicYear,
       };
-
       formData.append(
         'userInfo',
-        new Blob([JSON.stringify(userInfo)], { type: 'application/json' }) // JSON을 Blob으로 변환
+        new Blob([JSON.stringify(userInfo)], { type: 'application/json' })
       );
-
-      // ✅ 프로필 이미지가 있으면 추가
       if (profilePhoto) {
         formData.append('profileImage', profilePhoto);
       }
-
-      console.log('📝 FormData 확인:');
-      for (const pair of formData.entries()) {
-        console.log(pair[0], pair[1]);
-      }
-
-      // ✅ axios 요청 (Content-Type 자동 설정됨)
       const response = await axiosInstance.post('/api/user/signup', formData);
-
-      console.log('✅ 회원가입 성공:', response.data);
+      console.log(response);
       alert('회원가입이 완료되었습니다.');
       navigate('/');
     } catch (error: any) {
-      console.error('❌ 회원가입 실패:', error);
       alert(
-        `회원가입 중 오류가 발생했습니다: ${
-          error.response?.data?.message || '서버 오류'
-        }`
+        `회원가입 중 오류 발생: ${error.response?.data?.message || '서버 오류'}`
       );
     }
   };
@@ -229,8 +210,6 @@ const SignupForm: React.FC = () => {
       <ErrorMessage isValid={isNicknameValid}>
         {errorMessage || ' '}
       </ErrorMessage>
-
-      {/* 프로필, 상태 메시지, 학교 정보 컴포넌트 */}
       <ProfileUpload
         profilePhoto={profilePhoto}
         onPhotoChange={setProfilePhoto}
@@ -243,14 +222,10 @@ const SignupForm: React.FC = () => {
         selectedSchool={selectedSchool}
         selectedDepartment={selectedDepartment}
         grade={grade}
-        onSchoolChange={(school) => {
-          setSelectedSchool(school); // ✅ 객체 형태 { id, name }로 저장
-          setSelectedDepartment(null); // ✅ 학교 선택 시 학과 초기화
-        }}
+        onSchoolChange={setSelectedSchool}
         onDepartmentChange={setSelectedDepartment}
         onGradeChange={setGrade}
       />
-
       <SubmitButton onClick={handleSubmit}>회원가입 완료</SubmitButton>
     </FormContainer>
   );

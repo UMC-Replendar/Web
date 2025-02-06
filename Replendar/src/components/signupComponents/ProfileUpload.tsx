@@ -48,10 +48,9 @@ const UploadText = styled.div`
   text-align: center;
   user-select: none;
 `;
-
 interface ProfileUploadProps {
-  profilePhoto: string;
-  onPhotoChange: (photo: string) => void;
+  profilePhoto: File | string | null;
+  onPhotoChange: (photo: File | null) => void;
 }
 
 const ProfileUpload: React.FC<ProfileUploadProps> = ({
@@ -69,8 +68,8 @@ const ProfileUpload: React.FC<ProfileUploadProps> = ({
     const file = event.target.files[0];
 
     // 미리보기 이미지 생성
-    const imageUrl = URL.createObjectURL(file);
-    onPhotoChange(imageUrl);
+
+    onPhotoChange(file);
 
     await handleUpload(file);
   };
@@ -114,7 +113,14 @@ const ProfileUpload: React.FC<ProfileUploadProps> = ({
       <Title>프로필 사진 설정</Title>
       <UploadWrapper htmlFor="file-upload">
         {profilePhoto ? (
-          <UploadIcon src={profilePhoto} alt="프로필 사진 미리보기" />
+          <UploadIcon
+            src={
+              typeof profilePhoto === 'string'
+                ? profilePhoto
+                : URL.createObjectURL(profilePhoto)
+            }
+            alt="프로필 사진 미리보기"
+          />
         ) : (
           <>
             <img

@@ -85,7 +85,7 @@ const SchoolSearchModal: React.FC<{ onSelect: (school: string) => void }> = ({
           message: string;
           result: { id: number; schoolName: string }[];
         }>('/api/schools');
-        console.log('📡 API 응답 데이터:', response.data.result); // ✅ 디버깅 로그 추가
+        console.log('API 응답 데이터:', response.data.result);
 
         const formattedSchools = response.data.result.map((school) => ({
           id: school.id,
@@ -130,12 +130,7 @@ const SchoolSearchModal: React.FC<{ onSelect: (school: string) => void }> = ({
 
   const handleSelectSchool = (school: { id: number; name: string }) => {
     alert(`${school.name} 를 선택하였습니다.`);
-    setSelectedSchool(school); // ✅ Zustand 상태 업데이트
-    console.log(
-      '🛠 Zustand에 저장된 selectedSchool:',
-      useSchoolStore.getState().selectedSchool
-    ); // ✅ 상태 업데이트 즉시 확인
-
+    setSelectedSchool(school);
     onSelect(school.name);
     closeModal();
   };

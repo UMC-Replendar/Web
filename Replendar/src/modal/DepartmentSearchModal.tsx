@@ -4,6 +4,7 @@ import useModalStore from '../store/modalStore';
 import { axiosInstance } from '../apis/axios-instance';
 import useSchoolStore from '../store/schoolStore';
 import DepartmentRegisterModal from './DepartmentRegisterModal';
+import useDepartmentStore from '../store/useDepartmentStore';
 
 const ModalWrapper = styled.div`
   padding: 20px;
@@ -73,19 +74,17 @@ interface Department {
   name: string;
 }
 
-const DepartmentSearchModal: React.FC<{ onSelect: (dept: string) => void }> = ({
-  onSelect,
-}) => {
+const DepartmentSearchModal: React.FC = ({}) => {
   const { openModal, closeModal } = useModalStore();
-  const { selectedSchool } = useSchoolStore(); // ✅ Zustand에서 선택된 학교 가져오기
-  const selectedSchoolId = selectedSchool?.id ?? null; // ✅ 선택된 학교 ID 추출
-
+  const { selectedSchool } = useSchoolStore();
+  const selectedSchoolId = selectedSchool?.id ?? null;
+  const { setSelectedDepartment } = useDepartmentStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log('selectedSchoolId in useEffect:', selectedSchoolId); // 디버깅 로그 추가
+    console.log('선택된 학교 id', selectedSchoolId);
 
     if (!selectedSchoolId) {
       console.warn('학교 ID가 없습니다. API 요청을 중단합니다.');
@@ -143,9 +142,10 @@ const DepartmentSearchModal: React.FC<{ onSelect: (dept: string) => void }> = ({
     }
   };
 
-  const handleSelectDepartment = (dept: string) => {
-    alert(`${dept}를 선택하였습니다.`);
-    onSelect(dept);
+  const handleSelectDepartment = (dept: { id: number; name: string }) => {
+    alert(`${dept.name}를 선택하였습니다.`);
+
+    setSelectedDepartment(dept);
     closeModal();
   };
 
@@ -164,7 +164,7 @@ const DepartmentSearchModal: React.FC<{ onSelect: (dept: string) => void }> = ({
         {departments.map((dept) => (
           <DepartmentItem key={dept.id}>
             {dept.name}
-            <SelectButton onClick={() => handleSelectDepartment(dept.name)}>
+            <SelectButton onClick={() => handleSelectDepartment(dept)}>
               선택하기
             </SelectButton>
           </DepartmentItem>
