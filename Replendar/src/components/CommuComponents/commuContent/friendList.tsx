@@ -149,15 +149,15 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
             <RightAlignedItem>
               <NineDots
                 fill={
-                  modalState.selectedId === item.friendId
+                  modalState.selectedId === item.friendshipId
                     ? 'rgba(74, 198, 226, 1)'
                     : 'black'
                 }
-                onClick={() => handleNineDotsClick(item.friendId)}
+                onClick={() => handleNineDotsClick(item.friendshipId)}
               />
             </RightAlignedItem>
           </SpaceBtwDiv>
-          {modalState.isOpen && modalState.selectedId === item.friendId && (
+          {modalState.isOpen && modalState.selectedId === item.friendshipId && (
             <Modal
               onClick={(e) => e.stopPropagation()}
               top={`${index * 67 + 320}px`}
