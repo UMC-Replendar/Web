@@ -2,17 +2,45 @@ import styled from 'styled-components';
 import Setting from '../assets/images/Setting.png';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
+import axios from 'axios';
 
 function Settings() {
   const navigate = useNavigate();
   const { clearAuth } = useAuthStore();
-  const userId = localStorage.getItem('nickname') || null;
+  const { token, nickname } = useAuthStore();
 
   const LogoutClicked = () => {
     clearAuth();
     navigate('/login');
   };
 
+  const handleWithdraw = async () => {
+    if (!window.confirm('정말로 회원 탈퇴를 진행하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/user/withdraw`,
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      );
+
+      if (response.data.isSuccess) {
+        alert(response.data.message);
+        clearAuth();
+        navigate('/login');
+      } else {
+        throw new Error(response.data.message || '회원 탈퇴 실패');
+      }
+    } catch (error) {
+      console.error('회원 탈퇴 실패:', error);
+      alert('회원 탈퇴 중 오류가 발생했습니다.');
+    }
+  };
   return (
     <SettingsWrapper>
       <TitleContainer>
@@ -24,7 +52,7 @@ function Settings() {
           <SectionTitle>계정</SectionTitle>
           <FirstSectionLink>
             <IdContainer>아이디</IdContainer>
-            <NicknameContainer>{userId}</NicknameContainer>
+            <NicknameContainer>{nickname}</NicknameContainer>
           </FirstSectionLink>
         </SectionContainer>
         <SectionContainer>
@@ -47,7 +75,7 @@ function Settings() {
         </SectionContainer>
         <SectionContainer>
           <SectionTitle>기타</SectionTitle>
-          <SectionLink>회원 탈퇴</SectionLink>
+          <SectionLink onClick={handleWithdraw}>회원 탈퇴</SectionLink>
           <SectionLink onClick={LogoutClicked}>로그아웃</SectionLink>
         </SectionContainer>
       </ComponentContainer>
