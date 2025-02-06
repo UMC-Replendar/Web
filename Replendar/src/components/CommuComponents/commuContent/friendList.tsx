@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { NineDots } from '../commuIcons';
 import useGetData from '../../../hooks/useGetData';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { SmallToggleSwitch } from '../../../modal/EditTaskModal';
 import { ProfileImage } from '../commuIcons';
 import { IFriendList } from '../../../types';

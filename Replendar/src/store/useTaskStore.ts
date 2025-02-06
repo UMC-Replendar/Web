@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { create } from 'zustand';
-import axios from 'axios';
 
 interface Task {
   assignmentId: number;
@@ -10,13 +9,12 @@ interface Task {
   remainingTime: string;
   isToggled: boolean;
   isBookmarked: boolean;
+  memo: string;
 }
 
 interface TaskStore {
   tasks: Task[];
-  fetchTasks: (userId: number) => Promise<void>;
-  setTasks: (tasks: Task[]) => void;
-  addTask: (name: string, deadline: string) => void;
+  addTask: (task: Task) => void;
   deleteTask: (assignmentId: number) => void;
   toggleBookmark: (assignmentId: number) => void;
   editTask: (assignmentId: number, updatedTask: Partial<Task>) => void;
@@ -26,52 +24,10 @@ interface TaskStore {
 const useTaskStore = create<TaskStore>((set) => ({
   tasks: [],
 
-  setTasks: (newTasks) => set({ tasks: newTasks }),
-
-  fetchTasks: async (userId: number) => {
-    try {
-      const response = await axios.get(`/api/assignment?userId=${userId}`);
-      if (response.data.isSuccess) {
-        const formattedTasks = response.data.result.map((task: any) => ({
-          assignmentId: task.assignmentId,
-          color: task.visibility === 'ON' ? '#4CAF50' : '#F44336',
-          name: task.title,
-          deadline: task.due_date,
-          remainingTime: task.due_time,
-          isToggled: task.notification === 'ON',
-          isBookmarked: false,
-        }));
-        set({ tasks: formattedTasks });
-      } else {
-        console.error('API Error:', response.data.message);
-      }
-    } catch (error) {
-      console.error('Failed to fetch tasks:', error);
-    }
-  },
-
-  addTask: async (name, deadline) => {
-    try {
-      const response = await axios.post('/api/assignment', {
-        title: name,
-        due_date: deadline,
-      });
-      if (response.data.isSuccess) {
-        const newTask: Task = {
-          assignmentId: response.data.result.assignmentId,
-          color: '#7AC19A',
-          name,
-          deadline,
-          remainingTime: '',
-          isToggled: false,
-          isBookmarked: false,
-        };
-        set((state) => ({ tasks: [...state.tasks, newTask] }));
-      }
-    } catch (error) {
-      console.error('Failed to add task:', error);
-    }
-  },
+  addTask: (task) =>
+    set((state) => ({
+      tasks: [...state.tasks, task],
+    })),
 
   deleteTask: (assignmentId) =>
     set((state) => ({
@@ -105,10 +61,15 @@ const useTaskStore = create<TaskStore>((set) => ({
           return { ...task, remainingTime: '제출 마감' };
         }
 
-        const hours = Math.floor(diffMs / (1000 * 60 * 60));
-        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-        return { ...task, remainingTime: `${hours}h ${minutes}m ${seconds}s` };
+        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((diffMs / (1000 * 60)) % 60);
+        const seconds = Math.floor((diffMs / 1000) % 60);
+
+        return {
+          ...task,
+          remainingTime: `${days}d ${hours}h ${minutes}m ${seconds}s`,
+        };
       });
 
       return { tasks: [...updatedTasks] }; // 새로운 배열 반환

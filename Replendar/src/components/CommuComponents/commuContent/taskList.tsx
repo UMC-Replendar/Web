@@ -4,7 +4,7 @@ import PlusIcon from '../../../assets/images/PlusIcon.svg';
 import BlueButton from '../../blueButton';
 import DownArrow from '../../../assets/images/downArrow.svg';
 import { useState } from 'react';
-import useModalStore from '../../../store/modalStore';
+// import useModalStore from '../../../store/modalStore';
 import CommuModalContent from '../modalContents/commuModalContent';
 
 const Container = styled.div<{ expanded?: string }>`
@@ -89,7 +89,6 @@ const Modal = styled.div`
   border-radius: 10px;
   padding: 30px;
   flex-direction: column;
-  z-index:;
 `;
 const Overlay = styled.div`
   position: fixed;

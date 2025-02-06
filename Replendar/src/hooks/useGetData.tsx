@@ -6,19 +6,36 @@ import { axiosInstance } from '../apis/axios-instance';
 
 const useGetData = (url: string) => {
   const getData = async () => {
-    const response = await axiosInstance.get(url);
+    try {
+      const response = await axiosInstance.get(url);
 
-    return response.data.result;
+      // API 응답 구조 확인
+      console.log('API Response:', response.data);
+
+      if (response.data?.isSuccess) {
+        // 빈 배열이더라도 반환
+        return Array.isArray(response.data.result) ? response.data.result : [];
+      } else {
+        const errorMessage =
+          response.data?.message || 'Unexpected API response format';
+        console.error('API Error:', errorMessage);
+        return []; // 에러 시 빈 배열 반환
+      }
+    } catch (error: any) {
+      console.error('Network/API Error:', error.message || error);
+      return []; // 네트워크 오류 시에도 빈 배열 반환
+    }
   };
   const {
     data = [],
     isLoading,
     isError,
+    error,
   } = useQuery({
     queryKey: [url],
     queryFn: getData,
     enabled: !!url,
   });
-  return { data, isLoading, isError };
+  return { data, isLoading, isError, error };
 };
 export default useGetData;
