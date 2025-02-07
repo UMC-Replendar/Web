@@ -4,7 +4,7 @@ import useModalStore from '../../../store/modalStore';
 import styled from 'styled-components';
 import { createGroup } from '../../../apis/commuApi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SelectFriendsModal from '../../../modal/SelectFriendsModal';
 import useGetData from '../../../hooks/useGetData';
 import useFriendsStore from '../../../store/useFriendStore';
@@ -12,7 +12,19 @@ import useFriendsStore from '../../../store/useFriendStore';
 const MakeGroup: React.FC = () => {
   const { closeModal } = useModalStore();
 
-  const { isFriendModalOpen, openFriendModal } = useFriendsStore();
+  const {
+    isFriendModalOpen,
+    openFriendModal,
+    nicknames,
+    updateFriendsData,
+    setFriendData,
+    friendData,
+    resetFriends,
+  } = useFriendsStore();
+
+  useEffect(() => {
+    resetFriends();
+  }, [closeModal]);
 
   const [groupName, setGroupName] = useState('');
 
@@ -41,6 +53,20 @@ const MakeGroup: React.FC = () => {
     mutation.mutate(groupName);
   };
 
+  useEffect(() => {
+    updateFriendsData();
+  }, [isFriendModalOpen]);
+
+  const { data } = useGetData(`/api/friends`);
+
+  useEffect(() => {
+    if (JSON.stringify(data) !== JSON.stringify(friendData)) {
+      setFriendData(data);
+    }
+  }, [data]);
+  /*if (data && data !== friendData) {
+    setFriendData(data);
+  }*/
   return (
     <Container>
       <h1>그룹 만들기</h1>
@@ -57,10 +83,20 @@ const MakeGroup: React.FC = () => {
 
         <label>그룹에 넣을 친구</label>
       </GapDiv>
-      <PlusFriendsButton onClick={openFriendModal}>
-        <img src={GrayPlusIcon} alt="Gray Plus Icon" />
-        추가
-      </PlusFriendsButton>
+      <FlexDiv>
+        <PlusFriendsButton onClick={openFriendModal}>
+          <img src={GrayPlusIcon} alt="Gray Plus Icon" />
+          추가
+        </PlusFriendsButton>
+        {nicknames.length > 0 && (
+          <SelectedFriendsList>
+            {nicknames.map((nickname) => (
+              <FriendTag key={nickname}>{nickname}</FriendTag>
+            ))}
+          </SelectedFriendsList>
+        )}
+      </FlexDiv>
+
       {isFriendModalOpen && <SelectFriendsModal />}
       <FlexEndGroup>
         <PlusFriendsButton onClick={handleCreateGroup}>완료</PlusFriendsButton>
@@ -99,4 +135,30 @@ const GapDiv = styled.div`
 `;
 const Container = styled.div`
   padding: 20px;
+`;
+
+const SelectedFriendsList = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  flex-wrap: wrap;
+`;
+
+const FriendTag = styled.span`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgba(102, 102, 102, 1);
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(186, 186, 186, 1);
+  font-size: 14px;
+  width: 64px;
+  height: 31px;
+`;
+
+const FlexDiv = styled.div`
+  display: flex;
+  gap: 8px;
 `;

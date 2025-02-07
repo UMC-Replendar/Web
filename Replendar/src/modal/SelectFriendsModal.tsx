@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 import UnCheckBoxIcon from '../assets/images/UnCheckBoxIcon.svg';
 import CheckBoxIcon from '../assets/images/CheckBoxIcon.svg';
-import useGetData from '../hooks/useGetData';
-import { IFriendList } from '../types';
+import { IFriendList, ITaskFriendList } from '../types';
 import useFriendsStore from '../store/useFriendStore';
+
 const SelectFriendsModalOverlay = styled.div`
   position: fixed;
   top: 50%;
@@ -111,18 +111,19 @@ function SelectFriendsModal() {
     checkedFriends,
     toggleFriend,
     toggleAllFriends,
-    friendshipIds,
     closeFriendModal,
+    setFriendData,
+    friendData,
   } = useFriendsStore();
 
   //일단
-  const { data } = useGetData(`/api/friends`);
-
   //all true인지
   const isAllChecked =
-    Array.isArray(data) &&
-    data.length > 0 &&
-    data.every((friend: IFriendList) => checkedFriends[friend.friendshipId]);
+    Array.isArray(friendData) &&
+    friendData.length > 0 &&
+    friendData.every(
+      (friend: IFriendList | ITaskFriendList) => checkedFriends[friend.friendId]
+    );
 
   return (
     <SelectFriendsModalOverlay>
@@ -134,7 +135,9 @@ function SelectFriendsModal() {
             // data가 존재하고, data[0].friends 배열이 정의되어 있는지 확인
 
             toggleAllFriends(
-              data.map((friend: IFriendList) => friend.friendshipId)
+              friendData.map(
+                (friend: IFriendList | ITaskFriendList) => friend.friendId
+              )
             );
           }}
           style={{ cursor: 'pointer' }}
@@ -145,22 +148,22 @@ function SelectFriendsModal() {
           />
         </div>
       </SelectAllFriends>
-      {data.map((friend: IFriendList) => (
-        <FriendsItem key={friend.friendshipId}>
+      {friendData.map((friend: IFriendList | ITaskFriendList) => (
+        <FriendsItem key={friend.friendId}>
           <FriendsNameSection>
             <FriendsNickname>{friend.nickname}</FriendsNickname>
             <FriendsNameAndMemo>{friend.name}</FriendsNameAndMemo>
           </FriendsNameSection>
           <FriendsMemoSection>
             <FriendsNameAndMemo>메모</FriendsNameAndMemo>
-            <FriendsMemoInput />
+            <FriendsMemoInput value={friend.friendNote} />
             <div
-              onClick={() => toggleFriend(friend.friendshipId)}
+              onClick={() => toggleFriend(friend.friendId)}
               style={{ cursor: 'pointer' }}
             >
               <img
                 src={
-                  checkedFriends[friend.friendshipId]
+                  checkedFriends[friend.friendId]
                     ? CheckBoxIcon
                     : UnCheckBoxIcon
                 }

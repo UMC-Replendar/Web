@@ -68,3 +68,40 @@ export const createGroup = async (groupName: string) => {
   });
   return response.data.result;
 };
+
+//그룹 삭제
+export const deleteGroup = async (groupId: number) => {
+  const response = await axiosInstance.delete(` /api/friend-groups/{groupId}`);
+  return response.data.result;
+};
+
+//그룹에 친구 추가
+export const groupAddFriend = async ({
+  groupId,
+  friendshipIds,
+}: {
+  groupId: number;
+  friendshipIds: number[];
+}) => {
+  const response = await axiosInstance.post(
+    `/api/friend-groups/${groupId}/add-multiple`,
+    {
+      friendshipIds,
+    }
+  );
+  return response.data.result;
+};
+
+//그룹에 친구 삭제
+export const groupDeleteFriend = async ({
+  groupId,
+  friendshipId,
+}: {
+  groupId: number;
+  friendshipId: number;
+}) => {
+  const response = await axiosInstance.delete(
+    ` /api/friend-groups/${groupId}/remove/${friendshipId}`
+  );
+  return response.data.result;
+};
