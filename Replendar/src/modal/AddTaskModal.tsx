@@ -10,6 +10,7 @@ import useTaskStore from '../store/useTaskStore';
 import useModalStore from '../store/modalStore';
 import SelectFriendsModal from './SelectFriendsModal';
 import useFriendsStore from '../store/useFriendStore';
+import useGetData from '../hooks/useGetData';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -275,7 +276,15 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
 
   //const [showFriendsModal, setShowFriendsModal] = useState(false);
   //추가했어요
-  const { isFriendModalOpen, openFriendModal } = useFriendsStore();
+  const {
+    isFriendModalOpen,
+    openFriendModal,
+    nicknames,
+    updateFriendsData,
+    setFriendData,
+    friendData,
+    resetFriends,
+  } = useFriendsStore();
 
   const toggleBookmark = () => {
     setIsBookmarked((prev) => !prev);
@@ -288,6 +297,27 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
     const day = String(today.getDate()).padStart(2, '0');
     setPlaceholderDate(`${year} / ${month} / ${day}`);
   }, []);
+
+  //여기부터 수정
+  const userId = localStorage.getItem('id');
+
+  const { data } = useGetData(`/api/assignment/share?userId=${userId}`);
+
+  useEffect(() => {
+    updateFriendsData();
+  }, [isFriendModalOpen]);
+
+  useEffect(() => {
+    if (JSON.stringify(data) !== JSON.stringify(friendData)) {
+      setFriendData(data);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    resetFriends();
+  }, [closeModal]);
+
+  //여기까지 수정
 
   const handleComplete = async () => {
     if (!taskName.trim()) {
@@ -419,6 +449,13 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
             <img src={GrayPlusIcon} alt="Gray Plus Icon" />
             추가
           </PlusFriendsButton>
+          {nicknames.length > 0 && (
+            <SelectedFriendsList>
+              {nicknames.map((nickname) => (
+                <FriendTag key={nickname}>{nickname}</FriendTag>
+              ))}
+            </SelectedFriendsList>
+          )}
         </ShareSection>
 
         {isFriendModalOpen && <SelectFriendsModal />}
@@ -439,3 +476,29 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
 }
 
 export default AddTaskModal;
+
+//수정
+const SelectedFriendsList = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+`;
+
+const FriendTag = styled.span`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgba(102, 102, 102, 1);
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(186, 186, 186, 1);
+  font-size: 14px;
+  width: 64px;
+  height: 31px;
+`;
+
+const FlexDiv = styled.div`
+  display: flex;
+  gap: 8px;
+`;
