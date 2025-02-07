@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { useState, useEffect } from 'react';
 
 const ProfileContainer = styled.div`
   display: flex;
@@ -46,96 +45,43 @@ const InfoBox = styled.div`
 `;
 
 const Nickname = styled.h2`
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 28px;
 `;
 
 const InfoText = styled.p`
-  font-size: 18px;
+  font-size: 28px;
+  color: #666666;
+  margin-top: 10px; //안넣으면 margin-top : 28px 드가는데 왜그러지
 `;
 
 const Message = styled.p`
-  font-size: 18px;
-  color: gray;
+  font-size: 19px;
+  font-weight: 500;
 `;
 
-function ProfileSection() {
-  const [image, setImage] = useState<string | null>(null);
-  const [nickname, setNickname] = useState<string>('닉네임 없음');
-  const [statusMessage, setStatusMessage] =
-    useState<string>('상태 메시지 없음');
-  const [school, setSchool] = useState<string>('학교 정보 없음');
-  const [department, setDepartment] = useState<string>('학과 정보 없음');
-  const [grade, setGrade] = useState<string>('학년 정보 없음');
+interface ProfileProps {
+  profileData: any;
+}
 
-  // 🔹 localStorage에서 signupData를 파싱하여 상태 업데이트
-  useEffect(() => {
-    const storedData = localStorage.getItem('signupData');
-    if (storedData) {
-      try {
-        const data = JSON.parse(storedData);
-        setImage(data.profilePhoto || null);
-        setNickname(data.nickname || '닉네임 없음');
-        setStatusMessage(data.statusMessage || '상태 메시지 없음');
-        setSchool(data.selectedSchool || '학교 정보 없음');
-        setDepartment(data.selectedDepartment || '학과 정보 없음');
-        setGrade(data.grade || '학년 정보 없음');
-      } catch (error) {
-        console.error('로컬스토리지 데이터 파싱 오류:', error);
-      }
-    }
-  }, []);
-
-  // 🔹 프로필 사진 업로드 시 localStorage에 저장(추가 수정 가능)
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const imageData = reader.result as string;
-        setImage(imageData);
-        // 기존 signupData에 profilePhoto만 업데이트하는 예시
-        const storedData = localStorage.getItem('signupData');
-        if (storedData) {
-          const data = JSON.parse(storedData);
-          data.profilePhoto = imageData;
-          localStorage.setItem('signupData', JSON.stringify(data));
-        } else {
-          localStorage.setItem('profileImage', imageData);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
+const ProfileSection: React.FC<ProfileProps> = ({ profileData }) => {
   return (
     <ProfileContainer>
-      {/* 🔹 프로필 사진 */}
-      <ProfilePicture htmlFor="file-upload">
-        {image ? (
-          <UploadIcon src={image} alt="프로필 사진" />
+      <ProfilePicture>
+        {profileData.profileImageUrl ? (
+          <UploadIcon src={profileData.profileImageUrl} alt="프로필 사진" />
         ) : (
-          <UploadText>프로필 사진 업로드</UploadText>
+          <UploadText>프로필 사진 없음</UploadText>
         )}
       </ProfilePicture>
-      <input
-        id="file-upload"
-        type="file"
-        accept="image/*"
-        style={{ display: 'none' }}
-        onChange={handleImageUpload}
-      />
 
-      {/* 🔹 사용자 정보 */}
       <InfoBox>
-        <Nickname>{nickname}</Nickname>
-        <Message>{statusMessage}</Message>
-        <InfoText>학교: {school}</InfoText>
-        <InfoText>학과: {department}</InfoText>
-        <InfoText>학년: {grade}</InfoText>
+        <Nickname>{profileData.nickname || '닉네임 없음'}</Nickname>
+        <Message>{profileData.statusMessage || '상태 메시지 없음'}</Message>
+        <InfoText>친구: {profileData.friendCount}</InfoText>
+        <InfoText>진행 중인 과제: {profileData.ongoingTasks}</InfoText>
       </InfoBox>
     </ProfileContainer>
   );
-}
+};
 
 export default ProfileSection;
