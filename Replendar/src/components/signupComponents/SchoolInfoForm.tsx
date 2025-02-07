@@ -58,12 +58,22 @@ const Select = styled.select`
   margin-left: 30px;
 `;
 
+interface School {
+  id: number;
+  name: string;
+}
+
+interface Department {
+  id: number;
+  name: string;
+}
+
 interface SchoolInfoFormProps {
-  selectedSchool: string;
-  selectedDepartment: string;
+  selectedSchool: School | null;
+  selectedDepartment: Department | null;
   grade: string;
-  onSchoolChange: (school: string) => void;
-  onDepartmentChange: (dept: string) => void;
+  onSchoolChange: (school: School) => void;
+  onDepartmentChange: (dept: Department) => void;
   onGradeChange: (grade: string) => void;
 }
 
@@ -80,7 +90,12 @@ const SchoolInfoForm: React.FC<SchoolInfoFormProps> = ({
   // 학교 모달 열기 및 선택 처리
   const handleOpenSchoolModal = () => {
     openModal(
-      <SchoolSearchModal onSelect={(school) => onSchoolChange(school)} />
+      <SchoolSearchModal
+        onSelect={(school) => {
+          onSchoolChange({ id: Date.now(), name: school });
+          onDepartmentChange({ id: 0, name: '' }); // ✅ 학교 선택 시 학과 초기화
+        }}
+      />
     );
   };
 
@@ -92,8 +107,7 @@ const SchoolInfoForm: React.FC<SchoolInfoFormProps> = ({
     }
     openModal(
       <DepartmentSearchModal
-        selectedSchool={selectedSchool}
-        onSelect={(dept) => onDepartmentChange(dept)}
+        onSelect={(dept) => onDepartmentChange({ id: Date.now(), name: dept })}
       />
     );
   };
@@ -108,7 +122,7 @@ const SchoolInfoForm: React.FC<SchoolInfoFormProps> = ({
           <Input
             type="text"
             placeholder="학교 검색은 버튼을 클릭하세요."
-            value={selectedSchool}
+            value={selectedSchool ? selectedSchool.name : ''} // ✅ 객체에서 name 참조
             disabled
           />
           <Button onClick={handleOpenSchoolModal}>검색하기</Button>
@@ -119,7 +133,7 @@ const SchoolInfoForm: React.FC<SchoolInfoFormProps> = ({
           <Input
             type="text"
             placeholder="학과 검색은 버튼을 클릭하세요."
-            value={selectedDepartment}
+            value={selectedDepartment ? selectedDepartment.name : ''} // ✅ 객체에서 name 참조
             disabled
           />
           <Button onClick={handleOpenDepartmentModal}>검색하기</Button>
