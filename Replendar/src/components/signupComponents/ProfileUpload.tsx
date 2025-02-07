@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { axiosInstance } from '../../apis/axios-instance';
 import useAuthStore from '../../store/authStore';
@@ -48,6 +48,7 @@ const UploadText = styled.div`
   text-align: center;
   user-select: none;
 `;
+
 interface ProfileUploadProps {
   profilePhoto: File | string | null;
   onPhotoChange: (photo: File | null) => void;
@@ -68,7 +69,6 @@ const ProfileUpload: React.FC<ProfileUploadProps> = ({
     const file = event.target.files[0];
 
     // 미리보기 이미지 생성
-
     onPhotoChange(file);
 
     await handleUpload(file);
@@ -83,11 +83,11 @@ const ProfileUpload: React.FC<ProfileUploadProps> = ({
 
     isUploading.current = true;
     const formData = new FormData();
-    formData.append('files', file);
+    formData.append('profileImage', file); // ✅ API 스펙에 맞게 key 수정
 
     try {
       const response = await axiosInstance.post(
-        `/api/s3/upload/${id}`,
+        '/api/s3/update-profile',
         formData,
         {
           headers: {
