@@ -1,10 +1,8 @@
 import styled from 'styled-components';
 import UnCheckBoxIcon from '../assets/images/UnCheckBoxIcon.svg';
 import CheckBoxIcon from '../assets/images/CheckBoxIcon.svg';
-import useGetData from '../hooks/useGetData';
-import { IFriendList } from '../types';
+import { IFriendList, ITaskFriendList } from '../types';
 import useFriendsStore from '../store/useFriendStore';
-import { useEffect } from 'react';
 
 const SelectFriendsModalOverlay = styled.div`
   position: fixed;
@@ -123,7 +121,9 @@ function SelectFriendsModal() {
   const isAllChecked =
     Array.isArray(friendData) &&
     friendData.length > 0 &&
-    friendData.every((friend: IFriendList) => checkedFriends[friend.friendId]);
+    friendData.every(
+      (friend: IFriendList | ITaskFriendList) => checkedFriends[friend.friendId]
+    );
 
   return (
     <SelectFriendsModalOverlay>
@@ -135,7 +135,9 @@ function SelectFriendsModal() {
             // data가 존재하고, data[0].friends 배열이 정의되어 있는지 확인
 
             toggleAllFriends(
-              friendData.map((friend: IFriendList) => friend.friendId)
+              friendData.map(
+                (friend: IFriendList | ITaskFriendList) => friend.friendId
+              )
             );
           }}
           style={{ cursor: 'pointer' }}
@@ -146,7 +148,7 @@ function SelectFriendsModal() {
           />
         </div>
       </SelectAllFriends>
-      {friendData.map((friend: IFriendList) => (
+      {friendData.map((friend: IFriendList | ITaskFriendList) => (
         <FriendsItem key={friend.friendId}>
           <FriendsNameSection>
             <FriendsNickname>{friend.nickname}</FriendsNickname>
