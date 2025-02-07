@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import AddTaskModal from '../modal/AddTaskModal';
 import CustomCalendar from '../components/OngoingComponents/CustomCalendar';
@@ -8,7 +8,9 @@ import UpArrowIcon from '../assets/images/UpArrowIcon.svg';
 import EditTaskModal from '../modal/EditTaskModal';
 import useModalStore from '../store/modalStore';
 // import useTaskStore from '../store/useTaskStore';
+import useAuthStore from '../store/authStore';
 import useGetData from '../hooks/useGetData';
+import axios from 'axios';
 
 const PageWrapper = styled.div`
   margin-top: 79px;
@@ -198,20 +200,43 @@ function TaskItem({
 function OngoingTasks() {
   // const { tasks, setTasks, deleteTask, updateRemainingTimes } = useTaskStore(); // Zustand에서 상태 가져오기
   const { isOpen, openModal, closeModal, modalContent } = useModalStore(); // useModalStore 추가했어요요
-  const userId = 4;
+  const { token } = useAuthStore();
+
+  const storedUserId = localStorage.getItem('id');
+  const userId = storedUserId ? parseInt(storedUserId, 10) : null; // integer
   const {
-    data: tasks,
+    data: tasks = [],
     isLoading,
     isError,
-  } = useGetData(`/api/assignment?userId=${userId}`);
+  } = useGetData(`/api/assignment?userId=${userId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  useEffect(() => {
+    console.log('과제 목록:', tasks);
+  }, [tasks]);
+
   const [visibleTasksCount, setVisibleTasksCount] = useState(3);
 
   const handleShowMore = () => {
     setVisibleTasksCount((prev) => (prev < tasks.length ? tasks.length : 3));
   };
 
-  const handleCompleteTask = (assignmentId: number) => {
-    console.log(`Complete task with ID: ${assignmentId}`);
+  const handleCompleteTask = async (assignmentId: any) => {
+    try {
+      await axios.patch(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment/complete/${assignmentId}`,
+        {},
+        {
+          headers: { Authorization: `${token}` },
+        }
+      );
+    } catch (error) {
+      console.error('과제 완료 처리 중 오류 발생:', error);
+      alert('과제 완료 처리 중 문제가 발생했습니다.');
+    }
   };
 
   const handleEditTask = (task: any) => {
@@ -226,6 +251,9 @@ function OngoingTasks() {
 
   if (isLoading) return <div>로딩 중...</div>;
   if (isError) return <div>데이터를 불러오는 데 실패했습니다.</div>;
+
+  // 과제 색상 지정
+  const taskColors = ['#2BAE66', '#2BAE66', '#25C26C', '#25C26C'];
 
   return (
     <PageWrapper>
@@ -272,11 +300,11 @@ function OngoingTasks() {
       </MainPageTitleWrapper>
 
       <TaskBox $isScrollable={tasks.length > 10}>
-        {tasks.slice(0, visibleTasksCount).map((task: any) => (
+        {tasks.slice(0, visibleTasksCount).map((task: any, index: number) => (
           <TaskItem
             key={task.assignmentId}
             assignmentId={task.assignmentId}
-            color={'#7AC19A'}
+            color={index < 4 ? taskColors[index] : '#7AC19A'} // 5번째 과제부터 #7AC19A 적용
             name={task.title}
             remainingTime={task.due_time}
             memo={task.memo}
