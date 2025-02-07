@@ -83,7 +83,7 @@ const ProfileUpload: React.FC<ProfileUploadProps> = ({
 
     isUploading.current = true;
     const formData = new FormData();
-    formData.append('profileImage', file); // ✅ API 스펙에 맞게 key 수정
+    formData.append('profileImage', file); // profileImage 이름에 맞게 수정정
 
     try {
       const response = await axiosInstance.post(
@@ -136,7 +136,7 @@ const ProfileUpload: React.FC<ProfileUploadProps> = ({
         type="file"
         accept="image/*"
         style={{ display: 'none' }}
-        onChange={handleFileChange} // ✅ 파일 선택 시 자동 업로드
+        onChange={handleFileChange} // 파일 선택 시 자동 업로드
       />
     </UploadContainer>
   );

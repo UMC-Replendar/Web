@@ -91,8 +91,8 @@ const SchoolInfoForm: React.FC<SchoolInfoFormProps> = ({
     openModal(
       <SchoolSearchModal
         onSelect={(schoolName: string) => {
-          onSchoolChange({ id: 0, name: schoolName }); // ✅ ID 없이 이름만 설정
-          onDepartmentChange({ id: 0, name: '' }); // ✅ 학과 초기화
+          onSchoolChange({ id: 0, name: schoolName }); // ID 없이 이름만 설정
+          onDepartmentChange({ id: 0, name: '' }); // 학과 초기화
         }}
       />
     );
@@ -116,7 +116,7 @@ const SchoolInfoForm: React.FC<SchoolInfoFormProps> = ({
           <Input
             type="text"
             placeholder="학교 검색은 버튼을 클릭하세요."
-            value={selectedSchool ? selectedSchool.name : ''} // ✅ 객체에서 name 참조
+            value={selectedSchool ? selectedSchool.name : ''}
             disabled
           />
           <Button onClick={handleOpenSchoolModal}>검색하기</Button>
@@ -127,7 +127,7 @@ const SchoolInfoForm: React.FC<SchoolInfoFormProps> = ({
           <Input
             type="text"
             placeholder="학과 검색은 버튼을 클릭하세요."
-            value={selectedDepartment ? selectedDepartment.name : ''} // ✅ 객체에서 name 참조
+            value={selectedDepartment ? selectedDepartment.name : ''}
             disabled
           />
           <Button onClick={handleOpenDepartmentModal}>검색하기</Button>
