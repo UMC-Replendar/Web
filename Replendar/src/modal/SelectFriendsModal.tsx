@@ -1,8 +1,9 @@
-import { useState } from 'react';
 import styled from 'styled-components';
 import UnCheckBoxIcon from '../assets/images/UnCheckBoxIcon.svg';
 import CheckBoxIcon from '../assets/images/CheckBoxIcon.svg';
-
+import useGetData from '../hooks/useGetData';
+import { IFriendList } from '../types';
+import useFriendsStore from '../store/useFriendStore';
 const SelectFriendsModalOverlay = styled.div`
   position: fixed;
   top: 50%;
@@ -88,8 +89,40 @@ const FriendsMemoInput = styled.input`
   resize: none;
 `;
 
+const ConfirmButton = styled.button`
+  width: 100%;
+  padding: 12px;
+  background-color: #4caf50;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 5px;
+  margin-top: 20px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #45a049;
+  }
+`;
+
 function SelectFriendsModal() {
-  const [isChecked, setIsChecked] = useState(false);
+  const {
+    checkedFriends,
+    toggleFriend,
+    toggleAllFriends,
+    friendshipIds,
+    closeFriendModal,
+  } = useFriendsStore();
+
+  //일단
+  const { data } = useGetData(`/api/friends`);
+
+  //all true인지
+  const isAllChecked =
+    Array.isArray(data) &&
+    data.length > 0 &&
+    data.every((friend: IFriendList) => checkedFriends[friend.friendshipId]);
 
   return (
     <SelectFriendsModalOverlay>
@@ -97,34 +130,48 @@ function SelectFriendsModal() {
       <SelectAllFriends>
         전체 선택
         <div
-          onClick={() => setIsChecked(!isChecked)}
+          onClick={() => {
+            // data가 존재하고, data[0].friends 배열이 정의되어 있는지 확인
+
+            toggleAllFriends(
+              data.map((friend: IFriendList) => friend.friendshipId)
+            );
+          }}
           style={{ cursor: 'pointer' }}
         >
           <img
-            src={isChecked ? CheckBoxIcon : UnCheckBoxIcon}
+            src={isAllChecked ? CheckBoxIcon : UnCheckBoxIcon}
             alt="Checkbox Icon"
           />
         </div>
       </SelectAllFriends>
-      <FriendsItem>
-        <FriendsNameSection>
-          <FriendsNickname>닉네임</FriendsNickname>
-          <FriendsNameAndMemo>이름</FriendsNameAndMemo>
-        </FriendsNameSection>
-        <FriendsMemoSection>
-          <FriendsNameAndMemo>메모</FriendsNameAndMemo>
-          <FriendsMemoInput />
-          <div
-            onClick={() => setIsChecked(!isChecked)}
-            style={{ cursor: 'pointer' }}
-          >
-            <img
-              src={isChecked ? CheckBoxIcon : UnCheckBoxIcon}
-              alt="Checkbox Icon"
-            />
-          </div>
-        </FriendsMemoSection>
-      </FriendsItem>
+      {data.map((friend: IFriendList) => (
+        <FriendsItem key={friend.friendshipId}>
+          <FriendsNameSection>
+            <FriendsNickname>{friend.nickname}</FriendsNickname>
+            <FriendsNameAndMemo>{friend.name}</FriendsNameAndMemo>
+          </FriendsNameSection>
+          <FriendsMemoSection>
+            <FriendsNameAndMemo>메모</FriendsNameAndMemo>
+            <FriendsMemoInput />
+            <div
+              onClick={() => toggleFriend(friend.friendshipId)}
+              style={{ cursor: 'pointer' }}
+            >
+              <img
+                src={
+                  checkedFriends[friend.friendshipId]
+                    ? CheckBoxIcon
+                    : UnCheckBoxIcon
+                }
+                alt="Checkbox Icon"
+              />
+            </div>
+          </FriendsMemoSection>
+        </FriendsItem>
+      ))}
+
+      <ConfirmButton onClick={closeFriendModal}>선택 완료</ConfirmButton>
     </SelectFriendsModalOverlay>
   );
 }

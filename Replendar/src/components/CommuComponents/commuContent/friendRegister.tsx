@@ -15,6 +15,9 @@ const friendRegister = () => {
     mq ? `/api/friends/search?nickname=${mq}` : ''
   );
 
+  const hasData = Array.isArray(data) && data.length > 0;
+  const friendData = hasData ? data[0] : null;
+
   //친구요청api호출
   const mutation = useMutation({
     mutationFn: (friendId: number) => sendFriendRequest(friendId),
@@ -58,25 +61,25 @@ const friendRegister = () => {
         </SearchBtn>
       </InputContainer>
       <EmptyDiv>
-        {data.length === 0 && !!mq && !isLoading && (
+        {!hasData && !!mq && !isLoading && (
           <FlexDiv width="900px">존재하지 않는 사용자입니다.</FlexDiv>
         )}
         {!!mq && isLoading && <div>스켈레톤</div>}
 
-        {data && data.length !== 0 ? (
+        {hasData ? (
           <>
             <ProfileContainer>
               <ProfileImage />
               <FlexAlignStart>
-                <NoMarginH3>{data.nickname}</NoMarginH3>
-                <NoMarginH3>{data.name}</NoMarginH3>
-                <NoMarginP>{data.statusMessage}</NoMarginP>
+                <NoMarginH3>{friendData.nickname}</NoMarginH3>
+                <NoMarginH3>{friendData.name}</NoMarginH3>
+                <NoMarginP>{friendData.statusMessage}</NoMarginP>
               </FlexAlignStart>
             </ProfileContainer>
             <FlexDiv>
               <SearchBtn
                 width={'134px'}
-                onClick={() => mutation.mutate(data.friendId)}
+                onClick={() => mutation.mutate(friendData.friendId)}
               >
                 친구요청
               </SearchBtn>

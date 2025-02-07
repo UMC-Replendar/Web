@@ -10,6 +10,7 @@ interface MenuContentProps {
   menuState: string;
   expanded: string;
 }
+
 const MenuContent: React.FC<MenuContentProps> = ({ menuState, expanded }) => {
   let content;
   switch (menuState) {

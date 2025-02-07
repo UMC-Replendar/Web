@@ -2,19 +2,25 @@ import styled from 'styled-components';
 import DownArrow from '../../../assets/images/downArrow.svg';
 import UpArrow from '../../../assets/images/upArrow.svg';
 import { AddButton } from '../../../pages/OngoingTasks';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PlusIcon } from '../commuIcons';
-import FriendList from './friendList';
+import FriendListRender from '../friendListRender';
 import useModalStore from '../../../store/modalStore';
 import AddGroup from '../modalContents/addGroup';
 import MakeGroup from '../modalContents/makeGroup';
+import useGetData from '../../../hooks/useGetData';
+import { IGroupList } from '../../../types';
 
 const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
-  const [showGroups, setShowGroups] = useState<boolean[]>(
-    new Array(data.length).fill(false)
-  );
+  //expand mq없는 듯
+  const { openModal } = useModalStore();
 
-  const visibleItems = expanded === 'true' ? 20 : 4;
+  const handleAddGroup = () => {
+    openModal(<AddGroup />);
+  };
+  const handleMakeGroup = () => {
+    openModal(<MakeGroup />);
+  };
 
   const toggleGroup = (index: number) => {
     setShowGroups((prev) => {
@@ -24,14 +30,19 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
     });
   };
 
-  const { openModal } = useModalStore();
+  const { data, isLoading, isError } = useGetData(`/api/friend-groups`);
 
-  const handleAddGroup = () => {
-    openModal(<AddGroup />);
-  };
-  const handleMakeGroup = () => {
-    openModal(<MakeGroup />);
-  };
+  const [showGroups, setShowGroups] = useState<boolean[]>(
+    new Array(data.length).fill(false)
+  );
+
+  if (isLoading) {
+    return <div>스켈레톤</div>;
+
+    if (isError) {
+      return <div>에러</div>;
+    }
+  }
 
   return (
     <Container>
@@ -42,27 +53,38 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
         </AddButton>
       </AddButtonDiv>
 
-      {data.slice(0, visibleItems).map((item, index) => (
-        <div key={index}>
-          <SpaceBtwDiv status={showGroups[index].toString()}>
+      {data.map((group: IGroupList, index: number) => (
+        <div key={group.groupId}>
+          <SpaceBtwDiv
+            status={
+              showGroups[group.groupId] !== undefined
+                ? showGroups[group.groupId].toString()
+                : 'false'
+            }
+          >
             <FlexDiv>
-              {item.groupName}
+              {group.groupName}
               <img
-                src={showGroups[index] ? UpArrow : DownArrow}
-                alt={showGroups[index] ? 'UpArrow Icon' : 'DownArrow Icon'}
-                onClick={() => toggleGroup(index)}
+                src={showGroups[group.groupId] ? UpArrow : DownArrow}
+                alt={
+                  showGroups[group.groupId] ? 'UpArrow Icon' : 'DownArrow Icon'
+                }
+                onClick={() => toggleGroup(group.groupId)}
               />
             </FlexDiv>
 
-            {showGroups[index] && (
+            {showGroups[group.groupId] && (
               <FlexDiv onClick={handleAddGroup}>
                 그룹에 추가하기 <PlusIcon fill="white" />
               </FlexDiv>
             )}
           </SpaceBtwDiv>
-          {showGroups[index] && (
+          {showGroups[group.groupId] && (
             <FlexDiv>
-              <FriendList expanded="false" />
+              <FriendListRender
+                data={group.friends}
+                queryKey="/api/friend-groups"
+              />
             </FlexDiv>
           )}
         </div>

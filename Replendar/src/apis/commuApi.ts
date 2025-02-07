@@ -60,3 +60,11 @@ export const patchNote = async ({
   });
   return response.data.result;
 };
+
+//그룹 생성
+export const createGroup = async (groupName: string) => {
+  const response = await axiosInstance.post(`/api/friend-groups`, {
+    groupName,
+  });
+  return response.data.result;
+};

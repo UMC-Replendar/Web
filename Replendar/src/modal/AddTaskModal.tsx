@@ -9,6 +9,7 @@ import GrayPlusIcon from '../assets/images/GrayPlusIcon.svg';
 import useTaskStore from '../store/useTaskStore';
 import useModalStore from '../store/modalStore';
 import SelectFriendsModal from './SelectFriendsModal';
+import useFriendsStore from '../store/useFriendStore';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -271,7 +272,10 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
   const [alarmCount, setAlarmCount] = useState<number | null>(null); // 알림 주기 설정
   const [memo, setMemo] = useState('');
   const [placeholderDate, setPlaceholderDate] = useState('');
-  const [showFriendsModal, setShowFriendsModal] = useState(false);
+
+  //const [showFriendsModal, setShowFriendsModal] = useState(false);
+  //추가했어요
+  const { isFriendModalOpen, openFriendModal } = useFriendsStore();
 
   const toggleBookmark = () => {
     setIsBookmarked((prev) => !prev);
@@ -411,13 +415,13 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
 
         <ShareSection>
           <Label>공유할 친구</Label>
-          <PlusFriendsButton onClick={() => setShowFriendsModal(true)}>
+          <PlusFriendsButton onClick={openFriendModal}>
             <img src={GrayPlusIcon} alt="Gray Plus Icon" />
             추가
           </PlusFriendsButton>
         </ShareSection>
 
-        {showFriendsModal && <SelectFriendsModal />}
+        {isFriendModalOpen && <SelectFriendsModal />}
 
         <MemoSection>
           <Label>메모</Label>
