@@ -13,7 +13,6 @@ const CommuModalContent: React.FC = () => {
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
     setPlaceholderDate(`${year}-${month}-${day}`);
-    console.log(placeholderDate);
   }, []);
 
   return (

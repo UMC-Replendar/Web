@@ -13,8 +13,9 @@ const useGetData = (url: string) => {
       console.log('API Response:', response.data);
 
       if (response.data?.isSuccess) {
-        // 빈 배열이더라도 반환
-        return Array.isArray(response.data.result) ? response.data.result : [];
+        return Array.isArray(response.data.result)
+          ? response.data.result
+          : [response.data.result];
       } else {
         const errorMessage =
           response.data?.message || 'Unexpected API response format';
@@ -34,6 +35,7 @@ const useGetData = (url: string) => {
   } = useQuery({
     queryKey: [url],
     queryFn: getData,
+    enabled: !!url,
   });
   return { data, isLoading, isError, error };
 };

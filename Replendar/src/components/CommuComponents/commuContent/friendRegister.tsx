@@ -3,17 +3,32 @@ import { useState } from 'react';
 import SearchIcon from '../../../assets/images/search.svg';
 import useGetData from '../../../hooks/useGetData';
 import { ProfileImage } from '../commuIcons';
+import { sendFriendRequest } from '../../../apis/commuApi';
+import { useMutation } from '@tanstack/react-query';
 
 const friendRegister = () => {
   const [mq, setMq] = useState('');
-
   const [searchNickname, setSearchNickname] = useState('');
 
-  const {
-    data = [],
-    isLoading,
-    isError,
-  } = useGetData(`/api/friends/search?nickname=${mq}`);
+  //친구등록검색api호출
+  const { data, isLoading, isError } = useGetData(
+    mq ? `/api/friends/search?nickname=${mq}` : ''
+  );
+
+  const hasData = Array.isArray(data) && data.length > 0;
+  const friendData = hasData ? data[0] : null;
+
+  //친구요청api호출
+  const mutation = useMutation({
+    mutationFn: (friendId: number) => sendFriendRequest(friendId),
+    onSuccess: () => {
+      alert('친구 요청이 성공적으로 보내졌습니다.');
+    },
+    onError: (error: Error) => {
+      alert('친구 요청을 보내는 데 실패했습니다.');
+      console.error(error);
+    },
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchNickname(e.target.value);
@@ -30,6 +45,7 @@ const friendRegister = () => {
     if (!trimmedNickname || mq === trimmedNickname) return;
     setMq(searchNickname);
   };
+
   return (
     <Container>
       <InputContainer>
@@ -45,23 +61,28 @@ const friendRegister = () => {
         </SearchBtn>
       </InputContainer>
       <EmptyDiv>
-        {data.length === 0 && !!mq && !isLoading && (
-          <FlexDiv width="900px">검색 결과 '{mq}'가 없습니다</FlexDiv>
+        {!hasData && !!mq && !isLoading && (
+          <FlexDiv width="900px">존재하지 않는 사용자입니다.</FlexDiv>
         )}
         {!!mq && isLoading && <div>스켈레톤</div>}
 
-        {data && data.length !== 0 ? (
+        {hasData ? (
           <>
             <ProfileContainer>
               <ProfileImage />
               <FlexAlignStart>
-                <NoMarginH3>{data.nickname}</NoMarginH3>
-                <NoMarginH3>{data.name}</NoMarginH3>
-                <NoMarginP>{data.statusMessage}</NoMarginP>
+                <NoMarginH3>{friendData.nickname}</NoMarginH3>
+                <NoMarginH3>{friendData.name}</NoMarginH3>
+                <NoMarginP>{friendData.statusMessage}</NoMarginP>
               </FlexAlignStart>
             </ProfileContainer>
             <FlexDiv>
-              <SearchBtn width={'134px'}>친구요청</SearchBtn>
+              <SearchBtn
+                width={'134px'}
+                onClick={() => mutation.mutate(friendData.friendId)}
+              >
+                친구요청
+              </SearchBtn>
             </FlexDiv>
           </>
         ) : null}
