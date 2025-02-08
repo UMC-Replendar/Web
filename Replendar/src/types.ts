@@ -21,10 +21,18 @@ export interface IFriendList {
   name: string;
   ongoingAssignments: number;
   buddyStatus: 'YES' | 'NO';
+  friendNote: string;
 }
 
 export interface IGroupList {
   groupId: number; // 그룹 ID
   groupName: string; // 그룹 이름
   friends: IFriendList[]; // 그룹에 속한 친구들의 배열
+}
+
+export interface ITaskFriendList {
+  friendId: number; // 친구 ID
+  nickname: string; // 닉네임
+  name: string; // 친구 이름
+  friendNote: string; // 메모
 }

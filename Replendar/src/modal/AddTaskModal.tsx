@@ -10,6 +10,7 @@ import SelectFriendsModal from './SelectFriendsModal';
 import useTaskStore from '../store/useTaskStore';
 import useModalStore from '../store/modalStore';
 import useFriendsStore from '../store/useFriendStore';
+import useGetData from '../hooks/useGetData';
 
 // MUI DatePicker 관련 Import 추가
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -334,11 +335,37 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
 
   //const [showFriendsModal, setShowFriendsModal] = useState(false);
   //추가했어요
-  const { isFriendModalOpen, openFriendModal } = useFriendsStore();
+  const {
+    isFriendModalOpen,
+    openFriendModal,
+    nicknames,
+    updateFriendsData,
+    setFriendData,
+    friendData,
+    resetFriends,
+  } = useFriendsStore();
 
   const toggleBookmark = () => {
     setIsBookmarked((prev) => !prev);
   };
+
+  const userId = localStorage.getItem('id');
+
+  const { data } = useGetData(`/api/assignment/share?userId=${userId}`);
+
+  useEffect(() => {
+    updateFriendsData();
+  }, [isFriendModalOpen]);
+
+  useEffect(() => {
+    if (JSON.stringify(data) !== JSON.stringify(friendData)) {
+      setFriendData(data);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    resetFriends();
+  }, [closeModal]);
 
   const handleComplete = async () => {
     if (!taskName.trim()) {
@@ -500,6 +527,13 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
             <img src={GrayPlusIcon} alt="Gray Plus Icon" />
             추가
           </PlusFriendsButton>
+          {nicknames.length > 0 && (
+            <SelectedFriendsList>
+              {nicknames.map((nickname) => (
+                <FriendTag key={nickname}>{nickname}</FriendTag>
+              ))}
+            </SelectedFriendsList>
+          )}
         </ShareSection>
 
         {isFriendModalOpen && <SelectFriendsModal />}
@@ -520,3 +554,29 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
 }
 
 export default AddTaskModal;
+
+//수정
+const SelectedFriendsList = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+`;
+
+const FriendTag = styled.span`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgba(102, 102, 102, 1);
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(186, 186, 186, 1);
+  font-size: 14px;
+  width: 64px;
+  height: 31px;
+`;
+
+const FlexDiv = styled.div`
+  display: flex;
+  gap: 8px;
+`;

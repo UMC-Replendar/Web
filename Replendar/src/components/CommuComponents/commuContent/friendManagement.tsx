@@ -10,10 +10,12 @@ import AddGroup from '../modalContents/addGroup';
 import MakeGroup from '../modalContents/makeGroup';
 import useGetData from '../../../hooks/useGetData';
 import { IGroupList } from '../../../types';
+import useFriendsStore from '../../../store/useFriendStore';
 
 const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
   //expand mq없는 듯
   const { openModal } = useModalStore();
+  const { updateFriendsData, isFriendModalOpen } = useFriendsStore();
 
   const handleAddGroup = () => {
     openModal(<AddGroup />);
