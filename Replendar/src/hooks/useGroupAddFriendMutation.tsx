@@ -15,8 +15,7 @@ export const useGroupAddFriendMutation = () => {
       friendshipIds: number[];
     }) => groupAddFriend({ groupId, friendshipIds }),
 
-    onSuccess: (data) => {
-      alert(data);
+    onSuccess: () => {
       closeModal();
       queryClient.invalidateQueries({ queryKey: [`/api/friend-groups`] });
     },

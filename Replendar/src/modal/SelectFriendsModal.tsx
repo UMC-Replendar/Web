@@ -112,7 +112,6 @@ function SelectFriendsModal() {
     toggleFriend,
     toggleAllFriends,
     closeFriendModal,
-    setFriendData,
     friendData,
   } = useFriendsStore();
 
@@ -132,8 +131,6 @@ function SelectFriendsModal() {
         전체 선택
         <div
           onClick={() => {
-            // data가 존재하고, data[0].friends 배열이 정의되어 있는지 확인
-
             toggleAllFriends(
               friendData.map(
                 (friend: IFriendList | ITaskFriendList) => friend.friendId

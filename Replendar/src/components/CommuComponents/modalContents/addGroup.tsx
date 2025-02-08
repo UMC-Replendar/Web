@@ -40,7 +40,7 @@ const AddGroup: React.FC<{ groupId: number }> = ({ groupId }) => {
     if (JSON.stringify(data) !== JSON.stringify(friendData)) {
       setFriendData(data);
     }
-  }, [data]);
+  }, [data, openFriendModal]);
 
   const handleGroupAddFriend = () => {
     if (nicknames.length === 0) {

@@ -22,6 +22,7 @@ const MakeGroup = () => {
     setFriendData,
     friendData,
     resetFriends,
+    friendshipIds,
   } = useFriendsStore();
 
   useEffect(() => {
@@ -32,10 +33,16 @@ const MakeGroup = () => {
 
   const queryClient = useQueryClient();
 
-  //groupAddFriendMutation.mutate();
-  const mutation = useMutation({
+  const AddGroupmutation = useMutation({
     mutationFn: (groupName: string) => createGroup(groupName),
     onSuccess: (data) => {
+      const validFriendshipIds = friendshipIds.filter(
+        (id): id is number => id !== null
+      );
+      groupAddFriendMutation.mutate({
+        groupId: data.groupId,
+        friendshipIds: validFriendshipIds,
+      });
       alert('그룹이 성공적으로 생성되었습니다.');
 
       closeModal();
@@ -54,7 +61,7 @@ const MakeGroup = () => {
       alert('그룹 이름을 입력하세요.');
       return;
     }
-    mutation.mutate(groupName);
+    AddGroupmutation.mutate(groupName);
   };
 
   useEffect(() => {
@@ -67,7 +74,7 @@ const MakeGroup = () => {
     if (JSON.stringify(data) !== JSON.stringify(friendData)) {
       setFriendData(data);
     }
-  }, [data]);
+  }, [data, openFriendModal]);
 
   return (
     <Container>

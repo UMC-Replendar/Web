@@ -70,10 +70,9 @@ const FlexDiv = styled.div`
 const StyledDiv = styled.div<{ expanded: string }>`
   background: rgba(252, 246, 245, 1);
   width: 95%;
-
+  overflow-y: ${({ expanded }) => (expanded === 'true' ? 'auto' : 'hidden')};
   border-radius: 20px;
   box-shadow: 0px 5px 15.7px 0px rgba(177, 198, 187, 0.4);
-
   display: flex;
   flex-direction: column;
   justify-content: start;

@@ -11,11 +11,14 @@ import {
   deleteFriend,
   patchNote,
 } from '../../apis/commuApi';
+import BlueButton from '../blueButton';
+import { groupDeleteFriend } from '../../apis/commuApi';
 
 const FriendListRender: React.FC<{
   data: IFriendList[]; // 데이터는 props로 전달
   queryKey: string;
-}> = ({ data, queryKey }) => {
+  groupId?: number;
+}> = ({ data, queryKey, groupId }) => {
   // props로 data를 받음
   const queryClient = useQueryClient();
 
@@ -88,6 +91,26 @@ const FriendListRender: React.FC<{
       : ''
   );
 
+  const groupDeleteFriendMutation = useMutation({
+    mutationFn: ({
+      groupId,
+      friendshipId,
+    }: {
+      groupId: number;
+      friendshipId: number;
+    }) => groupDeleteFriend({ groupId, friendshipId }),
+
+    onSuccess: (data) => {
+      alert(data);
+      queryClient.invalidateQueries({ queryKey: [`/api/friend-groups`] });
+    },
+
+    onError: (error: Error) => {
+      alert('그룹에 친구 추가하기 실패했습니다');
+      console.error(error);
+    },
+  });
+
   const hasData = Array.isArray(noteData) && noteData.length > 0;
   const memo = hasData ? noteData[0].note : null;
 
@@ -110,7 +133,7 @@ const FriendListRender: React.FC<{
     }));
   };
   return (
-    <Container>
+    <>
       {data.length === 0 && <div>친구 없음</div>}
       {data.map((item: IFriendList, index: number) => (
         <div key={item.friendId}>
@@ -123,6 +146,19 @@ const FriendListRender: React.FC<{
 
             <CenterDiv>진행 중인 과제: {item.ongoingAssignments}개</CenterDiv>
             <RightAlignedItem>
+              {groupId && (
+                <BlueButton
+                  status="그룹에서 삭제하기"
+                  onClick={() =>
+                    groupDeleteFriendMutation.mutate({
+                      groupId: groupId,
+                      friendshipId: item.friendshipId,
+                    })
+                  }
+                >
+                  그룹에서 삭제하기
+                </BlueButton>
+              )}
               <NineDots
                 fill={
                   modalState.selectedId === item.friendId
@@ -195,18 +231,11 @@ const FriendListRender: React.FC<{
           )}
         </div>
       ))}
-    </Container>
+    </>
   );
 };
 
 export default FriendListRender;
-
-const Container = styled.div`
-  width: 100%;
-  height: 855px;
-  padding: 20px;
-  overflow-y: auto;
-`;
 
 const SpaceBtwDiv = styled.div`
   display: flex;
@@ -232,6 +261,7 @@ const RightAlignedItem = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 40px;
 `;
 
 const CenterDiv = styled.div<{ width?: string }>`

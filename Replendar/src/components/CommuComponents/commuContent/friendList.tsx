@@ -1,5 +1,6 @@
 import FriendListRender from '../friendListRender';
 import useGetData from '../../../hooks/useGetData';
+import styled from 'styled-components';
 
 const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const url = expanded ? `/api/friends` : `/api/friends?limit=5`;
@@ -13,7 +14,16 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
     return <h1>에러</h1>;
   }
 
-  return <FriendListRender data={data} queryKey={url} />;
+  return (
+    <Container>
+      <FriendListRender data={data} queryKey={url} />
+    </Container>
+  );
 };
 
+const Container = styled.div`
+  width: 100%;
+
+  padding: 20px;
+`;
 export default FriendList;

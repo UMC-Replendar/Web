@@ -13,7 +13,7 @@ const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
   };
 
   return (
-    <Container expanded={expanded}>
+    <Container>
       <AddButtonDiv>
         <AddButton onClick={handleOpenModal}>
           과제 추가하기
@@ -53,10 +53,9 @@ const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
 };
 
 export default LectureList;
-const Container = styled.div<{ expanded?: string }>`
+const Container = styled.div`
   width: 100%;
 
-  height: 855px;
   padding: 20px;
 
   table {
