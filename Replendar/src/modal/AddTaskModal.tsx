@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import BookmarkIcon from '../assets/images/BookmarkIcon.svg';
 import BookmarkFilledIcon from '../assets/images/BookmarkFilledIcon.svg';
@@ -6,18 +6,27 @@ import LockIcon from '../assets/images/LockIcon.svg';
 import UnLockIcon from '../assets/images/UnLockIcon.svg';
 import ToggleSwitch from '../components/OngoingComponents/ToggleSwitch';
 import GrayPlusIcon from '../assets/images/GrayPlusIcon.svg';
+import SelectFriendsModal from './SelectFriendsModal';
 import useTaskStore from '../store/useTaskStore';
 import useModalStore from '../store/modalStore';
-import SelectFriendsModal from './SelectFriendsModal';
 import useFriendsStore from '../store/useFriendStore';
 import useGetData from '../hooks/useGetData';
+
+// MUI DatePicker 관련 Import 추가
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { TextField } from '@mui/material';
+import { styled as muiStyled } from '@mui/material/styles';
+import dayjs, { Dayjs } from 'dayjs';
+dayjs.locale('ko');
 
 const ModalOverlay = styled.div`
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 50%;
+  width: 60%;
   max-width: 150vh;
   height: auto;
   max-height: 95vh;
@@ -131,6 +140,57 @@ const InputContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 4px;
+`;
+
+const StyledTextField = muiStyled(TextField)({
+  width: 'auto',
+  maxWidth: '200px',
+  boxSizing: 'border-box',
+
+  '& .MuiInputBase-root': {
+    display: 'flex',
+    alignItems: 'center',
+    fontSize: '19px',
+    padding: '8px',
+    height: '47px',
+  },
+
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '5px',
+    border: '0.5px solid #E8E8E8',
+    backgroundColor: 'white',
+
+    '&:hover .MuiOutlinedInput-notchedOutline, &.Mui-focused .MuiOutlinedInput-notchedOutline':
+      {
+        borderColor: '#E8E8E8',
+      },
+  },
+
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderColor: '#E8E8E8',
+  },
+
+  '& .MuiSvgIcon-root': {
+    fontSize: '1.2rem',
+  },
+});
+
+const StyledTimeInput = styled.input`
+  display: flex;
+  padding: 8px 16px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  border: 1px solid #e8e8e8;
+  background: white;
+  color: #666666;
+  font-family: Pretendard;
+  font-size: 19px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 140%;
+
+  width: 86px;
 `;
 
 const OpenSettingSection = styled.div`
@@ -266,13 +326,12 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
   const { closeModal } = useModalStore();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [taskName, setTaskName] = useState('');
-  const [deadline, setDeadline] = useState('');
+  const [deadline, setDeadline] = useState<Dayjs | null>(dayjs());
   const [time, setTime] = useState('');
   const [isPublic, setIsPublic] = useState(false); // 과제 공개 여부
   const [isOn, setIsOn] = useState(false); // 알림 설정
   const [alarmCount, setAlarmCount] = useState<number | null>(null); // 알림 주기 설정
   const [memo, setMemo] = useState('');
-  const [placeholderDate, setPlaceholderDate] = useState('');
 
   //const [showFriendsModal, setShowFriendsModal] = useState(false);
   //추가했어요
@@ -290,15 +349,6 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
     setIsBookmarked((prev) => !prev);
   };
 
-  useEffect(() => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    setPlaceholderDate(`${year} / ${month} / ${day}`);
-  }, []);
-
-  //여기부터 수정
   const userId = localStorage.getItem('id');
 
   const { data } = useGetData(`/api/assignment/share?userId=${userId}`);
@@ -317,8 +367,6 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
     resetFriends();
   }, [closeModal]);
 
-  //여기까지 수정
-
   const handleComplete = async () => {
     if (!taskName.trim()) {
       alert('과제명을 입력해주세요.');
@@ -329,10 +377,15 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
       return;
     }
 
+    console.log('과제 추가:', {
+      deadline: deadline.format('YYYY/MM/DD'),
+      time: time || '23:59',
+    });
+
     await addTask({
       assignmentId: Date.now(),
       name: taskName,
-      deadline,
+      deadline: deadline.format('YYYY/MM/DD'),
       remainingTime: '',
       color: '#7AC19A',
       isToggled: false,
@@ -342,6 +395,30 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
 
     onTaskAdded();
     closeModal();
+  };
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let inputTime = e.target.value.replace(/[^0-9]/g, '');
+
+    if (inputTime.length > 4) {
+      inputTime = inputTime.slice(0, 4);
+    }
+
+    let formattedTime = inputTime;
+    if (inputTime.length >= 2) {
+      formattedTime = `${inputTime.slice(0, 2)}:${inputTime.slice(2)}`;
+    }
+
+    setTime(formattedTime);
+  };
+
+  const handleTimeBlur = () => {
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+    if (!timeRegex.test(time)) {
+      alert('24시간 형식 (00:00 ~ 23:59)으로 입력하세요.');
+      setTime('');
+    }
   };
 
   const alarmOptions = [
@@ -380,24 +457,25 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
 
           <TaskDeadlineSection>
             <Label>과제 마감일</Label>
-            <InputContainer>
-              <Input
-                type="date"
-                value={deadline}
-                placeholder={placeholderDate}
-                onChange={(e) => setDeadline(e.target.value)}
-              />
-              <Input
-                type="time"
-                value={time}
-                step="60"
-                lang="en-GB" // 24시간 형식 적용
-                placeholder="23:59"
-                onChange={(e) => setTime(e.target.value)}
-                required
-                pattern="[0-9]{2}:[0-9]{2}" // 24시간 형식 강제
-              />
-            </InputContainer>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <InputContainer>
+                <DesktopDatePicker
+                  value={deadline}
+                  onChange={(newValue) => setDeadline(newValue || deadline)}
+                  format="YYYY/MM/DD"
+                  slots={{ textField: StyledTextField }}
+                />
+                <StyledTimeInput
+                  type="text"
+                  value={time}
+                  placeholder="23:59"
+                  onChange={handleTimeChange}
+                  onBlur={handleTimeBlur}
+                  maxLength={5}
+                  required
+                />
+              </InputContainer>
+            </LocalizationProvider>
           </TaskDeadlineSection>
         </Section>
 
