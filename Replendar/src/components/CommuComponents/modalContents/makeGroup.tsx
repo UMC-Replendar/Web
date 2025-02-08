@@ -8,9 +8,11 @@ import { useState, useEffect } from 'react';
 import SelectFriendsModal from '../../../modal/SelectFriendsModal';
 import useGetData from '../../../hooks/useGetData';
 import useFriendsStore from '../../../store/useFriendStore';
-
-const MakeGroup: React.FC = () => {
+import { useGroupAddFriendMutation } from '../../../hooks/useGroupAddFriendMutation';
+const MakeGroup = () => {
   const { closeModal } = useModalStore();
+
+  const groupAddFriendMutation = useGroupAddFriendMutation();
 
   const {
     isFriendModalOpen,
@@ -30,10 +32,12 @@ const MakeGroup: React.FC = () => {
 
   const queryClient = useQueryClient();
 
+  //groupAddFriendMutation.mutate();
   const mutation = useMutation({
     mutationFn: (groupName: string) => createGroup(groupName),
-    onSuccess: () => {
+    onSuccess: (data) => {
       alert('그룹이 성공적으로 생성되었습니다.');
+
       closeModal();
 
       queryClient.invalidateQueries({
@@ -64,9 +68,7 @@ const MakeGroup: React.FC = () => {
       setFriendData(data);
     }
   }, [data]);
-  /*if (data && data !== friendData) {
-    setFriendData(data);
-  }*/
+
   return (
     <Container>
       <h1>그룹 만들기</h1>

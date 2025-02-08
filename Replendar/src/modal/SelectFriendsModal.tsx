@@ -156,7 +156,7 @@ function SelectFriendsModal() {
           </FriendsNameSection>
           <FriendsMemoSection>
             <FriendsNameAndMemo>메모</FriendsNameAndMemo>
-            <FriendsMemoInput value={friend.friendNote} />
+            <FriendsMemoInput defaultValue={friend.friendNote} />
             <div
               onClick={() => toggleFriend(friend.friendId)}
               style={{ cursor: 'pointer' }}

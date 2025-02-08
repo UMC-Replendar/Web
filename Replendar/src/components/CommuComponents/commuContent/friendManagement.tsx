@@ -10,15 +10,13 @@ import AddGroup from '../modalContents/addGroup';
 import MakeGroup from '../modalContents/makeGroup';
 import useGetData from '../../../hooks/useGetData';
 import { IGroupList } from '../../../types';
-import useFriendsStore from '../../../store/useFriendStore';
 
 const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
   //expand mq없는 듯
   const { openModal } = useModalStore();
-  const { updateFriendsData, isFriendModalOpen } = useFriendsStore();
 
-  const handleAddGroup = () => {
-    openModal(<AddGroup />);
+  const handleAddGroup = (groupId: number) => {
+    openModal(<AddGroup groupId={groupId} />);
   };
   const handleMakeGroup = () => {
     openModal(<MakeGroup />);
@@ -76,7 +74,7 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
             </FlexDiv>
 
             {showGroups[group.groupId] && (
-              <FlexDiv onClick={handleAddGroup}>
+              <FlexDiv onClick={() => handleAddGroup(group.groupId)}>
                 그룹에 추가하기 <PlusIcon fill="white" />
               </FlexDiv>
             )}

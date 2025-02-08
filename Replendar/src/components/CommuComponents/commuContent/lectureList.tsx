@@ -58,7 +58,6 @@ const Container = styled.div<{ expanded?: string }>`
 
   height: 855px;
   padding: 20px;
-  overflow-y: ${({ expanded }) => (expanded === 'true' ? 'auto' : 'hidden')};
 
   table {
     width: 100%;
