@@ -224,14 +224,25 @@ function OngoingTasks() {
     setVisibleTasksCount((prev) => (prev < tasks.length ? tasks.length : 3));
   };
 
-  const handleCompleteTask = async (assignmentId: any) => {
+  const [taskList, setTaskList] = useState(tasks);
+
+  useEffect(() => {
+    setTaskList(tasks);
+  }, [tasks]);
+
+  const handleCompleteTask = async (assignmentId: number) => {
     try {
       await axios.patch(
         `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment/complete/${assignmentId}`,
         {},
         {
-          headers: { Authorization: `${token}` },
+          headers: { Authorization: `Bearer ${token}` },
         }
+      );
+
+      // 진행 중인 과제 목록에서 제거
+      setTaskList((prevTasks: any[]) =>
+        prevTasks.filter((task) => task.assignmentId !== assignmentId)
       );
     } catch (error) {
       console.error('과제 완료 처리 중 오류 발생:', error);
@@ -281,17 +292,19 @@ function OngoingTasks() {
             <img src={PlusIcon} alt="Plus Icon" />
           </AddButton>
 
-          {tasks.length > 3 && (
+          {taskList.length > 3 && (
             <More onClick={handleShowMore}>
-              {visibleTasksCount === tasks.length ? '닫기' : '더보기'}
+              {visibleTasksCount === taskList.length ? '닫기' : '더보기'}
               <img
                 src={
-                  visibleTasksCount === tasks.length
+                  visibleTasksCount === taskList.length
                     ? UpArrowIcon
                     : DownArrowIcon
                 }
                 alt={
-                  visibleTasksCount === tasks.length ? 'Up Arrow' : 'Down Arrow'
+                  visibleTasksCount === taskList.length
+                    ? 'Up Arrow'
+                    : 'Down Arrow'
                 }
               />
             </More>
@@ -299,23 +312,25 @@ function OngoingTasks() {
         </div>
       </MainPageTitleWrapper>
 
-      <TaskBox $isScrollable={tasks.length > 10}>
-        {tasks.slice(0, visibleTasksCount).map((task: any, index: number) => (
-          <TaskItem
-            key={task.assignmentId}
-            assignmentId={task.assignmentId}
-            color={index < 4 ? taskColors[index] : '#7AC19A'} // 5번째 과제부터 #7AC19A 적용
-            name={task.title}
-            remainingTime={task.due_time}
-            memo={task.memo}
-            onComplete={() => handleCompleteTask(task.assignmentId)}
-            onEdit={() => handleEditTask(task)}
-          />
-        ))}
+      <TaskBox $isScrollable={taskList.length > 10}>
+        {taskList
+          .slice(0, visibleTasksCount)
+          .map((task: any, index: number) => (
+            <TaskItem
+              key={task.assignmentId}
+              assignmentId={task.assignmentId}
+              color={index < 4 ? taskColors[index] : '#7AC19A'} // 5번째 과제부터 #7AC19A 적용
+              name={task.title}
+              remainingTime={task.due_time}
+              memo={task.memo}
+              onComplete={() => handleCompleteTask(task.assignmentId)}
+              onEdit={() => handleEditTask(task)}
+            />
+          ))}
       </TaskBox>
 
       <CustomCalendar
-        tasks={tasks.map((task: any) => ({
+        tasks={taskList.map((task: any) => ({
           name: task.title,
           deadline: task.due_date,
         }))}
