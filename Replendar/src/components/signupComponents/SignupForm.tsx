@@ -183,6 +183,7 @@ const SignupForm: React.FC = () => {
       alert('회원가입이 완료되었습니다.');
       navigate('/');
     } catch (error: any) {
+      console.log(error.response.data);
       alert(
         `회원가입 중 오류 발생: ${error.response?.data?.message || '서버 오류'}`
       );
