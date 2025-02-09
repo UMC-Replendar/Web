@@ -3,11 +3,24 @@ import Setting from '../assets/images/Setting.png';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import axios from 'axios';
+import { useProfileStore } from '../store/profileStore';
+import { useEffect } from 'react';
 
 function Settings() {
   const navigate = useNavigate();
   const { clearAuth } = useAuthStore();
-  const { token, nickname } = useAuthStore();
+  const { token } = useAuthStore();
+  const { profile, fetchProfile } = useProfileStore();
+
+  useEffect(() => {
+    // profile이 없을 때만 API 호출
+    if (!profile) {
+      console.log('프로필 데이터가 없음, fetchProfile 실행');
+      fetchProfile();
+    } else {
+      console.log('기존 프로필 데이터 사용');
+    }
+  }, [profile]);
 
   const LogoutClicked = async () => {
     if (!window.confirm('정말로 로그아웃을 진행하시겠습니까?')) {
@@ -18,6 +31,7 @@ function Settings() {
       // const response = await axiosInstance.post('/api/user/logout', {});
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_BASE_URL}/api/user/logout`,
+        {},
         {
           headers: {
             Authorization: `${token}`,
@@ -74,7 +88,9 @@ function Settings() {
           <SectionTitle>계정</SectionTitle>
           <FirstSectionLink>
             <IdContainer>아이디</IdContainer>
-            <NicknameContainer>{nickname}</NicknameContainer>
+            <NicknameContainer>
+              {profile?.nickname || '리플레닝'}
+            </NicknameContainer>
           </FirstSectionLink>
         </SectionContainer>
         <SectionContainer>

@@ -64,11 +64,7 @@ const TableHeader = styled.th`
   background-color: #fcf6f5;
 `;
 
-const TableRow = styled.tr`
-  /* &:nth-child(even) {
-    background: #f9f3f1;
-  } */
-`;
+const TableRow = styled.tr``;
 
 const TableCell = styled.td`
   color: #555;
