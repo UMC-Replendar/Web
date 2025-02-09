@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import BlueButton from '../blueButton';
+import useGetData from '../../hooks/useGetData';
 
 const Container = styled.div`
   width: 100%;
@@ -52,7 +53,6 @@ const ContentBox = styled.div`
   width: calc(100% - 146px);
   display: flex;
   flex-direction: column;
-
   height: 100%;
 `;
 
@@ -61,7 +61,7 @@ const HistoryWhiteBox = styled.div`
   border-radius: 20px;
   padding: 20px;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1px; /* 각 항목 간 1px 간격 유지 */
+  margin-bottom: 1px;
 `;
 
 const HistoryItem = styled.div`
@@ -82,20 +82,36 @@ const HistoryDetails = styled.div`
 
 const HistoryPage: React.FC = () => {
   const [activeMenu, setActiveMenu] = useState<string>('전체');
-  const content = [
-    {
-      date: '11 / 02',
-      time: '23:55',
-      task: '000님이 ~~~~~~~하기 과제',
-      status: '완료',
-    },
-    {
-      date: '11 / 02',
-      time: '23:55',
-      task: '000님이 ~~~~~~~하기 과제',
-      status: '미완료',
-    },
-  ];
+  const [apiUrl, setApiUrl] = useState<string>('/api/activity');
+
+  useEffect(() => {
+    switch (activeMenu) {
+      case '친구소식':
+        setApiUrl('/api/activity/friend');
+        break;
+      case '과제알림':
+        setApiUrl('/api/activity/assignment/notify');
+        break;
+      case '기타':
+        setApiUrl(''); // 기타는 API 요청 없이 빈 값 설정
+        break;
+      default:
+        setApiUrl('/api/activity');
+    }
+  }, [activeMenu]);
+
+  const { data, isLoading, isError } = apiUrl
+    ? useGetData(apiUrl, {
+        params: {
+          page: 1,
+          size: 5,
+          sort: 'CreatedAt',
+        },
+      })
+    : { data: [], isLoading: false, isError: false };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>데이터를 불러오는 중 오류 발생!</div>;
 
   return (
     <Container>
@@ -112,23 +128,26 @@ const HistoryPage: React.FC = () => {
         ))}
       </Menu>
       <ContentBox>
-        {content.map((item, index) => (
-          <HistoryWhiteBox key={index}>
-            {' '}
-            <HistoryItem>
-              <HistoryDetails>
-                <div>{item.date}</div>
-                <div>{item.time}</div>
-                <div>{item.task}</div>
-              </HistoryDetails>
-              <BlueButton
-                status={item.status === '완료' ? '등록됨' : '내 일정에 등록'}
-              >
-                {item.status}
-              </BlueButton>
-            </HistoryItem>
-          </HistoryWhiteBox>
-        ))}
+        {apiUrl ? (
+          data.map((item: any, index: number) => (
+            <HistoryWhiteBox key={index}>
+              <HistoryItem>
+                <HistoryDetails>
+                  <div>{item.date}</div>
+                  <div>{item.time}</div>
+                  <div>{item.task}</div>
+                </HistoryDetails>
+                <BlueButton
+                  status={item.status === '완료' ? '등록됨' : '내 일정에 등록'}
+                >
+                  {item.status}
+                </BlueButton>
+              </HistoryItem>
+            </HistoryWhiteBox>
+          ))
+        ) : (
+          <div>기타 항목이 없습니다.</div>
+        )}
       </ContentBox>
     </Container>
   );

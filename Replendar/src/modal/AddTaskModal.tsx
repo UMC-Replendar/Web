@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import BookmarkIcon from '../assets/images/BookmarkIcon.svg';
 import BookmarkFilledIcon from '../assets/images/BookmarkFilledIcon.svg';

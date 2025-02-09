@@ -99,7 +99,7 @@ const DepartmentSearchModal: React.FC = ({}) => {
           code: string;
           message: string;
           result: { id: number; majorName: string }[];
-        }>(`/api/majors?schoolId=${selectedSchoolId}`);
+        }>(`/api/major?schoolId=${selectedSchoolId}`);
 
         const formattedDepartments = response.data.result.map((dept) => ({
           id: dept.id,
