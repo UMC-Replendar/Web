@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { useState } from 'react';
 import BlueButton from '../../blueButton';
 import { useInView } from 'react-intersection-observer';
 import ClipLoader from 'react-spinners/ClipLoader';
@@ -44,7 +43,7 @@ const RightAlignedItem = styled.div`
   gap: 40px;
 `;
 
-const DepartmentList: React.FC<{ expanded: string }> = ({ expanded }) => {
+const DepartmentList = () => {
   const {
     data,
     isPending,
@@ -74,8 +73,8 @@ const DepartmentList: React.FC<{ expanded: string }> = ({ expanded }) => {
 
   return (
     <Container>
-      {data?.pages?.map((page: IPage, index: number) =>
-        page.content.map((item: IContent, index: number) => (
+      {data?.pages?.map((page: IPage) =>
+        page.content.map((item: IContent) => (
           <FlexDiv key={item.friendId}>
             <CenterDiv>{item.time}</CenterDiv>
             <CenterDiv>

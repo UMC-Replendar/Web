@@ -2,9 +2,7 @@ import styled from 'styled-components';
 import { AddButton } from '../../../pages/OngoingTasks';
 import PlusIcon from '../../../assets/images/PlusIcon.svg';
 import BlueButton from '../../blueButton';
-import DownArrow from '../../../assets/images/downArrow.svg';
 import { useState } from 'react';
-// import useModalStore from '../../../store/modalStore';
 import CommuModalContent from '../modalContents/commuModalContent';
 
 const Container = styled.div`

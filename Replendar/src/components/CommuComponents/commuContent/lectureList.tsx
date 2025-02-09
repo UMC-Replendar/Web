@@ -6,7 +6,7 @@ import CommuModalContent from '../modalContents/commuModalContent';
 import useGetData from '../../../hooks/useGetData';
 import { ILecture } from '../../../types';
 //학년 정보 가져올 수 있으면 defaultValue 수정 데이터 YEAR 2이런식이랑 귀찮 나중에
-const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
+const LectureList = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [academicYear, setAcademicYear] = useState(1);
 
@@ -48,7 +48,7 @@ const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
         </thead>
 
         <tbody>
-          {data.map((item: ILecture, index: number) => (
+          {data.map((item: ILecture) => (
             <tr key={item.lectureName}>
               <td>{item.academicYear}</td>
 
@@ -160,28 +160,3 @@ const Overlay = styled.div`
   height: 100%;
   z-index: 1;
 `;
-
-//임시데이터
-const data = [
-  { grade: '1학년', professor: '김철수', course: '컴퓨터 과학 기초' },
-  { grade: '2학년', professor: '이영희', course: '자료 구조' },
-  { grade: '3학년', professor: '박민수', course: '알고리즘' },
-  { grade: '4학년', professor: '최유리', course: '운영체제' },
-  { grade: '1학년', professor: '한지훈', course: '웹 프로그래밍' },
-  { grade: '2학년', professor: '송정민', course: '네트워크 이론' },
-  { grade: '3학년', professor: '오세훈', course: '소프트웨어 공학' },
-  { grade: '4학년', professor: '김소연', course: '인공지능' },
-  { grade: '1학년', professor: '이수진', course: '수학적 사고' },
-  { grade: '2학년', professor: '정해진', course: '디지털 회로' },
-  { grade: '2학년', professor: '송정민', course: '네트워크 이론' },
-  { grade: '3학년', professor: '오세훈', course: '소프트웨어 공학' },
-  { grade: '4학년', professor: '김소연', course: '인공지능' },
-  { grade: '1학년', professor: '이수진', course: '수학적 사고' },
-  { grade: '2학년', professor: '정해진', course: '디지털 회로' },
-  { grade: '2학년', professor: '송정민', course: '네트워크 이론' },
-  { grade: '3학년', professor: '오세훈', course: '소프트웨어 공학' },
-  { grade: '4학년', professor: '김소연', course: '인공지능' },
-  { grade: '1학년', professor: '이수진', course: '수학적 사고' },
-  { grade: '2학년', professor: '정해진', course: '디지털 회로' },
-  ,
-];
