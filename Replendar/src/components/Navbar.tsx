@@ -8,14 +8,14 @@ import dayjs from 'dayjs';
 // import ChillChillGuy from '../assets/images/ChillGuy.png';
 function NavBar() {
   const [currentTime, setCurrentTime] = useState(
-    dayjs().format('YYYY/MM/DD HH:mm:ss')
+    dayjs().format('YYYY년 MM월 DD일 HH:mm:ss')
   );
   const profilePhoto = localStorage.getItem('profilePhoto'); // Base64 이미지
   const nickname = localStorage.getItem('nickname') || '닉네임'; // 기본 닉네임 설정
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTime(dayjs().format('YYYY/MM/DD HH:mm:ss'));
+      setCurrentTime(dayjs().format('YYYY년 MM월 DD일 HH:mm:ss'));
     }, 1000);
 
     return () => clearInterval(interval);

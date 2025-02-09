@@ -5,8 +5,14 @@ import Sidebar from './Sidebar';
 import NavBar from './Navbar';
 import { useLocation } from 'react-router-dom';
 import Modal from '../modal/Modal';
+import { useEffect } from 'react';
 
 function App() {
+  useEffect(() => {
+    window.onbeforeunload = function pushRefresh() {
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    };
+  }, []);
   const location = useLocation();
   const hideLayout =
     location.pathname === '/login' ||

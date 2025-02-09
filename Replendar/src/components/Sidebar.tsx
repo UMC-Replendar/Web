@@ -17,6 +17,10 @@ function Sidebar() {
     setScrollY(window.scrollY * 0.67);
   };
 
+  // const scrollToTop = () => {
+  //   window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  // };
+
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     return () => {
@@ -110,7 +114,7 @@ const MenuContainer = styled.div`
   height: 100%;
 `;
 
-const Menu = styled.nav<{ isActive: boolean; backgroundColor: string }>`
+const Menu = styled.div<{ isActive: boolean; backgroundColor: string }>`
   width: 100%;
   display: flex;
   flex-direction: row;

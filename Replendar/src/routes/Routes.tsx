@@ -22,25 +22,58 @@ import useAuthStore from '../store/authStore';
 
 function Router() {
   const { token } = useAuthStore();
-
   return (
     <Routes>
       <Route
         path="/"
         element={token ? <OngoingTasks /> : <Navigate to="/login" replace />}
       />
-      {/* <Route path="/" element={<OngoingTasks />}></Route> */}
-      <Route path="/info" element={<Info />}></Route>
-      <Route path="/community" element={<Community />}></Route>
+      <Route
+        path="/info"
+        element={token ? <Info /> : <Navigate to="/login" replace />}
+      ></Route>
+      <Route
+        path="/community"
+        element={token ? <Community /> : <Navigate to="/login" replace />}
+      ></Route>
       <Route path="/login" element={<Login />}></Route>
-      <Route path="/settings" element={<Settings />}></Route>
-      <Route path="/settings/theme" element={<ThemeSettingPage />}></Route>
-      <Route path="/settings/ask" element={<AskPage />}></Route>
-      <Route path="/settings/notify" element={<NotifyPage />}></Route>
-      <Route path="/settings/detail" element={<DetailPage />}></Route>
-      <Route path="/completed" element={<CompletedTasksPage />} />
-      <Route path="/stored" element={<StoredTasksPage />} />
-      <Route path="/history" element={<HistoryPage />}></Route>
+      {/*토큰 없으면 무조건 login으로 가게 했는데, 에러 잡아야 할 수 있으니, 세팅 페이지는 그냥 열어놓을게요*/}
+      <Route
+        path="/settings"
+        element={token ? <Settings /> : <Navigate to="/login" replace />}
+      ></Route>
+      <Route
+        path="/settings/theme"
+        element={
+          token ? <ThemeSettingPage /> : <Navigate to="/login" replace />
+        }
+      ></Route>
+      <Route
+        path="/settings/ask"
+        element={token ? <AskPage /> : <Navigate to="/login" replace />}
+      ></Route>
+      <Route
+        path="/settings/notify"
+        element={token ? <NotifyPage /> : <Navigate to="/login" replace />}
+      ></Route>
+      <Route
+        path="/settings/detail"
+        element={token ? <DetailPage /> : <Navigate to="/login" replace />}
+      ></Route>
+      <Route
+        path="/completed"
+        element={
+          token ? <CompletedTasksPage /> : <Navigate to="/login" replace />
+        }
+      />
+      <Route
+        path="/stored"
+        element={token ? <StoredTasksPage /> : <Navigate to="/login" replace />}
+      />
+      <Route
+        path="/history"
+        element={token ? <HistoryPage /> : <Navigate to="/login" replace />}
+      ></Route>
       <Route path="/signup" element={<SignUp />}></Route>
 
       <Route path="/callback" element={<Redirect />}></Route>

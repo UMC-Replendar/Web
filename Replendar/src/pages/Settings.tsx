@@ -9,9 +9,31 @@ function Settings() {
   const { clearAuth } = useAuthStore();
   const { token, nickname } = useAuthStore();
 
-  const LogoutClicked = () => {
-    clearAuth();
-    navigate('/login');
+  const LogoutClicked = async () => {
+    if (!window.confirm('정말로 로그아웃을 진행하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      // const response = await axiosInstance.post('/api/user/logout', {});
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/user/logout`,
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      );
+      if (response.data.isSuccess) {
+        alert('로그아웃 되었습니다.');
+        clearAuth();
+        navigate('/login');
+      } else {
+        throw new Error(response.data.message || '로그아웃 실패');
+      }
+    } catch (error) {
+      console.error('로그아웃에 실패했습니다', error);
+    }
   };
 
   const handleWithdraw = async () => {
@@ -30,7 +52,7 @@ function Settings() {
       );
 
       if (response.data.isSuccess) {
-        alert(response.data.message);
+        alert('회원탈퇴 되었습니다.');
         clearAuth();
         navigate('/login');
       } else {
