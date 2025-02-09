@@ -48,16 +48,7 @@ const Container = styled.div`
 `;
 const SpaceBtwDiv = styled.div`
   div {
-    gap: 20px;
     display: flex;
-    width: 200px;
-  }
-  img {
-    vertical-align: middle; /* 이미지 정렬 */
-  }
-  span {
-    display: flex;
-    font-size: 19px;
   }
 
   display: flex;
@@ -97,13 +88,27 @@ const Overlay = styled.div`
   z-index: 1;
 `;
 
+const Select = styled.select`
+  width: 100px;
+  background: rgba(252, 246, 245, 1);
+  border: none;
+  outline: none;
+  font-size: 19px;
+  margin-left: 50px;
+`;
+
 const TaskList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const visibleItems = expanded === 'true' ? 10 : 3;
   const [isOpen, setIsOpen] = useState(false);
+  const [academicYear, setAcademicYear] = useState('');
+  const [professor, setProfessor] = useState('');
+  const [sortKey, setSortKey] = useState('');
 
   const handleOpenModal = () => {
     setIsOpen(!isOpen);
   };
+
+  //데이터 보낼 때 학년 숫자형식으로 바꿔서 보내기
   return (
     <Container>
       <SpaceBtwDiv>
@@ -114,13 +119,42 @@ const TaskList: React.FC<{ expanded: string }> = ({ expanded }) => {
             <img src={PlusIcon} alt="Plus Icon" />
           </AddButton>
         </AddButtonDiv>
-
         <div>
-          <span>2학년</span>
-          <span>정렬</span>
-          <span>
-            교수명 <img src={DownArrow} alt="DownArrow Icon" />
-          </span>
+          <Select
+            value={academicYear}
+            onChange={(e) => setAcademicYear(e.target.value)}
+          >
+            <option value="" hidden>
+              학년
+            </option>
+            <option value="1">1학년</option>
+            <option value="2">2학년</option>
+            <option value="3">3학년</option>
+            <option value="4">4학년</option>
+            <option value="5">5학년</option>
+          </Select>
+
+          <Select
+            onChange={(e) => setProfessor(e.target.value)}
+            value={professor}
+          >
+            <option value="" hidden>
+              교수명
+            </option>
+            <option value="김교수">김교수</option>
+            <option value="이교수">이교수</option>
+            <option value="박교수">박교수</option>
+          </Select>
+          <Select onChange={(e) => setSortKey(e.target.value)} value={sortKey}>
+            <option value="" hidden>
+              정렬
+            </option>
+            <option value="등록일">등록일</option>
+            <option value="교수명">교수명</option>
+            <option value="강좌명">강좌명</option>
+            <option value="과제명">과제명</option>
+            <option value="마감일">마감일</option>
+          </Select>
         </div>
       </SpaceBtwDiv>
 
