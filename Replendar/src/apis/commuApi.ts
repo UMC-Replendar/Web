@@ -71,7 +71,7 @@ export const createGroup = async (groupName: string) => {
 
 //그룹 삭제
 export const deleteGroup = async (groupId: number) => {
-  const response = await axiosInstance.delete(` /api/friend-groups/{groupId}`);
+  const response = await axiosInstance.delete(`/api/friend-groups/${groupId}`);
   return response.data.result;
 };
 
@@ -101,7 +101,7 @@ export const groupDeleteFriend = async ({
   friendshipId: number;
 }) => {
   const response = await axiosInstance.delete(
-    ` /api/friend-groups/${groupId}/remove/${friendshipId}`
+    `/api/friend-groups/${groupId}/remove/${friendshipId}`
   );
   return response.data.result;
 };

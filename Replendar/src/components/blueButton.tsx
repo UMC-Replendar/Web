@@ -1,7 +1,13 @@
 import styled from 'styled-components';
 
 interface BlueBtnProps {
-  status?: '등록됨' | '내 일정에 등록' | '완료' | '미완료' | undefined;
+  status?:
+    | '등록됨'
+    | '내 일정에 등록'
+    | '완료'
+    | '미완료'
+    | '그룹에서 삭제하기'
+    | undefined;
   onClick?: () => void;
   children: React.ReactNode;
 }
@@ -21,7 +27,13 @@ const BlueButton: React.FC<BlueBtnProps> = ({
 export default BlueButton;
 
 const BlueBtn = styled.button<{
-  status: '등록됨' | '내 일정에 등록' | '완료' | '미완료' | undefined;
+  status:
+    | '등록됨'
+    | '내 일정에 등록'
+    | '완료'
+    | '미완료'
+    | '그룹에서 삭제하기'
+    | undefined;
 }>`
   border-radius: 50px;
   background-color: ${({ status }) => {

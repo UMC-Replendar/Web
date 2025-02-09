@@ -4,9 +4,7 @@ import BlueButton from '../../blueButton';
 
 const Container = styled.div`
   width: 100%;
-  height: 855px;
   padding: 20px;
-  overflow-y: auto;
 `;
 
 const FlexDiv = styled.div`
