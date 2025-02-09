@@ -1,3 +1,6 @@
+//양식 확인용
+//연결은 HistoryPage.tsx 완성 후
+
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import BlueButton from '../blueButton';
