@@ -7,11 +7,9 @@ import { useState } from 'react';
 // import useModalStore from '../../../store/modalStore';
 import CommuModalContent from '../modalContents/commuModalContent';
 
-const Container = styled.div<{ expanded?: string }>`
+const Container = styled.div`
   width: 100%;
-  height: 855px;
   padding: 20px;
-  overflow-y: ${({ expanded }) => (expanded === 'true' ? 'auto' : 'hidden')};
 
   table {
     width: 100%;
@@ -107,7 +105,7 @@ const TaskList: React.FC<{ expanded: string }> = ({ expanded }) => {
     setIsOpen(!isOpen);
   };
   return (
-    <Container expanded={expanded}>
+    <Container>
       <SpaceBtwDiv>
         <AddButtonDiv>
           {' '}
