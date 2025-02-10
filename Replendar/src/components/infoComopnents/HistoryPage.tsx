@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useQuery } from '@tanstack/react-query';
+import { axiosInstance } from '../../apis/axios-instance';
 import BlueButton from '../blueButton';
 
 const Container = styled.div`
@@ -52,7 +54,6 @@ const ContentBox = styled.div`
   width: calc(100% - 146px);
   display: flex;
   flex-direction: column;
-
   height: 100%;
 `;
 
@@ -61,7 +62,7 @@ const HistoryWhiteBox = styled.div`
   border-radius: 20px;
   padding: 20px;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1px; /* 각 항목 간 1px 간격 유지 */
+  margin-bottom: 1px;
 `;
 
 const HistoryItem = styled.div`
@@ -82,20 +83,40 @@ const HistoryDetails = styled.div`
 
 const HistoryPage: React.FC = () => {
   const [activeMenu, setActiveMenu] = useState<string>('전체');
-  const content = [
-    {
-      date: '11 / 02',
-      time: '23:55',
-      task: '000님이 ~~~~~~~하기 과제',
-      status: '완료',
+
+  const apiUrl = (() => {
+    switch (activeMenu) {
+      case '친구소식':
+        return '/api/activity/friend';
+      case '과제알림':
+        return '/api/activity/assignment/notify';
+      case '기타':
+        return '/api/activity'; // 이후 공지사항 관련 API 연결
+      default:
+        return '/api/activity'; // 전체 API
+    }
+  })();
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['activity', activeMenu], // 메뉴별 캐싱
+    queryFn: async () => {
+      const response = await axiosInstance.get(apiUrl, {
+        params: { page: 1, size: 5, sort: 'CreatedAt' },
+      });
+
+      console.log(`${activeMenu} API Response:`, response.data);
+
+      // 전체 API는 response.data.content, 나머지는 response.data.result.content
+      return activeMenu === '전체'
+        ? response.data.content || []
+        : response.data.result?.content || [];
     },
-    {
-      date: '11 / 02',
-      time: '23:55',
-      task: '000님이 ~~~~~~~하기 과제',
-      status: '미완료',
-    },
-  ];
+    staleTime: 1000 * 60 * 5, // 5분 동안 데이터 캐싱 유지
+    refetchOnWindowFocus: false, // 창 포커스 변경 시 리패치 비활성화
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>데이터를 불러오는 중 오류 발생!</div>;
 
   return (
     <Container>
@@ -112,23 +133,29 @@ const HistoryPage: React.FC = () => {
         ))}
       </Menu>
       <ContentBox>
-        {content.map((item, index) => (
-          <HistoryWhiteBox key={index}>
-            {' '}
-            <HistoryItem>
-              <HistoryDetails>
-                <div>{item.date}</div>
-                <div>{item.time}</div>
-                <div>{item.task}</div>
-              </HistoryDetails>
-              <BlueButton
-                status={item.status === '완료' ? '등록됨' : '내 일정에 등록'}
-              >
-                {item.status}
-              </BlueButton>
-            </HistoryItem>
-          </HistoryWhiteBox>
-        ))}
+        {data.length > 0 ? (
+          data.map(
+            (
+              item: any,
+              index: number //어떻게 배치하지
+            ) => (
+              <HistoryWhiteBox key={index}>
+                <HistoryItem>
+                  <HistoryDetails>
+                    <div>{item.date}</div>
+                    <div>{item.time}</div>
+                    <div>{item.content}</div>
+                  </HistoryDetails>
+                  <BlueButton status={item.check ? '등록됨' : '내 일정에 등록'}>
+                    {item.check ? '등록됨' : '내 일정에 등록'}
+                  </BlueButton>
+                </HistoryItem>
+              </HistoryWhiteBox>
+            )
+          )
+        ) : (
+          <div>기록이 없습니다.</div>
+        )}
       </ContentBox>
     </Container>
   );

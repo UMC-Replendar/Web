@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-
 import { axiosInstance } from '../apis/axios-instance';
+import { NavigateFunction } from 'react-router-dom';
 
 interface ProfileData {
   nickname: string | null;
@@ -17,13 +17,13 @@ interface ProfileData {
 interface ProfileStore {
   profile: ProfileData | null;
   loading: boolean;
-  fetchProfile: () => Promise<void>;
+  fetchProfile: (navigate: NavigateFunction) => Promise<void>;
 }
 
 export const useProfileStore = create<ProfileStore>((set) => ({
   profile: null,
   loading: true,
-  fetchProfile: async () => {
+  fetchProfile: async (navigate) => {
     try {
       const response = await axiosInstance.get('/api/user/mypage');
       console.log('API 응답 데이터:', response.data);
@@ -33,9 +33,13 @@ export const useProfileStore = create<ProfileStore>((set) => ({
         set({ profile: response.data.result, loading: false });
       } else {
         set({ loading: false });
+        alert('로그인이 필요합니다.');
+        navigate('/login');
       }
     } catch (error) {
       set({ loading: false });
+      alert('로그인이 필요합니다.');
+      navigate('/login');
     }
   },
 }));
