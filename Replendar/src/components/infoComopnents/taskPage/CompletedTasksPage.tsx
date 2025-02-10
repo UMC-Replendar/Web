@@ -4,6 +4,7 @@ import { Task } from '../../../types';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import useAuthStore from '../../../store/authStore';
+import WrokedIcon from '../../../assets/images/Worked.svg';
 import { axiosInstance } from '../../../apis/axios-instance';
 import { useNavigate } from 'react-router-dom';
 
@@ -145,7 +146,7 @@ const CompletedTasksPage: React.FC = () => {
   return (
     <Container>
       <Wrapper>
-        <Image src="src/assets/images/Worked.svg" alt="Task Icon" />
+        <Image src={WrokedIcon} alt="Task Icon" />
         <Text>완료한 과제</Text>
       </Wrapper>
 

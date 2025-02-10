@@ -1,16 +1,26 @@
 import styled, { keyframes } from 'styled-components';
 import AppIcon from '../assets/images/AppIcon.png';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useProfileStore } from '../store/profileStore';
 import DefaultProfileImg from '../assets/images/SideBarIcons/DefaultProfileImg.svg';
 
 function NavBar() {
+  const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState(
     dayjs().format('YYYY년 MM월 DD일 HH:mm:ss')
   );
-  const { profile } = useProfileStore();
+  const { profile, fetchProfile } = useProfileStore();
+
+  useEffect(() => {
+    if (!profile) {
+      console.log('프로필 데이터가 없음, fetchProfile 실행');
+      fetchProfile(navigate);
+    } else {
+      console.log('기존 프로필 데이터 사용');
+    }
+  }, [profile]);
 
   useEffect(() => {
     const interval = setInterval(() => {
