@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import PreviousArrowIcon from '/src/assets/images/PreviousArrowIcon.svg';
 import NextArrowIcon from '/src/assets/images/NextArrowIcon.svg';
 import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
 
 const CalendarWrapper = styled.div`
   margin-top: 66px;

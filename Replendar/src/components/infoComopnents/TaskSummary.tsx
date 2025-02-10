@@ -92,7 +92,7 @@ const TaskSummary: React.FC<TaskSummaryProps> = ({ taskData }) => {
         </TaskContainer>
       </SummaryButton>
 
-      <SummaryButton onClick={() => navigate('/important')}>
+      <SummaryButton onClick={() => navigate('/info/important')}>
         <Icon
           src="src/assets/images/InfoIcons/Task.svg"
           alt="Important Task Icon"
