@@ -199,7 +199,7 @@ function TaskItem({
 
 function OngoingTasks() {
   // const { tasks, setTasks, deleteTask, updateRemainingTimes } = useTaskStore(); // Zustand에서 상태 가져오기
-  const { isOpen, openModal, closeModal, modalContent } = useModalStore(); // useModalStore 추가했어요요
+  const { isOpen, openModal, closeModal, modalContent } = useModalStore();
   const { token } = useAuthStore();
 
   const storedUserId = localStorage.getItem('id');

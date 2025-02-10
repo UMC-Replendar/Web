@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import BookmarkIcon from '../assets/images/BookmarkIcon.svg';
 import BookmarkFilledIcon from '../assets/images/BookmarkFilledIcon.svg';
@@ -11,6 +11,8 @@ import useTaskStore from '../store/useTaskStore';
 import useModalStore from '../store/modalStore';
 import useFriendsStore from '../store/useFriendStore';
 import useGetData from '../hooks/useGetData';
+import useAuthStore from '../store/authStore';
+import axios from 'axios';
 
 // MUI DatePicker 관련 Import 추가
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -180,6 +182,7 @@ const StyledTimeInput = styled.input`
   padding: 8px 16px;
   justify-content: center;
   align-items: center;
+  text-align: center;
   border-radius: 5px;
   border: 1px solid #e8e8e8;
   background: white;
@@ -322,7 +325,6 @@ interface AddTaskModalProps {
 }
 
 function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
-  const { addTask } = useTaskStore();
   const { closeModal } = useModalStore();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [taskName, setTaskName] = useState('');
@@ -330,11 +332,10 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
   const [time, setTime] = useState('');
   const [isPublic, setIsPublic] = useState(false); // 과제 공개 여부
   const [isOn, setIsOn] = useState(false); // 알림 설정
-  const [alarmCount, setAlarmCount] = useState<number | null>(null); // 알림 주기 설정
+  const [alarmCycles, setAlarmCycles] = useState<string[]>([]);
   const [memo, setMemo] = useState('');
+  const { token } = useAuthStore();
 
-  //const [showFriendsModal, setShowFriendsModal] = useState(false);
-  //추가했어요
   const {
     isFriendModalOpen,
     openFriendModal,
@@ -344,10 +345,6 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
     friendData,
     resetFriends,
   } = useFriendsStore();
-
-  const toggleBookmark = () => {
-    setIsBookmarked((prev) => !prev);
-  };
 
   const userId = localStorage.getItem('id');
 
@@ -367,6 +364,10 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
     resetFriends();
   }, [closeModal]);
 
+  const toggleBookmark = () => {
+    setIsBookmarked((prev) => !prev);
+  };
+
   const handleComplete = async () => {
     if (!taskName.trim()) {
       alert('과제명을 입력해주세요.');
@@ -377,24 +378,42 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
       return;
     }
 
-    console.log('과제 추가:', {
-      deadline: deadline.format('YYYY/MM/DD'),
-      time: time || '23:59',
-    });
+    const formattedDeadline = deadline
+      ? deadline.format('YYYY/MM/DD HH:mm')
+      : null;
 
-    await addTask({
-      assignmentId: Date.now(),
-      name: taskName,
-      deadline: deadline.format('YYYY/MM/DD'),
-      remainingTime: '',
-      color: '#7AC19A',
-      isToggled: false,
-      isBookmarked,
-      memo,
-    });
+    const taskData = {
+      title: taskName,
+      endDate: formattedDeadline,
+      notification: isOn ? 'ON' : 'OFF',
+      visibility: isPublic ? 'ON' : 'OFF',
+      notifyCycle: alarmCycles,
+      shareIds: friendData ? friendData.map((friend) => friend.friendId) : [],
+      memo: memo.trim() === '' ? '' : memo,
+      favorite: isBookmarked ? 'ACTIVE' : 'INACTIVE',
+      originAssId: null,
+      lectureAssignmentId: null,
+    };
 
-    onTaskAdded();
-    closeModal();
+    console.log('📌 최종 전송 데이터:', JSON.stringify(taskData, null, 2));
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment`,
+        taskData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      console.log('과제 추가 성공:', response.data);
+      useTaskStore.getState().addTask(response.data);
+      onTaskAdded();
+      closeModal();
+    } catch (error) {
+      console.error('과제 추가 중 오류 발생:', error);
+      alert('과제 추가 처리 중 문제가 발생했습니다.');
+    }
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -422,11 +441,17 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
   };
 
   const alarmOptions = [
-    { label: '3회', value: 3 },
-    { label: '24시간 전', value: 24 },
-    { label: '10시간 전', value: 10 },
-    { label: '1시간 전', value: 1 },
+    { label: '3일 전', value: 'DAY3' },
+    { label: '24시간 전', value: 'DAY1' },
+    { label: '10시간 전', value: 'H10' },
+    { label: '1시간 전', value: 'H1' },
   ];
+
+  const handleAlarmCycleToggle = (cycle: string) => {
+    setAlarmCycles((prev) =>
+      prev.includes(cycle) ? prev.filter((c) => c !== cycle) : [...prev, cycle]
+    );
+  };
 
   return (
     <ModalOverlay onClick={closeModal}>
@@ -511,8 +536,8 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
               {alarmOptions.map(({ label, value }) => (
                 <AlarmCycleSettingButton
                   key={value}
-                  isActive={alarmCount === value}
-                  onClick={() => setAlarmCount(value)}
+                  isActive={alarmCycles.includes(value)}
+                  onClick={() => handleAlarmCycleToggle(value)}
                 >
                   {label}
                 </AlarmCycleSettingButton>
@@ -555,7 +580,6 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
 
 export default AddTaskModal;
 
-//수정
 const SelectedFriendsList = styled.div`
   display: flex;
   align-items: center;
@@ -574,9 +598,4 @@ const FriendTag = styled.span`
   font-size: 14px;
   width: 64px;
   height: 31px;
-`;
-
-const FlexDiv = styled.div`
-  display: flex;
-  gap: 8px;
 `;
