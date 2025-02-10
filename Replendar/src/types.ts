@@ -4,13 +4,13 @@ export interface Task {
   time: string;
   description: string;
   delay: string;
-  status: '완료' | '미완료';
+  status: string;
 }
 
 // 기존 StoredTask 정의 (마감일과 유효성만 포함)
 export interface StoredTask {
   date: string; // 마감일
-  delay: '만료' | '유효'; // 만료 여부
+  delay: '만료' | '유효' | undefined; // 만료 여부
   description: string; // 과제명
 }
 

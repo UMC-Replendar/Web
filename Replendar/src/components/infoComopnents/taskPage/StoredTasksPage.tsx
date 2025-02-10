@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import useAuthStore from '../../../store/authStore';
-import { Task } from '../../../types'; //task타입 정의가 통일되어야 하는가?
+import { Task } from '../../../types';
 import { axiosInstance } from '../../../apis/axios-instance';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   display: flex;
@@ -89,12 +90,13 @@ const StoredTaskPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { token } = useAuthStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStoredTasks = async () => {
       if (!token) {
-        setError('로그인이 필요합니다.');
-        window.location.href = '/login';
+        alert('로그인이 필요합니다.');
+        navigate('/');
         return;
       }
 
@@ -135,38 +137,6 @@ const StoredTaskPage: React.FC = () => {
     fetchStoredTasks();
   }, [token]);
 
-  useEffect(() => {
-    if (tasks.length === 0) {
-      console.log('예제 데이터 적용');
-      setTasks([
-        {
-          date: '2025-02-10',
-          StoredTaskdelay: '유효',
-          description: 'React 프로젝트 제출',
-          time: '',
-          delay: '',
-          status: undefined,
-        },
-        {
-          date: '2025-02-15',
-          StoredTaskdelay: '만료',
-          description: 'TypeScript 강의 듣기',
-          time: '',
-          delay: '',
-          status: undefined,
-        },
-        {
-          date: '2025-02-20',
-          StoredTaskdelay: '유효',
-          description: '스터디 리포트 작성',
-          time: '',
-          delay: '',
-          status: undefined,
-        },
-      ]);
-    }
-  }, [tasks]);
-
   if (loading) return <p>로딩 중...</p>;
   if (error) return <p>오류 발생: {error}</p>;
 
@@ -185,14 +155,12 @@ const StoredTaskPage: React.FC = () => {
         </GridContainer>
 
         {tasks.map((task, index) => {
-          const isValid = task.StoredTaskdelay === '유효';
+          const isValid = task.delay === '유효';
           return (
             <WhiteBox key={index}>
               <TaskRow>
                 <div>{task.date}</div>
-                <TaskStatus isValid={isValid}>
-                  {task.StoredTaskdelay}
-                </TaskStatus>
+                <TaskStatus isValid={isValid}>{task.delay}</TaskStatus>
                 <div>{task.description}</div>
               </TaskRow>
             </WhiteBox>

@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import styled from 'styled-components';
+import { axiosInstance } from '../../apis/axios-instance';
 
 const ProfileContainer = styled.div`
   display: flex;
@@ -55,8 +57,18 @@ const InfoText = styled.p`
 `;
 
 const Message = styled.p`
+  display: flex;
+  flex-direction: row;
   font-size: 19px;
   font-weight: 500;
+  gap: 10px;
+`;
+const ModifyMessage = styled.img`
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  justify-content: center;
+  align-items: center;
 `;
 
 interface ProfileProps {
@@ -64,6 +76,20 @@ interface ProfileProps {
 }
 
 const ProfileSection: React.FC<ProfileProps> = ({ profileData }) => {
+  const [statusMessage, setStatusMessage] = useState(
+    profileData.statusMessage || '상태 메시지 없음'
+  );
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleUpdateMessage = async () => {
+    try {
+      await axiosInstance.patch('/api/user/status', { statusMessage });
+      setIsEditing(false);
+    } catch (error) {
+      console.error('상태 메시지 업데이트 실패:', error);
+    }
+  };
+
   return (
     <ProfileContainer>
       <ProfilePicture>
@@ -76,12 +102,32 @@ const ProfileSection: React.FC<ProfileProps> = ({ profileData }) => {
 
       <InfoBox>
         <Nickname>{profileData.nickname || '닉네임 없음'}</Nickname>
-        <Message>{profileData.statusMessage || '상태 메시지 없음'}</Message>
+        <Message>
+          {isEditing ? (
+            <input
+              type="text"
+              value={statusMessage}
+              onChange={(e) => setStatusMessage(e.target.value)}
+              onBlur={handleUpdateMessage}
+              onKeyDown={(e) => e.key === 'Enter' && handleUpdateMessage()}
+              autoFocus
+            />
+          ) : (
+            <>
+              {statusMessage}
+              <ModifyMessage
+                src="./src/assets/images/Pencil.svg"
+                alt="수정"
+                onClick={() => setIsEditing(true)}
+              />
+            </>
+          )}
+        </Message>
+
         <InfoText>친구: {profileData.friendCount}</InfoText>
         <InfoText>진행 중인 과제: {profileData.ongoingTasks}</InfoText>
       </InfoBox>
     </ProfileContainer>
   );
 };
-
 export default ProfileSection;
