@@ -575,8 +575,3 @@ const FriendTag = styled.span`
   width: 64px;
   height: 31px;
 `;
-
-const FlexDiv = styled.div`
-  display: flex;
-  gap: 8px;
-`;

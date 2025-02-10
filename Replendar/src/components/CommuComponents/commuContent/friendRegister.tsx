@@ -11,7 +11,7 @@ const friendRegister = () => {
   const [searchNickname, setSearchNickname] = useState('');
 
   //친구등록검색api호출
-  const { data, isLoading, isError } = useGetData(
+  const { data, isLoading } = useGetData(
     mq ? `/api/friends/search?nickname=${mq}` : ''
   );
 

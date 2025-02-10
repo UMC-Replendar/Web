@@ -24,16 +24,16 @@ const MenuContent: React.FC<MenuContentProps> = ({ menuState, expanded }) => {
       content = <FriendNews expanded={expanded} />;
       break;
     case '친구관리':
-      content = <FriendManagement expanded={expanded} />;
+      content = <FriendManagement />;
       break;
     case '학과소식':
-      content = <DepartmentList expanded={expanded} />;
+      content = <DepartmentList />;
       break;
     case '과제목록':
       content = <TaskList expanded={expanded} />;
       break;
     case '강좌목록':
-      content = <LectureList expanded={expanded} />;
+      content = <LectureList />;
       break;
     default:
       content = <FriendRegister />;
