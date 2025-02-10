@@ -28,7 +28,6 @@ function Settings() {
     }
 
     try {
-      // const response = await axiosInstance.post('/api/user/logout', {});
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_BASE_URL}/api/user/logout`,
         {},

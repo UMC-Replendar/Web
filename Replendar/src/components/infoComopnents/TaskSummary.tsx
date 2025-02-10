@@ -67,7 +67,7 @@ const TaskSummary: React.FC<TaskSummaryProps> = ({ taskData }) => {
 
   return (
     <SummaryContainer>
-      <SummaryButton onClick={() => navigate('/completed')}>
+      <SummaryButton onClick={() => navigate('/info/completed')}>
         <Icon src="src/assets/images/Worked.svg" alt="Completed Task Icon" />
         <TaskContainer>
           <TaskText>완료한 과제</TaskText>
@@ -75,7 +75,7 @@ const TaskSummary: React.FC<TaskSummaryProps> = ({ taskData }) => {
         </TaskContainer>
       </SummaryButton>
 
-      <SummaryButton onClick={() => navigate('/stored')}>
+      <SummaryButton onClick={() => navigate('/info/stored')}>
         <Icon
           src="src/assets/images/InfoIcons/Task.svg"
           alt="Stored Task Icon"
@@ -86,7 +86,7 @@ const TaskSummary: React.FC<TaskSummaryProps> = ({ taskData }) => {
         </TaskContainer>
       </SummaryButton>
 
-      <SummaryButton onClick={() => navigate('/notcompleted')}>
+      <SummaryButton onClick={() => navigate('/info/notcompleted')}>
         <Icon
           src="src/assets/images/InfoIcons/Task.svg"
           alt="Incomplete Task Icon"
@@ -97,7 +97,7 @@ const TaskSummary: React.FC<TaskSummaryProps> = ({ taskData }) => {
         </TaskContainer>
       </SummaryButton>
 
-      <SummaryButton onClick={() => navigate('/important')}>
+      <SummaryButton onClick={() => navigate('/info/important')}>
         <Icon
           src="src/assets/images/InfoIcons/Task.svg"
           alt="Important Task Icon"
