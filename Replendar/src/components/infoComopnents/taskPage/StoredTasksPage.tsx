@@ -5,7 +5,7 @@ import { Task } from '../../../types';
 import { axiosInstance } from '../../../apis/axios-instance';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import taskIcon from '../../../assets/images/InfoIcons/Task.svg';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -143,7 +143,7 @@ const StoredTaskPage: React.FC = () => {
   return (
     <Container>
       <Wrapper>
-        <Image src="src/assets/images/InfoIcons/Task.svg" alt="Task Icon" />
+        <Image src={taskIcon} alt="Task Icon" />
         <Text>보관한 과제</Text>
       </Wrapper>
 

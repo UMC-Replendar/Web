@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { axiosInstance } from '../../apis/axios-instance';
 import useAuthStore from '../../store/authStore';
 import { useProfileStore } from '../../store/profileStore';
-
+import CameraIcon from '../../assets/images/Camera.svg';
 const UploadContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -132,10 +132,7 @@ const ProfileUpload: React.FC<ProfileUploadProps> = ({
           />
         ) : (
           <>
-            <img
-              src="./src/assets/images/Camera.svg"
-              alt="사진 업로드 아이콘"
-            />
+            <img src={CameraIcon} alt="사진 업로드 아이콘" />
             <UploadText>사진 업로드하기</UploadText>
           </>
         )}
