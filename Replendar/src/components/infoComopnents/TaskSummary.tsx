@@ -93,10 +93,7 @@ const TaskSummary: React.FC<TaskSummaryProps> = ({ taskData }) => {
       </SummaryButton>
 
       <SummaryButton onClick={() => navigate('/info/important')}>
-        <Icon
-          src="src/assets/images/InfoIcons/Task.svg"
-          alt="Important Task Icon"
-        />
+        <Icon src={taskIcon} alt="Important Task Icon" />
         <TaskContainer>
           <TaskText>중요한 과제</TaskText>
           <TaskCount>{taskData.important_taskCount}</TaskCount>
