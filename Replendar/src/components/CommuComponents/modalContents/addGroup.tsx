@@ -2,7 +2,7 @@ import GrayPlusIcon from '../../../assets/images/GrayPlusIcon.svg';
 import { PlusFriendsButton } from '../../../modal/AddTaskModal';
 import useModalStore from '../../../store/modalStore';
 import styled from 'styled-components';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import SelectFriendsModal from '../../../modal/SelectFriendsModal';
 import useGetData from '../../../hooks/useGetData';
 import useFriendsStore from '../../../store/useFriendStore';

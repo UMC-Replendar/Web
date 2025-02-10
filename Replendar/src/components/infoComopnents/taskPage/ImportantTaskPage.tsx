@@ -6,7 +6,7 @@ import useAuthStore from '../../../store/authStore';
 import { axiosInstance } from '../../../apis/axios-instance';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import taskIcon from '../../assets/images/InfoIcons/Task.svg';
+import taskIcon from '../../../assets/images/InfoIcons/Task.svg';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
