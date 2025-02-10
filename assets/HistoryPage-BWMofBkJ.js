@@ -1,4 +1,4 @@
-import{r as x,j as t,d as n,a as l}from"./index-BZGV8Fg6.js";import{a as p}from"./useQuery-BvRKwqBt.js";import{B as f}from"./blueButton-D_mLbESf.js";const h=n.div`
+import{r as x,j as t,d as n,a as l}from"./index-B7gUGqRc.js";import{a as p}from"./useQuery-D4OBwsx6.js";import{B as f}from"./blueButton-BKLYKWyS.js";const h=n.div`
   width: 100%;
   height: 100%;
   display: flex;
