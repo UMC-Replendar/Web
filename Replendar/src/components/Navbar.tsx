@@ -2,20 +2,20 @@ import styled, { keyframes } from 'styled-components';
 import AppIcon from '../assets/images/AppIcon.png';
 import ProfileImage from '../assets/images/ProfileImg.png';
 import { Link } from 'react-router-dom';
-// import KakaoLogo from '../assets/images/KakaoTalk_logo.png';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-// import ChillChillGuy from '../assets/images/ChillGuy.png';
+import { useProfileStore } from '../store/profileStore';
+import DefaultProfileImg from '../assets/images/SideBarIcons/DefaultProfileImg.svg';
+
 function NavBar() {
   const [currentTime, setCurrentTime] = useState(
-    dayjs().format('YYYY/MM/DD HH:mm:ss')
+    dayjs().format('YYYY년 MM월 DD일 HH:mm:ss')
   );
-  const profilePhoto = localStorage.getItem('profilePhoto'); // Base64 이미지
-  const nickname = localStorage.getItem('nickname') || '닉네임'; // 기본 닉네임 설정
+  const { profile } = useProfileStore(); // 기본 닉네임 설정
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTime(dayjs().format('YYYY/MM/DD HH:mm:ss'));
+      setCurrentTime(dayjs().format('YYYY년 MM월 DD일 HH:mm:ss'));
     }, 1000);
 
     return () => clearInterval(interval);
@@ -40,10 +40,13 @@ function NavBar() {
         <UserContainer>
           <Link to={'/info'}>
             {/* ✅ 프로필 이미지가 존재하면 표시, 없으면 기본 이미지 */}
-            <ProfileImg src={profilePhoto || ProfileImage} alt="Profile" />
+            <ProfileImg
+              src={profile?.profileImageUrl || DefaultProfileImg}
+              alt="Profile"
+            />
           </Link>
           <Link to={'/info'}>
-            <ProfileStatus>{nickname}</ProfileStatus>
+            <ProfileStatus>{profile?.nickname || '리플레닝'}</ProfileStatus>
           </Link>
         </UserContainer>
       </ProfileWrapper>
@@ -104,7 +107,7 @@ const UserContainer = styled.div`
   align-items: center;
   gap: 10px;
   padding: 10px 15px;
-  border-radius: 0px; /* 둥근 모서리 적용 */
+  border-radius: 0px;
   transition: box-shadow 0.3s ease-in-out;
 
   &:hover {
@@ -124,9 +127,15 @@ const TimeDisplay = styled.span`
   animation: ${fadeAnimation} 0.8s ease-in-out;
 `;
 
-const ProfileImg = styled.img`
+const ProfileImg = styled.div<{ src: string }>`
   width: 34px;
   height: 34px;
+  border-radius: 300px;
+  background-image: url(${(props) => props.src});
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: #d9d9d9;
 `;
 
 const ProfileStatus = styled.span`

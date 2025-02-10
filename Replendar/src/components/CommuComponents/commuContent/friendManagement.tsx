@@ -15,7 +15,7 @@ import { useMutation } from '@tanstack/react-query';
 import { deleteGroup } from '../../../apis/commuApi';
 import { useQueryClient } from '@tanstack/react-query';
 
-const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
+const FriendManagement = () => {
   //expand mq없는 듯
   const { openModal } = useModalStore();
 
@@ -73,7 +73,7 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
         </AddButton>
       </AddButtonDiv>
 
-      {data.map((group: IGroupList, index: number) => (
+      {data.map((group: IGroupList) => (
         <div key={group.groupId}>
           <SpaceBtwDiv
             status={
