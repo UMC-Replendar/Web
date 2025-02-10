@@ -13,6 +13,7 @@ import {
 } from '../../apis/commuApi';
 import BlueButton from '../blueButton';
 import { groupDeleteFriend } from '../../apis/commuApi';
+import CustomCalendar from '../OngoingComponents/CustomCalendar';
 
 const FriendListRender: React.FC<{
   data: IFriendList[]; // 데이터는 props로 전달
@@ -34,6 +35,7 @@ const FriendListRender: React.FC<{
 
   const [isEditing, setIsEditing] = useState(false);
   const [updatedNote, setUpdatedNote] = useState<string>('');
+  const [calendarShow, setCalendarShow] = useState(false);
 
   const bestFriendmutation = useMutation({
     mutationFn: ({
@@ -91,6 +93,12 @@ const FriendListRender: React.FC<{
       : ''
   );
 
+  const { data: tasks } = useGetData(
+    calendarShow
+      ? `/api/assignment/friend/${modalState.selectedId}/public-assignments`
+      : ''
+  );
+
   const groupDeleteFriendMutation = useMutation({
     mutationFn: ({
       groupId,
@@ -126,6 +134,7 @@ const FriendListRender: React.FC<{
   };
 
   const handleNineDotsClick = (id: number) => {
+    setCalendarShow(false);
     setModalState((prev) => ({
       isOpen: prev.selectedId !== id || !prev.isOpen,
       selectedId: prev.selectedId === id ? null : id,
@@ -137,6 +146,32 @@ const FriendListRender: React.FC<{
       {data.length === 0 && <div>친구 없음</div>}
       {data.map((item: IFriendList, index: number) => (
         <div key={item.friendId}>
+          {calendarShow && modalState.selectedId && tasks.length > 0 && (
+            <>
+              <StyledModal>
+                <FlexStartDiv>
+                  <ProfileImage width={'30'} height={'30'} />
+
+                  <CenterDiv width="100px" bold>
+                    {item.nickname}
+                  </CenterDiv>
+
+                  <CenterDiv bold>
+                    진행 중인 과제: {item.ongoingAssignments}개
+                  </CenterDiv>
+                </FlexStartDiv>
+                <CloseButton onClick={() => setCalendarShow(false)}>
+                  닫기
+                </CloseButton>
+                <CustomCalendar
+                  tasks={tasks.map((task: any) => ({
+                    name: task.title,
+                    deadline: task.due_date,
+                  }))}
+                />
+              </StyledModal>
+            </>
+          )}
           <SpaceBtwDiv>
             <FlexDiv>
               <ProfileImage width={'30'} height={'30'} />
@@ -176,7 +211,7 @@ const FriendListRender: React.FC<{
             >
               <ModalContent>
                 <span>진행중인 과제: {item.ongoingAssignments}개</span>
-                <div>일정확인</div>
+                <div onClick={() => setCalendarShow(true)}>일정확인</div>
               </ModalContent>
 
               <P>과제공유</P>
@@ -237,12 +272,38 @@ const FriendListRender: React.FC<{
 
 export default FriendListRender;
 
+const StyledModal = styled.div`
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  z-index: 1000;
+  min-width: 300px;
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+  &:hover {
+    color: rgba(57, 130, 226, 1);
+  }
+`;
+
 const SpaceBtwDiv = styled.div`
   display: flex;
   position: relative;
   gap: 100px; /* 갭 조정 */
   width: 100%;
-  font-size: 19px;
+
   height: 67px;
   background: white;
   border-radius: 20px;
@@ -264,13 +325,13 @@ const RightAlignedItem = styled.div`
   gap: 40px;
 `;
 
-const CenterDiv = styled.div<{ width?: string }>`
+const CenterDiv = styled.div<{ width?: string; bold?: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: ${(props) => props.width || 'auto'};
+  width: ${({ width }) => width || 'auto'};
+  font-weight: ${({ bold }) => (bold ? 'bold' : 'normal')};
 `;
-
 const FlexDiv = styled.div`
   img {
     width: 30px;
@@ -279,6 +340,17 @@ const FlexDiv = styled.div`
   }
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 20px;
+`;
+const FlexStartDiv = styled.div`
+  img {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+  }
+  display: flex;
+  justify-content: flex-start;
   align-items: center;
   gap: 20px;
 `;

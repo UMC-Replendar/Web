@@ -4,7 +4,7 @@ import { useInView } from 'react-intersection-observer';
 import ClipLoader from 'react-spinners/ClipLoader';
 import { useGetInfiniteData } from '../../../hooks/useGetInfiniteData';
 import { useEffect } from 'react';
-import { IContent, IPage } from '../../../types';
+import { IDepartmentNewsContent, IPage } from '../../../types';
 
 const Container = styled.div`
   width: 100%;
@@ -43,7 +43,16 @@ const RightAlignedItem = styled.div`
   gap: 40px;
 `;
 
-const DepartmentList = () => {
+const Scroll = styled.div`
+  width: 100vw;
+  height: 50px;
+  margin-top: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const DepartmentNews = () => {
   const {
     data,
     isPending,
@@ -52,7 +61,7 @@ const DepartmentList = () => {
     isFetching,
     hasNextPage,
     fetchNextPage,
-  } = useGetInfiniteData('/api/major/lectures/news', 5);
+  } = useGetInfiniteData('/api/major/lectures/news', 4);
 
   const { ref, inView } = useInView({ threshold: 0 });
 
@@ -73,8 +82,8 @@ const DepartmentList = () => {
 
   return (
     <Container>
-      {data?.pages?.map((page: IPage) =>
-        page.content.map((item: IContent) => (
+      {data?.pages?.map((page: IPage<IDepartmentNewsContent>) =>
+        page.content.map((item: IDepartmentNewsContent) => (
           <FlexDiv key={item.friendId}>
             <CenterDiv>{item.time}</CenterDiv>
             <CenterDiv>
@@ -91,11 +100,11 @@ const DepartmentList = () => {
         ))
       )}
       {isFetching && <div>스켈레톤</div>}
-      <div ref={ref} className="scroll">
+      <Scroll ref={ref} className="scroll">
         {isFetching && <ClipLoader color={'#fff'}></ClipLoader>}
-      </div>
+      </Scroll>
     </Container>
   );
 };
 
-export default DepartmentList;
+export default DepartmentNews;
