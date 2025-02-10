@@ -130,7 +130,6 @@ import { lazy, Suspense } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 
-// 📌 Lazy Loading 적용
 const Info = lazy(() => import('../pages/Info'));
 const Community = lazy(() => import('../pages/community'));
 const Login = lazy(() => import('../pages/login'));
