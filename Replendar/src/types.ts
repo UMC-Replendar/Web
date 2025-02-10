@@ -44,7 +44,7 @@ export interface ILecture {
   lectureId: number; // ID는 일반적으로 숫자로 사용됨 (필요하면 string으로 변경)
 }
 
-export interface IContent {
+export interface IDepartmentNewsContent {
   friendId: number; // 친구 아이디
   assignmentId: number; // 과제 아이디
   lectureAssignmentId: number; // 학과 과제 아이디
@@ -70,7 +70,7 @@ export interface IPageable {
 }
 
 export interface IPage {
-  content: IContent[]; // 각 페이지의 데이터 항목들을 포함
+  content: IDepartmentNewsContent[]; // 각 페이지의 데이터 항목들을 포함
   pageable: IPageable; // 페이지네이션 정보
   last: boolean; // 마지막 페이지 여부
   totalPages: number; // 총 페이지 수
