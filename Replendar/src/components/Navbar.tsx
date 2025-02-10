@@ -1,6 +1,5 @@
 import styled, { keyframes } from 'styled-components';
 import AppIcon from '../assets/images/AppIcon.png';
-import ProfileImage from '../assets/images/ProfileImg.png';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
@@ -11,7 +10,16 @@ function NavBar() {
   const [currentTime, setCurrentTime] = useState(
     dayjs().format('YYYY년 MM월 DD일 HH:mm:ss')
   );
-  const { profile } = useProfileStore(); // 기본 닉네임 설정
+  const { profile, fetchProfile } = useProfileStore();
+
+  useEffect(() => {
+    if (!profile) {
+      console.log('프로필 데이터가 없음, fetchProfile 실행');
+      fetchProfile();
+    } else {
+      console.log('기존 프로필 데이터 사용');
+    }
+  }, [profile]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -39,11 +47,7 @@ function NavBar() {
         </UserContainer>
         <UserContainer>
           <Link to={'/info'}>
-            {/* ✅ 프로필 이미지가 존재하면 표시, 없으면 기본 이미지 */}
-            <ProfileImg
-              src={profile?.profileImageUrl || DefaultProfileImg}
-              alt="Profile"
-            />
+            <ProfileImg src={profile?.profileImageUrl || DefaultProfileImg} />
           </Link>
           <Link to={'/info'}>
             <ProfileStatus>{profile?.nickname || '리플레닝'}</ProfileStatus>

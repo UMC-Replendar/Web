@@ -6,6 +6,7 @@ import NavBar from './Navbar';
 import { useLocation } from 'react-router-dom';
 import Modal from '../modal/Modal';
 import { useEffect } from 'react';
+import 'react-calendar/dist/Calendar.css';
 
 function App() {
   useEffect(() => {

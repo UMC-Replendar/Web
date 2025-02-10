@@ -1,47 +1,49 @@
 import styled from 'styled-components';
 import ThemeSettingIcon from '../../assets/images/SettingsPageIcons/ThemeSettingIcon.png';
-import { useThemeStore } from '../../store/useThemeStore';
+import useAuthStore from '../../store/authStore'; // ✅ useAuthStore 사용
 import GreenTheme from '../../assets/images/SettingsPageIcons/GreenTheme.svg';
 import BlueTheme from '../../assets/images/SettingsPageIcons/BlueTheme.svg';
 import PurpleTheme from '../../assets/images/SettingsPageIcons/PurpleTheme.svg';
 
 export default function ThemeSettingPage() {
-  const { selectedTheme, setTheme } = useThemeStore();
+  const { theme, setTheme } = useAuthStore(); // ✅ useAuthStore에서 theme 가져오기
 
-  console.log(selectedTheme);
+  console.log(theme);
+
   return (
     <Container>
       <TitleContainer>
         <TitleIcon src={ThemeSettingIcon} />
         <TitleSpan>테마설정</TitleSpan>
       </TitleContainer>
+
       <OptionContainer>
         <SelectButton
-          selected={selectedTheme === '기본테마'}
-          onClick={() => setTheme('기본테마')}
+          selected={theme === 'DEFAULT'}
+          onClick={() => setTheme('DEFAULT')} // ✅ 서버에 반영되도록 수정
         />
-        <ThemeOption src={GreenTheme} selected={selectedTheme === '기본테마'}>
-          <ThemeText></ThemeText>
+        <ThemeOption src={GreenTheme} selected={theme === 'DEFAULT'}>
+          <ThemeText>기본 테마</ThemeText>
         </ThemeOption>
       </OptionContainer>
 
       <OptionContainer>
         <SelectButton
-          selected={selectedTheme === '테마1'}
-          onClick={() => setTheme('테마1')}
+          selected={theme === 'THEME1'}
+          onClick={() => setTheme('THEME1')} // ✅ 서버에 반영되도록 수정
         />
-        <ThemeOption src={BlueTheme} selected={selectedTheme === '테마1'}>
-          <ThemeText></ThemeText>
+        <ThemeOption src={BlueTheme} selected={theme === 'THEME1'}>
+          <ThemeText>파랑 테마</ThemeText>
         </ThemeOption>
       </OptionContainer>
 
       <OptionContainer>
         <SelectButton
-          selected={selectedTheme === '테마2'}
-          onClick={() => setTheme('테마2')}
+          selected={theme === 'THEME2'}
+          onClick={() => setTheme('THEME2')} // ✅ 서버에 반영되도록 수정
         />
-        <ThemeOption src={PurpleTheme} selected={selectedTheme === '테마2'}>
-          <ThemeText></ThemeText>
+        <ThemeOption src={PurpleTheme} selected={theme === 'THEME2'}>
+          <ThemeText>보라 테마</ThemeText>
         </ThemeOption>
       </OptionContainer>
     </Container>

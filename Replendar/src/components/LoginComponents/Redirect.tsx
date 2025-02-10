@@ -6,7 +6,7 @@ import useAuthStore from '../../store/authStore';
 export default function Redirect() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { setAuth } = useAuthStore();
+  const { setAuth, setTheme } = useAuthStore();
   const AUTHORIZE_CODE: string | null = new URLSearchParams(
     window.location.search
   ).get('code');
@@ -17,10 +17,11 @@ export default function Redirect() {
         .get(`${import.meta.env.VITE_BACKEND_API_URL}?code=${AUTHORIZE_CODE}`)
         .then((response) => {
           console.log(response);
-          const { accessToken, id, nickName, email } = response.data.result;
-          console.log(accessToken, id, nickName, email);
+          const { accessToken, id, nickName, email, theme } =
+            response.data.result;
           if (response.data.isSuccess) {
-            setAuth(accessToken, email, id, nickName);
+            setAuth(accessToken, email, id, nickName, theme);
+            setTheme(theme);
             navigate('/signup');
 
             alert('로그인에 성공했습니다');
@@ -45,9 +46,6 @@ export default function Redirect() {
       navigate('/login');
     }
   };
-
-  // api 호출 두 번 하는 거 이이이새키 때문이었음.
-  // dependency를 빈 배열로 주면 랜더링 될 때만 실행된다함.
   useEffect(() => {
     getToken();
   }, []);
