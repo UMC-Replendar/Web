@@ -2,7 +2,8 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import { axiosInstance } from '../../apis/axios-instance';
 import ProfileUpload from '../signupComponents/ProfileUpload';
-
+import pencilIcon from '../../assets/images/Pencil.svg';
+import enterIcon from '../../assets/images/check.svg';
 const ProfileContainer = styled.div`
   display: flex;
   gap: 100px;
@@ -110,7 +111,7 @@ const ProfileSection: React.FC<ProfileProps> = ({ profileData }) => {
                 autoFocus
               />
               <EnterIcon
-                src="./src/assets/images/check.svg"
+                src={enterIcon}
                 alt="입력 완료"
                 onClick={handleUpdateMessage}
               />
@@ -119,7 +120,7 @@ const ProfileSection: React.FC<ProfileProps> = ({ profileData }) => {
             <>
               {statusMessage}
               <ModifyMessage
-                src="./src/assets/images/Pencil.svg"
+                src={pencilIcon}
                 alt="수정"
                 onClick={() => setIsEditing(true)}
               />
