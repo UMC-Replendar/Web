@@ -81,7 +81,6 @@ const Fakelogin = () => {
 
       if (data.isSuccess && data.result.accessToken) {
         const { accessToken, email, id, nickname, theme } = data.result;
-        // localStorage.setItem('token', data.result.accessToken); // ✅ JWT 저장
         console.log(data);
         setAuth(accessToken, email, id, nickname, theme); // ✅ Zustand에 토큰 저장
         if (nickname == null) {
