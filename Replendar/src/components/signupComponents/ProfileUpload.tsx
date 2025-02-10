@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { axiosInstance } from '../../apis/axios-instance';
 import useAuthStore from '../../store/authStore';
+import { useProfileStore } from '../../store/profileStore';
 
 const UploadContainer = styled.div`
   display: flex;
@@ -18,9 +19,9 @@ const Title = styled.h3`
   margin-bottom: 16px;
 `;
 
-const UploadWrapper = styled.label`
-  width: 250px;
-  height: 250px;
+const UploadWrapper = styled.label<{ size: number }>`
+  width: ${(props) => props.size}px;
+  height: ${(props) => props.size}px;
   margin-top: 10px;
   background: #e8e8e8;
   border-radius: 50%;
@@ -42,25 +43,27 @@ const UploadIcon = styled.img`
 
 const UploadText = styled.div`
   font-size: 17px;
-  font-family: 'Pretendard', sans-serif;
   font-weight: 500;
   color: #7e7f7f;
   text-align: center;
-  user-select: none;
 `;
 
 interface ProfileUploadProps {
   profilePhoto: File | string | null;
-  onPhotoChange: (photo: File | null) => void;
+  onPhotoChange: (photo: File | string | null) => void;
+  size?: number;
+  title?: string;
 }
 
 const ProfileUpload: React.FC<ProfileUploadProps> = ({
   profilePhoto,
   onPhotoChange,
+  size = 250, // 기본값 250px
+  title = '프로필 사진 설정',
 }) => {
   const { id } = useAuthStore();
-  const isUploading = useRef(false); // 중복 요청 방지용 ref 추가
-
+  const isUploading = useRef(false);
+  const { updateProfileImage } = useProfileStore();
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -68,7 +71,7 @@ const ProfileUpload: React.FC<ProfileUploadProps> = ({
 
     const file = event.target.files[0];
 
-    // 미리보기 이미지 생성
+    // 미리보기 적용
     onPhotoChange(file);
 
     await handleUpload(file);
@@ -83,7 +86,7 @@ const ProfileUpload: React.FC<ProfileUploadProps> = ({
 
     isUploading.current = true;
     const formData = new FormData();
-    formData.append('profileImage', file); // profileImage 이름에 맞게 수정정
+    formData.append('profileImage', file);
 
     try {
       const response = await axiosInstance.post(
@@ -96,10 +99,16 @@ const ProfileUpload: React.FC<ProfileUploadProps> = ({
         }
       );
 
-      console.log('파일 업로드 성공', response.data);
+      if (response.data.result) {
+        const newImageUrl = `${response.data.result}?t=${new Date().getTime()}`; //캐싱 방지
 
-      if (response.data?.url) {
-        onPhotoChange(response.data.url);
+        alert('프로필 사진 업로드 성공!');
+
+        //상태 업데이트
+        updateProfileImage(newImageUrl);
+
+        //UI 즉시 반영
+        onPhotoChange(newImageUrl);
       }
     } catch (error) {
       console.error('업로드 실패', error);
@@ -110,8 +119,8 @@ const ProfileUpload: React.FC<ProfileUploadProps> = ({
 
   return (
     <UploadContainer>
-      <Title>프로필 사진 설정</Title>
-      <UploadWrapper htmlFor="file-upload">
+      <Title>{title}</Title>
+      <UploadWrapper htmlFor="file-upload" size={size}>
         {profilePhoto ? (
           <UploadIcon
             src={
@@ -136,7 +145,7 @@ const ProfileUpload: React.FC<ProfileUploadProps> = ({
         type="file"
         accept="image/*"
         style={{ display: 'none' }}
-        onChange={handleFileChange} // 파일 선택 시 자동 업로드
+        onChange={handleFileChange}
       />
     </UploadContainer>
   );
