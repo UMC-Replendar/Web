@@ -5,6 +5,8 @@ import ClipLoader from 'react-spinners/ClipLoader';
 import { useGetInfiniteData } from '../../../hooks/useGetInfiniteData';
 import { useEffect } from 'react';
 import { IFriendNewsContent, IPage } from '../../../types';
+import useModalStore from '../../../store/modalStore';
+import AddTaskModal from '../../../modal/AddTaskModal';
 
 const Container = styled.div`
   width: 100%;
@@ -60,8 +62,11 @@ const FriendNews: React.FC<{ expanded: string }> = () => {
     isFetching,
     hasNextPage,
     fetchNextPage,
-  } = useGetInfiniteData(`/api/activity/friend`, 20);
+  } = useGetInfiniteData(`/api/activity/friend`, 5);
+
   const { ref, inView } = useInView({ threshold: 0 });
+
+  const { openModal } = useModalStore();
 
   useEffect(() => {
     if (inView) {
@@ -88,7 +93,19 @@ const FriendNews: React.FC<{ expanded: string }> = () => {
               {item.registered ? (
                 <BlueButton status="등록됨">등록됨</BlueButton>
               ) : (
-                <BlueButton>내 일정에 등록</BlueButton>
+                <BlueButton
+                  onClick={() =>
+                    openModal(
+                      <AddTaskModal
+                        onTaskAdded={() =>
+                          console.log('과제가 추가되었습니다.')
+                        }
+                      />
+                    )
+                  }
+                >
+                  내 일정에 등록
+                </BlueButton>
               )}
             </RightAlignedItem>
           </FlexDiv>
