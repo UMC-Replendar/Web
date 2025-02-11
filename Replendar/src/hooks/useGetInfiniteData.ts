@@ -6,6 +6,8 @@ function useGetInfiniteData(url: string, size: number = 10) {
     const { data } = await axiosInstance.get(
       `${url}?page=${pageParam}&size=${size}`
     );
+    console.log(`현재 요청한 페이지: ${pageParam}`);
+    console.log(data.result);
 
     return data.result;
   };
@@ -15,7 +17,7 @@ function useGetInfiniteData(url: string, size: number = 10) {
     queryKey: [url, size],
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      return lastPage.last ? undefined : lastPage.pageable.pageNumber + 1;
+      return lastPage.last ? undefined : lastPage.pageable.pageNumber + 2;
     },
   });
 }

@@ -54,6 +54,18 @@ export interface IDepartmentNewsContent {
   check: 'CHECK' | 'UNCHECK'; // 내일정에 등록 여부
 }
 
+export interface IFriendNewsContent {
+  date: string; // 예: "2025/02/05"
+  time: string; // 예: "03:22"
+  check: 'CHECK' | 'UNCHECK'; // 체크 여부
+  friendId: number; // 친구 ID
+  assId: number; // 과제 ID
+  content: string; // 내용
+  createdAt: string; // 생성 시간 (ISO 8601 형식)
+  type: string; // 예: "과제"
+  registered: boolean; // 내 일정에 등록한 과제 여부
+}
+
 export interface ISort {
   empty: boolean; // 정렬 정보 (비어있는지 여부)
   sorted: boolean; // 정렬 여부
@@ -69,8 +81,8 @@ export interface IPageable {
   unpaged: boolean; // 페이지가 없는지 여부
 }
 
-export interface IPage {
-  content: IDepartmentNewsContent[]; // 각 페이지의 데이터 항목들을 포함
+export interface IPage<T> {
+  content: T[]; // 각 페이지의 데이터 항목들을 포함
   pageable: IPageable; // 페이지네이션 정보
   last: boolean; // 마지막 페이지 여부
   totalPages: number; // 총 페이지 수
