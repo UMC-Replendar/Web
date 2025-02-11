@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import styled from 'styled-components';
-import { useState, useEffect } from 'react';
-
+import { axiosInstance } from '../../apis/axios-instance';
+import ProfileUpload from '../signupComponents/ProfileUpload';
+import pencilIcon from '../../assets/images/Pencil.svg';
+import enterIcon from '../../assets/images/check.svg';
 const ProfileContainer = styled.div`
   display: flex;
   gap: 100px;
@@ -11,34 +14,6 @@ const ProfileContainer = styled.div`
   margin-bottom: 54px;
 `;
 
-const ProfilePicture = styled.label`
-  width: 320px;
-  height: 320px;
-  background: #fcf6f5;
-  box-shadow: 0px 4px 6px -3px #cdcdcd;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  cursor: pointer;
-`;
-
-const UploadIcon = styled.img`
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-`;
-
-const UploadText = styled.div`
-  font-size: 17px;
-  font-weight: 500;
-  color: #7e7f7f;
-  text-align: center;
-  user-select: none;
-`;
-
 const InfoBox = styled.div`
   display: flex;
   flex-direction: column;
@@ -46,96 +21,118 @@ const InfoBox = styled.div`
 `;
 
 const Nickname = styled.h2`
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 28px;
 `;
 
 const InfoText = styled.p`
-  font-size: 18px;
+  font-size: 28px;
+  color: #666666;
+  margin-top: 10px;
 `;
 
 const Message = styled.p`
-  font-size: 18px;
-  color: gray;
+  display: flex;
+  flex-direction: row;
+  font-size: 19px;
+  font-weight: 500;
+  gap: 10px;
 `;
 
-function ProfileSection() {
-  const [image, setImage] = useState<string | null>(null);
-  const [nickname, setNickname] = useState<string>('닉네임 없음');
-  const [statusMessage, setStatusMessage] =
-    useState<string>('상태 메시지 없음');
-  const [school, setSchool] = useState<string>('학교 정보 없음');
-  const [department, setDepartment] = useState<string>('학과 정보 없음');
-  const [grade, setGrade] = useState<string>('학년 정보 없음');
+const ModifyMessage = styled.img`
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+`;
+const EnterIcon = styled.img`
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+`;
 
-  // 🔹 localStorage에서 signupData를 파싱하여 상태 업데이트
-  useEffect(() => {
-    const storedData = localStorage.getItem('signupData');
-    if (storedData) {
-      try {
-        const data = JSON.parse(storedData);
-        setImage(data.profilePhoto || null);
-        setNickname(data.nickname || '닉네임 없음');
-        setStatusMessage(data.statusMessage || '상태 메시지 없음');
-        setSchool(data.selectedSchool || '학교 정보 없음');
-        setDepartment(data.selectedDepartment || '학과 정보 없음');
-        setGrade(data.grade || '학년 정보 없음');
-      } catch (error) {
-        console.error('로컬스토리지 데이터 파싱 오류:', error);
-      }
-    }
-  }, []);
+const InputBox = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid #ccc;
+  padding: 5px;
+  border-radius: 5px;
 
-  // 🔹 프로필 사진 업로드 시 localStorage에 저장(추가 수정 가능)
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const imageData = reader.result as string;
-        setImage(imageData);
-        // 기존 signupData에 profilePhoto만 업데이트하는 예시
-        const storedData = localStorage.getItem('signupData');
-        if (storedData) {
-          const data = JSON.parse(storedData);
-          data.profilePhoto = imageData;
-          localStorage.setItem('signupData', JSON.stringify(data));
-        } else {
-          localStorage.setItem('profileImage', imageData);
-        }
-      };
-      reader.readAsDataURL(file);
+  input {
+    border: none;
+    outline: none;
+    font-size: 17px;
+    flex: 1;
+  }
+`;
+
+interface ProfileProps {
+  profileData: any;
+}
+
+const ProfileSection: React.FC<ProfileProps> = ({ profileData }) => {
+  const [statusMessage, setStatusMessage] = useState(
+    profileData.statusMessage || '상태 메시지 없음'
+  );
+  const [isEditing, setIsEditing] = useState(false);
+  const [profileImage, setProfileImage] = useState(profileData.profileImageUrl);
+
+  const handleUpdateMessage = async () => {
+    try {
+      await axiosInstance.patch(
+        `/api/user/status?statusMessage=${statusMessage}`
+      );
+      setIsEditing(false);
+    } catch (error) {
+      console.error('상태 메시지 업데이트 실패:', error);
     }
   };
 
   return (
     <ProfileContainer>
-      {/* 🔹 프로필 사진 */}
-      <ProfilePicture htmlFor="file-upload">
-        {image ? (
-          <UploadIcon src={image} alt="프로필 사진" />
-        ) : (
-          <UploadText>프로필 사진 업로드</UploadText>
-        )}
-      </ProfilePicture>
-      <input
-        id="file-upload"
-        type="file"
-        accept="image/*"
-        style={{ display: 'none' }}
-        onChange={handleImageUpload}
+      {/* ProfileUpload 컴포넌트 사용*/}
+      <ProfileUpload
+        profilePhoto={profileImage}
+        onPhotoChange={setProfileImage}
+        size={300}
+        title="프로필 사진 변경"
       />
 
-      {/* 🔹 사용자 정보 */}
       <InfoBox>
-        <Nickname>{nickname}</Nickname>
-        <Message>{statusMessage}</Message>
-        <InfoText>학교: {school}</InfoText>
-        <InfoText>학과: {department}</InfoText>
-        <InfoText>학년: {grade}</InfoText>
+        <Nickname>{profileData.nickname || '닉네임 없음'}</Nickname>
+        <Message>
+          {isEditing ? (
+            <InputBox>
+              <input
+                type="text"
+                value={statusMessage}
+                onChange={(e) => setStatusMessage(e.target.value)}
+                onBlur={handleUpdateMessage}
+                onKeyDown={(e) => e.key === 'Enter' && handleUpdateMessage()}
+                autoFocus
+              />
+              <EnterIcon
+                src={enterIcon}
+                alt="입력 완료"
+                onClick={handleUpdateMessage}
+              />
+            </InputBox>
+          ) : (
+            <>
+              {statusMessage}
+              <ModifyMessage
+                src={pencilIcon}
+                alt="수정"
+                onClick={() => setIsEditing(true)}
+              />
+            </>
+          )}
+        </Message>
+
+        <InfoText>친구: {profileData.friendCount}</InfoText>
+        <InfoText>진행 중인 과제: {profileData.ongoingTasks}</InfoText>
       </InfoBox>
     </ProfileContainer>
   );
-}
+};
 
 export default ProfileSection;

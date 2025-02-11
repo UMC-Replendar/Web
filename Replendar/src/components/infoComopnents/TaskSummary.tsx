@@ -1,6 +1,7 @@
-import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-
+import styled from 'styled-components';
+import workedIcon from '../../assets/images/Worked.svg';
+import taskIcon from '../../assets/images/InfoIcons/Task.svg';
 const SummaryContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -44,27 +45,13 @@ const TaskText = styled.div`
   color: #666666;
   font-size: 28px;
   font-weight: 500;
-  line-height: 39.2px;
-  font-family: Pretendard, sans-serif;
 `;
 
 const TaskCount = styled.div`
-  align-self: stretch;
   text-align: right;
   color: #666666;
   font-size: 28px;
   font-weight: 500;
-  line-height: 39.2px;
-  font-family: Pretendard, sans-serif;
-`;
-
-const IconContainer = styled.div`
-  width: 40px;
-  height: 40px;
-  padding: 2.33px 4.28px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 
 const Icon = styled.img`
@@ -72,61 +59,48 @@ const Icon = styled.img`
   height: 30px;
 `;
 
-function TaskSummary() {
+interface TaskSummaryProps {
+  taskData: any;
+}
+
+const TaskSummary: React.FC<TaskSummaryProps> = ({ taskData }) => {
   const navigate = useNavigate();
 
   return (
     <SummaryContainer>
-      <SummaryButton onClick={() => navigate('/completed')}>
-        <IconContainer>
-          <Icon src="src/assets/images/Worked.svg" alt="Completed Task Icon" />
-        </IconContainer>
+      <SummaryButton onClick={() => navigate('/info/completed')}>
+        <Icon src={workedIcon} alt="Completed Task Icon" />
         <TaskContainer>
           <TaskText>완료한 과제</TaskText>
-          <TaskCount>22</TaskCount>
+          <TaskCount>{taskData.completed_TasksCount}</TaskCount>
         </TaskContainer>
       </SummaryButton>
 
-      <SummaryButton onClick={() => navigate('/stored')}>
-        <IconContainer>
-          <Icon
-            src="src/assets/images/InfoIcons/Task.svg"
-            alt="Stored Task Icon"
-          />
-        </IconContainer>
+      <SummaryButton onClick={() => navigate('/info/stored')}>
+        <Icon src={taskIcon} alt="Stored Task Icon" />
         <TaskContainer>
           <TaskText>보관한 과제</TaskText>
-          <TaskCount>3</TaskCount>
+          <TaskCount>{taskData.store_TasksCount}</TaskCount>
         </TaskContainer>
       </SummaryButton>
 
-      <SummaryButton onClick={() => navigate('/notcompleted')}>
-        <IconContainer>
-          <Icon
-            src="src/assets/images/InfoIcons/Task.svg"
-            alt="Incomplete Task Icon"
-          />
-        </IconContainer>
+      <SummaryButton onClick={() => navigate('/info/notcompleted')}>
+        <Icon src={taskIcon} alt="Incomplete Task Icon" />
         <TaskContainer>
           <TaskText>미완료 과제</TaskText>
-          <TaskCount>3</TaskCount>
+          <TaskCount>{taskData.not_completedTasksCount}</TaskCount>
         </TaskContainer>
       </SummaryButton>
 
-      <SummaryButton onClick={() => navigate('/important')}>
-        <IconContainer>
-          <Icon
-            src="src/assets/images/InfoIcons/Task.svg"
-            alt="Important Task Icon"
-          />
-        </IconContainer>
+      <SummaryButton onClick={() => navigate('/info/important')}>
+        <Icon src={taskIcon} alt="Important Task Icon" />
         <TaskContainer>
           <TaskText>중요한 과제</TaskText>
-          <TaskCount>3</TaskCount>
+          <TaskCount>{taskData.important_taskCount}</TaskCount>
         </TaskContainer>
       </SummaryButton>
     </SummaryContainer>
   );
-}
+};
 
 export default TaskSummary;

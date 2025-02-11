@@ -58,12 +58,22 @@ const Select = styled.select`
   margin-left: 30px;
 `;
 
+interface School {
+  id: number;
+  name: string;
+}
+
+interface Department {
+  id: number;
+  name: string;
+}
+
 interface SchoolInfoFormProps {
-  selectedSchool: string;
-  selectedDepartment: string;
+  selectedSchool: School | null;
+  selectedDepartment: Department | null;
   grade: string;
-  onSchoolChange: (school: string) => void;
-  onDepartmentChange: (dept: string) => void;
+  onSchoolChange: (school: School) => void;
+  onDepartmentChange: (dept: Department) => void;
   onGradeChange: (grade: string) => void;
 }
 
@@ -77,25 +87,23 @@ const SchoolInfoForm: React.FC<SchoolInfoFormProps> = ({
 }) => {
   const { openModal } = useModalStore();
 
-  // 학교 모달 열기 및 선택 처리
   const handleOpenSchoolModal = () => {
     openModal(
-      <SchoolSearchModal onSelect={(school) => onSchoolChange(school)} />
+      <SchoolSearchModal
+        onSelect={(schoolName: string) => {
+          onSchoolChange({ id: 0, name: schoolName }); // ID 없이 이름만 설정
+          onDepartmentChange({ id: 0, name: '' }); // 학과 초기화
+        }}
+      />
     );
   };
 
-  // 학과 모달 열기 및 선택 처리 (선택된 학교가 있어야 함)
   const handleOpenDepartmentModal = () => {
     if (!selectedSchool) {
       alert('먼저 학교를 선택해주세요.');
       return;
     }
-    openModal(
-      <DepartmentSearchModal
-        selectedSchool={selectedSchool}
-        onSelect={(dept) => onDepartmentChange(dept)}
-      />
-    );
+    openModal(<DepartmentSearchModal />);
   };
 
   return (
@@ -108,7 +116,7 @@ const SchoolInfoForm: React.FC<SchoolInfoFormProps> = ({
           <Input
             type="text"
             placeholder="학교 검색은 버튼을 클릭하세요."
-            value={selectedSchool}
+            value={selectedSchool ? selectedSchool.name : ''}
             disabled
           />
           <Button onClick={handleOpenSchoolModal}>검색하기</Button>
@@ -119,7 +127,7 @@ const SchoolInfoForm: React.FC<SchoolInfoFormProps> = ({
           <Input
             type="text"
             placeholder="학과 검색은 버튼을 클릭하세요."
-            value={selectedDepartment}
+            value={selectedDepartment ? selectedDepartment.name : ''}
             disabled
           />
           <Button onClick={handleOpenDepartmentModal}>검색하기</Button>

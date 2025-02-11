@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import useModalStore from '../store/modalStore';
+import { axiosInstance } from '../apis/axios-instance';
+import useSchoolStore from '../store/schoolStore';
+import SchoolRegisterModal from './SchoolRegisterModal';
 
 const ModalWrapper = styled.div`
   padding: 20px;
@@ -25,6 +28,7 @@ const SearchButton = styled.button`
   color: black;
   border: none;
   border-radius: 5px;
+  cursor: pointer;
 `;
 
 const SchoolList = styled.ul`
@@ -48,7 +52,6 @@ const SelectButton = styled.button`
   border-radius: 5px;
   cursor: pointer;
 `;
-
 const RegisterOption = styled.p`
   margin-top: 20px;
   font-size: 14px;
@@ -64,19 +67,71 @@ const RegisterButton = styled.button`
   margin-left: 10px;
 `;
 
-interface SchoolSearchModalProps {
-  onSelect: (school: string) => void;
-}
-
-const SchoolSearchModal: React.FC<SchoolSearchModalProps> = ({ onSelect }) => {
-  const { closeModal } = useModalStore();
+const SchoolSearchModal: React.FC<{ onSelect: (school: string) => void }> = ({
+  onSelect,
+}) => {
+  const { openModal, closeModal } = useModalStore();
+  const { schools, setSchools, setSelectedSchool } = useSchoolStore();
   const [searchTerm, setSearchTerm] = useState('');
-  const schools = ['룡산머학교', '서울대학교', '부산대학교'];
+  const [loading, setLoading] = useState(false);
 
-  // 학교 선택 시 동작하는 함수
-  const handleSelectSchool = (school: string) => {
-    alert(`${school}를 선택하였습니다.`);
-    onSelect(school); // 부모 컴포넌트로 선택된 학교 전달
+  useEffect(() => {
+    const fetchSchools = async () => {
+      setLoading(true);
+      try {
+        const response = await axiosInstance.get<{
+          isSuccess: boolean;
+          code: string;
+          message: string;
+          result: { id: number; schoolName: string }[];
+        }>('/api/schools');
+        console.log('API 응답 데이터:', response.data.result);
+
+        const formattedSchools = response.data.result.map((school) => ({
+          id: school.id,
+          name: school.schoolName,
+        }));
+
+        setSchools(formattedSchools);
+      } catch (error) {
+        console.error('학교 목록 불러오기 오류:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSchools();
+  }, [setSchools]);
+
+  const handleSearch = async () => {
+    if (!searchTerm.trim()) return;
+
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get<{
+        isSuccess: boolean;
+        code: string;
+        message: string;
+        result: { id: number; schoolName: string }[];
+      }>(`/api/schools?keyword=${searchTerm}`);
+
+      const formattedSchools = response.data.result.map((school) => ({
+        id: school.id,
+        name: school.schoolName,
+      }));
+
+      setSchools(formattedSchools);
+    } catch (error) {
+      console.error('학교 검색 중 오류 발생:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSelectSchool = (school: { id: number; name: string }) => {
+    alert(`${school.name} 를 선택하였습니다.`);
+    setSelectedSchool(school);
+    onSelect(school.name);
     closeModal();
   };
 
@@ -89,22 +144,23 @@ const SchoolSearchModal: React.FC<SchoolSearchModalProps> = ({ onSelect }) => {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <SearchButton>검색</SearchButton>
+      <SearchButton onClick={handleSearch}>검색</SearchButton>
+      {loading && <p>검색 중...</p>}
       <SchoolList>
-        {schools
-          .filter((school) => school.includes(searchTerm))
-          .map((school, index) => (
-            <SchoolItem key={index}>
-              {school}
-              <SelectButton onClick={() => handleSelectSchool(school)}>
-                선택하기
-              </SelectButton>
-            </SchoolItem>
-          ))}
+        {schools.map((school) => (
+          <SchoolItem key={school.id}>
+            {school.name}
+            <SelectButton onClick={() => handleSelectSchool(school)}>
+              선택하기
+            </SelectButton>
+          </SchoolItem>
+        ))}
       </SchoolList>
       <RegisterOption>
         찾으시는 학교가 없나요?
-        <RegisterButton>등록하기</RegisterButton>
+        <RegisterButton onClick={() => openModal(<SchoolRegisterModal />)}>
+          등록하기
+        </RegisterButton>
       </RegisterOption>
     </ModalWrapper>
   );
