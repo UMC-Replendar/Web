@@ -1,32 +1,65 @@
-import { useEffect } from 'react';
 import { create } from 'zustand';
+import useAuthStore from './authStore';
+import axios from 'axios';
 
-interface Task {
+export interface Task {
   assignmentId: number;
-  color: string;
-  name: string;
-  deadline: string;
-  remainingTime: string;
-  isToggled: boolean;
-  isBookmarked: boolean;
+  title: string;
+  endDate: string;
+  notification: 'ON' | 'OFF';
+  visibility: 'ON' | 'OFF';
+  notifyCycle: string[];
+  shareIds: number[];
   memo: string;
+  favorite: 'ACTIVE' | 'INACTIVE';
+  originAssId: number | null;
+  lectureAssignmentId: number | null;
 }
 
 interface TaskStore {
   tasks: Task[];
-  addTask: (task: Task) => void;
-  deleteTask: (assignmentId: number) => void;
-  toggleBookmark: (assignmentId: number) => void;
-  editTask: (assignmentId: number, updatedTask: Partial<Task>) => void;
-  updateRemainingTimes: () => void;
+  setTasks: (tasks: Task[]) => void; // 전체 과제 목록 업데이트
+  addTask: (taskData: Omit<Task, 'assignmentId'>) => Promise<Task>; // 새로운 과제 추가
+  updateTask: (updatedTask: Task) => void; // 특정 과제 수정
+  deleteTask: (assignmentId: number) => void; // 특정 과제 삭제
+  completeTask: (assignmentId: number) => Promise<void>; // 특정 과제 완료 처리
+  fetchTasks: (userId: number) => Promise<void>; // 로그인, 강제 새로고침 할 때 실행
 }
 
 const useTaskStore = create<TaskStore>((set) => ({
   tasks: [],
 
-  addTask: (task) =>
+  setTasks: (tasks) => set({ tasks }),
+
+  addTask: async (taskData) => {
+    const { token } = useAuthStore.getState();
+
+    try {
+      const { data: newTask } = await axios.post(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment`,
+        taskData,
+        {
+          headers: { Authorization: `${token}` },
+        }
+      );
+
+      set((state) => ({
+        tasks: [...state.tasks, newTask],
+      }));
+
+      return newTask;
+    } catch (error) {
+      console.error('과제 추가 중 오류 발생:', error);
+      alert('과제 추가 처리 중 문제가 발생했습니다.');
+      throw error;
+    }
+  },
+
+  updateTask: (updatedTask) =>
     set((state) => ({
-      tasks: [...state.tasks, task],
+      tasks: state.tasks.map((task) =>
+        task.assignmentId === updatedTask.assignmentId ? updatedTask : task
+      ),
     })),
 
   deleteTask: (assignmentId) =>
@@ -34,58 +67,53 @@ const useTaskStore = create<TaskStore>((set) => ({
       tasks: state.tasks.filter((task) => task.assignmentId !== assignmentId),
     })),
 
-  toggleBookmark: (assignmentId) =>
-    set((state) => ({
-      tasks: state.tasks.map((task) =>
-        task.assignmentId === assignmentId
-          ? { ...task, isBookmarked: !task.isBookmarked }
-          : task
-      ),
-    })),
-
-  editTask: (assignmentId, updatedTask) =>
-    set((state) => ({
-      tasks: state.tasks.map((task) =>
-        task.assignmentId === assignmentId ? { ...task, ...updatedTask } : task
-      ),
-    })),
-
-  updateRemainingTimes: () =>
-    set((state) => {
-      const updatedTasks = state.tasks.map((task) => {
-        const deadlineDate = new Date(task.deadline);
-        const now = new Date();
-        const diffMs = deadlineDate.getTime() - now.getTime();
-
-        if (diffMs <= 0) {
-          return { ...task, remainingTime: '제출 마감' };
+  completeTask: async (assId) => {
+    const { token } = useAuthStore.getState();
+    try {
+      await axios.patch(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignemnt/complete/${assId}`,
+        {},
+        {
+          headers: { Authorization: `${token}` },
         }
+      );
 
-        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((diffMs / (1000 * 60)) % 60);
-        const seconds = Math.floor((diffMs / 1000) % 60);
+      set((state) => ({
+        tasks: state.tasks.filter((task) => task.assignmentId !== assId),
+      }));
 
-        return {
-          ...task,
-          remainingTime: `${days}d ${hours}h ${minutes}m ${seconds}s`,
-        };
-      });
+      console.log(`과제 완료 처리 성공: ${assId}`);
+    } catch (error) {
+      console.error('과제 완료 처리 중 오류 발생:', error);
+      alert('과제 완료 처리 중 문제가 발생했습니다.');
+    }
+  },
 
-      return { tasks: [...updatedTasks] }; // 새로운 배열 반환
-    }),
+  // editTask: (assignmentId, updatedTask) =>
+  //   set((state) => ({
+  //     tasks: state.tasks.map((task) =>
+  //       task.assignmentId === assignmentId ? { ...task, ...updatedTask } : task
+  //     ),
+  //   })),
+
+  fetchTasks: async (userId) => {
+    const { token } = useAuthStore.getState();
+
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment?userId=${userId}`,
+        {
+          headers: { Authorization: `${token}` },
+        }
+      );
+      set({ tasks: response.data });
+
+      console.log('과제 목록 불러오기 성공:', response.data);
+    } catch (error) {
+      console.error('과제 목록을 불러오는 중 오류 발생:', error);
+      alert(`과제 목록을 불러오는 중 문제가 발생했습니다.`);
+    }
+  },
 }));
 
 export default useTaskStore;
-
-export const useTaskUpdater = () => {
-  const updateRemainingTimes = useTaskStore(
-    (state) => state.updateRemainingTimes
-  );
-
-  useEffect(() => {
-    updateRemainingTimes();
-    const interval = setInterval(updateRemainingTimes, 1000);
-    return () => clearInterval(interval);
-  }, [updateRemainingTimes]);
-};

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import AddTaskModal from '../modal/AddTaskModal';
 import CustomCalendar from '../components/OngoingComponents/CustomCalendar';
@@ -7,9 +7,9 @@ import DownArrowIcon from '../assets/images/DownArrowIcon.svg';
 import UpArrowIcon from '../assets/images/UpArrowIcon.svg';
 import EditTaskModal from '../modal/EditTaskModal';
 import useModalStore from '../store/modalStore';
-// import useTaskStore from '../store/useTaskStore';
 import useAuthStore from '../store/authStore';
 import useGetData from '../hooks/useGetData';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
 const PageWrapper = styled.div`
@@ -163,32 +163,29 @@ const TaskCompleteButton = styled.button`
 `;
 
 interface TaskProps {
-  assignmentId: number;
-  color: string;
-  name: string;
-  remainingTime: string;
-  memo: string;
-  onComplete: () => void;
-  onEdit: () => void; // 수정 버튼 이벤트 추가
+  task: {
+    assignmentId: number;
+    color: string;
+    title: string;
+    due_date: string;
+    due_time: string;
+    memo: string;
+  };
+  onComplete: (assignmentId: number) => void;
+  onEdit: (task: TaskProps['task']) => void;
 }
 
-function TaskItem({
-  color,
-  name,
-  remainingTime,
-  onComplete,
-  onEdit,
-}: TaskProps) {
+function TaskItem({ task, onComplete, onEdit }: TaskProps) {
   return (
-    <TaskBlockContainer onClick={onEdit}>
-      <TaskBlock color={color}>
-        <TaskInfo>{name}</TaskInfo>
-        <TaskInfo>{remainingTime}</TaskInfo>
+    <TaskBlockContainer onClick={() => onEdit(task)}>
+      <TaskBlock color={task.color}>
+        <TaskInfo>{task.title}</TaskInfo>
+        <TaskInfo>{task.due_time}</TaskInfo>
       </TaskBlock>
       <TaskCompleteButton
         onClick={(e) => {
           e.stopPropagation(); // 이벤트 버블링 방지
-          onComplete();
+          onComplete(task.assignmentId);
         }}
       >
         완료
@@ -198,25 +195,21 @@ function TaskItem({
 }
 
 function OngoingTasks() {
-  // const { tasks, setTasks, deleteTask, updateRemainingTimes } = useTaskStore(); // Zustand에서 상태 가져오기
-  const { isOpen, openModal, closeModal, modalContent } = useModalStore(); // useModalStore 추가했어요요
+  const { isOpen, openModal, closeModal, modalContent } = useModalStore();
   const { token } = useAuthStore();
+  const queryClient = useQueryClient();
 
   const storedUserId = localStorage.getItem('id');
   const userId = storedUserId ? parseInt(storedUserId, 10) : null; // integer
+
+  // 진행 중인 과제 데이터 가져오기
   const {
     data: tasks = [],
     isLoading,
     isError,
   } = useGetData(`/api/assignment?userId=${userId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `${token}` },
   });
-
-  useEffect(() => {
-    console.log('과제 목록:', tasks);
-  }, [tasks]);
 
   const [visibleTasksCount, setVisibleTasksCount] = useState(3);
 
@@ -224,30 +217,24 @@ function OngoingTasks() {
     setVisibleTasksCount((prev) => (prev < tasks.length ? tasks.length : 3));
   };
 
-  const [taskList, setTaskList] = useState(tasks);
-
-  useEffect(() => {
-    setTaskList(tasks);
-  }, [tasks]);
-
-  const handleCompleteTask = async (assignmentId: number) => {
-    try {
+  // 과제 완료 처리
+  const completeTaskMutation = useMutation({
+    mutationFn: async (assId: number) => {
       await axios.patch(
-        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment/complete/${assignmentId}`,
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment/complete/${assId}`,
         {},
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `${token}` },
         }
       );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', userId] }); // 과제 목록 갱신
+    },
+  });
 
-      // 진행 중인 과제 목록에서 제거
-      setTaskList((prevTasks: any[]) =>
-        prevTasks.filter((task) => task.assignmentId !== assignmentId)
-      );
-    } catch (error) {
-      console.error('과제 완료 처리 중 오류 발생:', error);
-      alert('과제 완료 처리 중 문제가 발생했습니다.');
-    }
+  const handleCompleteTask = (assId: number) => {
+    completeTaskMutation.mutate(assId);
   };
 
   const handleEditTask = (task: any) => {
@@ -255,7 +242,7 @@ function OngoingTasks() {
       <EditTaskModal
         task={task}
         onClose={closeModal}
-        onComplete={() => handleCompleteTask(task.assignmentId)}
+        onComplete={() => handleCompleteTask(task)}
       />
     );
   };
@@ -283,7 +270,11 @@ function OngoingTasks() {
             onClick={() =>
               openModal(
                 <AddTaskModal
-                  onTaskAdded={() => console.log('과제가 추가되었습니다.')}
+                  onTaskAdded={() =>
+                    queryClient.invalidateQueries({
+                      queryKey: ['tasks', userId],
+                    })
+                  }
                 />
               )
             }
@@ -292,19 +283,17 @@ function OngoingTasks() {
             <img src={PlusIcon} alt="Plus Icon" />
           </AddButton>
 
-          {taskList.length > 3 && (
+          {tasks.length > 3 && (
             <More onClick={handleShowMore}>
-              {visibleTasksCount === taskList.length ? '닫기' : '더보기'}
+              {visibleTasksCount === tasks.length ? '닫기' : '더보기'}
               <img
                 src={
-                  visibleTasksCount === taskList.length
+                  visibleTasksCount === tasks.length
                     ? UpArrowIcon
                     : DownArrowIcon
                 }
                 alt={
-                  visibleTasksCount === taskList.length
-                    ? 'Up Arrow'
-                    : 'Down Arrow'
+                  visibleTasksCount === tasks.length ? 'Up Arrow' : 'Down Arrow'
                 }
               />
             </More>
@@ -312,29 +301,27 @@ function OngoingTasks() {
         </div>
       </MainPageTitleWrapper>
 
-      <TaskBox $isScrollable={taskList.length > 10}>
-        {taskList
-          .slice(0, visibleTasksCount)
-          .map((task: any, index: number) => (
-            <TaskItem
-              key={task.assignmentId}
-              assignmentId={task.assignmentId}
-              color={index < 4 ? taskColors[index] : '#7AC19A'} // 5번째 과제부터 #7AC19A 적용
-              name={task.title}
-              remainingTime={task.due_time}
-              memo={task.memo}
-              onComplete={() => handleCompleteTask(task.assignmentId)}
-              onEdit={() => handleEditTask(task)}
-            />
-          ))}
+      <TaskBox $isScrollable={tasks.length > 10}>
+        {tasks.slice(0, visibleTasksCount).map((task: any, index: number) => (
+          <TaskItem
+            key={task.assignmentId}
+            task={{
+              ...task,
+              color: index < 4 ? taskColors[index] : '#7AC19A',
+            }}
+            onComplete={handleCompleteTask}
+            onEdit={() => handleEditTask(task.assignmentId)}
+          />
+        ))}
       </TaskBox>
 
       <CustomCalendar
-        tasks={taskList.map((task: any) => ({
+        tasks={tasks.map((task: any) => ({
           name: task.title,
           deadline: task.due_date,
         }))}
       />
+
       {isOpen && modalContent}
     </PageWrapper>
   );
