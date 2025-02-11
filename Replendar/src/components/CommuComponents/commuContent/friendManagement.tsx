@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import DownArrow from '../../../assets/images/downArrow.svg';
 import UpArrow from '../../../assets/images/upArrow.svg';
 import { AddButton } from '../../../pages/OngoingTasks';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { PlusIcon } from '../commuIcons';
 import FriendListRender from '../friendListRender';
 import useModalStore from '../../../store/modalStore';
@@ -10,15 +10,19 @@ import AddGroup from '../modalContents/addGroup';
 import MakeGroup from '../modalContents/makeGroup';
 import useGetData from '../../../hooks/useGetData';
 import { IGroupList } from '../../../types';
-import useFriendsStore from '../../../store/useFriendStore';
+import Minus from '../../../assets/images/minus.svg';
+import { useMutation } from '@tanstack/react-query';
+import { deleteGroup } from '../../../apis/commuApi';
+import { useQueryClient } from '@tanstack/react-query';
 
-const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
+const FriendManagement = () => {
   //expand mq없는 듯
   const { openModal } = useModalStore();
-  const { updateFriendsData, isFriendModalOpen } = useFriendsStore();
 
-  const handleAddGroup = () => {
-    openModal(<AddGroup />);
+  const queryClient = useQueryClient();
+
+  const handleAddGroup = (groupId: number) => {
+    openModal(<AddGroup groupId={groupId} />);
   };
   const handleMakeGroup = () => {
     openModal(<MakeGroup />);
@@ -33,6 +37,20 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
   };
 
   const { data, isLoading, isError } = useGetData(`/api/friend-groups`);
+
+  const DeleteGroupMutation = useMutation({
+    mutationFn: (groupId: number) => deleteGroup(groupId),
+    onSuccess: (data) => {
+      alert(data);
+      queryClient.invalidateQueries({
+        queryKey: [`/api/friend-groups`],
+      });
+    },
+    onError: (error: Error) => {
+      alert('친구 요청을 보내는 데 실패했습니다.');
+      console.error(error);
+    },
+  });
 
   const [showGroups, setShowGroups] = useState<boolean[]>(
     new Array(data.length).fill(false)
@@ -55,7 +73,7 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
         </AddButton>
       </AddButtonDiv>
 
-      {data.map((group: IGroupList, index: number) => (
+      {data.map((group: IGroupList) => (
         <div key={group.groupId}>
           <SpaceBtwDiv
             status={
@@ -76,18 +94,26 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
             </FlexDiv>
 
             {showGroups[group.groupId] && (
-              <FlexDiv onClick={handleAddGroup}>
-                그룹에 추가하기 <PlusIcon fill="white" />
+              <FlexDiv gap="50px">
+                <FlexDiv
+                  onClick={() => DeleteGroupMutation.mutate(group.groupId)}
+                >
+                  그룹 삭제하기<img src={Minus} alt="MinusIcon"></img>
+                </FlexDiv>
+                <FlexDiv onClick={() => handleAddGroup(group.groupId)}>
+                  그룹에 추가하기 <PlusIcon fill="white" />
+                </FlexDiv>
               </FlexDiv>
             )}
           </SpaceBtwDiv>
           {showGroups[group.groupId] && (
-            <FlexDiv>
+            <ListRenderContatiner>
               <FriendListRender
                 data={group.friends}
                 queryKey="/api/friend-groups"
+                groupId={group.groupId}
               />
-            </FlexDiv>
+            </ListRenderContatiner>
           )}
         </div>
       ))}
@@ -106,7 +132,6 @@ const AddButtonDiv = styled.div`
 `;
 const Container = styled.div`
   width: 100%;
-  height: 855px;
   padding: 20px;
   overflow-y: auto;
 `;
@@ -129,27 +154,14 @@ const SpaceBtwDiv = styled.div<{ status: string }>`
   }
 `;
 
-const FlexDiv = styled.div`
+const FlexDiv = styled.div<{ gap?: string }>`
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: ${(props) => props.gap};
 `;
-//임시데이터
-const data = [
-  { groupName: '그룹1' },
-  { groupName: '그룹2' },
-  { groupName: '그룹3' },
-  { groupName: '그룹4' },
-  { groupName: '그룹5' },
-  { groupName: '그룹6' },
-  { groupName: '그룹7' },
-  { groupName: '그룹8' },
-  { groupName: '그룹9' },
-  { groupName: '그룹10' },
-  { groupName: '그룹5' },
-  { groupName: '그룹6' },
-  { groupName: '그룹7' },
-  { groupName: '그룹8' },
-  { groupName: '그룹9' },
-  { groupName: '그룹10' },
-];
+
+const ListRenderContatiner = styled.div`
+  display: flex;
+  flex-direction: column;
+`;

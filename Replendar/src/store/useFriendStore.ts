@@ -89,6 +89,7 @@ const useFriendsStore = create<FriendsStore>((set, get) => ({
       friendshipIds: [],
       nicknames: [],
       friendData: [],
+      isFriendModalOpen: false,
     }),
 
   isFriendModalOpen: false,

@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { NineDots } from '../CommuComponents/commuIcons';
 import useGetData from '../../hooks/useGetData';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { SmallToggleSwitch } from '../../modal/EditTaskModal';
 import { ProfileImage } from '../CommuComponents/commuIcons';
 import { IFriendList } from '../../types';
@@ -11,11 +11,15 @@ import {
   deleteFriend,
   patchNote,
 } from '../../apis/commuApi';
+import BlueButton from '../blueButton';
+import { groupDeleteFriend } from '../../apis/commuApi';
+import CustomCalendar from '../OngoingComponents/CustomCalendar';
 
 const FriendListRender: React.FC<{
   data: IFriendList[]; // 데이터는 props로 전달
   queryKey: string;
-}> = ({ data, queryKey }) => {
+  groupId?: number;
+}> = ({ data, queryKey, groupId }) => {
   // props로 data를 받음
   const queryClient = useQueryClient();
 
@@ -31,6 +35,7 @@ const FriendListRender: React.FC<{
 
   const [isEditing, setIsEditing] = useState(false);
   const [updatedNote, setUpdatedNote] = useState<string>('');
+  const [calendarShow, setCalendarShow] = useState(false);
 
   const bestFriendmutation = useMutation({
     mutationFn: ({
@@ -88,6 +93,32 @@ const FriendListRender: React.FC<{
       : ''
   );
 
+  const { data: tasks } = useGetData(
+    calendarShow
+      ? `/api/assignment/friend/${modalState.selectedId}/public-assignments`
+      : ''
+  );
+
+  const groupDeleteFriendMutation = useMutation({
+    mutationFn: ({
+      groupId,
+      friendshipId,
+    }: {
+      groupId: number;
+      friendshipId: number;
+    }) => groupDeleteFriend({ groupId, friendshipId }),
+
+    onSuccess: (data) => {
+      alert(data);
+      queryClient.invalidateQueries({ queryKey: [`/api/friend-groups`] });
+    },
+
+    onError: (error: Error) => {
+      alert('그룹에 친구 추가하기 실패했습니다');
+      console.error(error);
+    },
+  });
+
   const hasData = Array.isArray(noteData) && noteData.length > 0;
   const memo = hasData ? noteData[0].note : null;
 
@@ -103,6 +134,7 @@ const FriendListRender: React.FC<{
   };
 
   const handleNineDotsClick = (id: number) => {
+    setCalendarShow(false);
     setModalState((prev) => ({
       isOpen: prev.selectedId !== id || !prev.isOpen,
       selectedId: prev.selectedId === id ? null : id,
@@ -110,10 +142,36 @@ const FriendListRender: React.FC<{
     }));
   };
   return (
-    <Container>
+    <>
       {data.length === 0 && <div>친구 없음</div>}
       {data.map((item: IFriendList, index: number) => (
         <div key={item.friendId}>
+          {calendarShow && modalState.selectedId && tasks.length > 0 && (
+            <>
+              <StyledModal>
+                <FlexStartDiv>
+                  <ProfileImage width={'30'} height={'30'} />
+
+                  <CenterDiv width="100px" bold>
+                    {item.nickname}
+                  </CenterDiv>
+
+                  <CenterDiv bold>
+                    진행 중인 과제: {item.ongoingAssignments}개
+                  </CenterDiv>
+                </FlexStartDiv>
+                <CloseButton onClick={() => setCalendarShow(false)}>
+                  닫기
+                </CloseButton>
+                <CustomCalendar
+                  tasks={tasks.map((task: any) => ({
+                    name: task.title,
+                    deadline: task.due_date,
+                  }))}
+                />
+              </StyledModal>
+            </>
+          )}
           <SpaceBtwDiv>
             <FlexDiv>
               <ProfileImage width={'30'} height={'30'} />
@@ -123,6 +181,19 @@ const FriendListRender: React.FC<{
 
             <CenterDiv>진행 중인 과제: {item.ongoingAssignments}개</CenterDiv>
             <RightAlignedItem>
+              {groupId && (
+                <BlueButton
+                  status="그룹에서 삭제하기"
+                  onClick={() =>
+                    groupDeleteFriendMutation.mutate({
+                      groupId: groupId,
+                      friendshipId: item.friendshipId,
+                    })
+                  }
+                >
+                  그룹에서 삭제하기
+                </BlueButton>
+              )}
               <NineDots
                 fill={
                   modalState.selectedId === item.friendId
@@ -140,7 +211,7 @@ const FriendListRender: React.FC<{
             >
               <ModalContent>
                 <span>진행중인 과제: {item.ongoingAssignments}개</span>
-                <div>일정확인</div>
+                <div onClick={() => setCalendarShow(true)}>일정확인</div>
               </ModalContent>
 
               <P>과제공유</P>
@@ -195,17 +266,36 @@ const FriendListRender: React.FC<{
           )}
         </div>
       ))}
-    </Container>
+    </>
   );
 };
 
 export default FriendListRender;
 
-const Container = styled.div`
-  width: 100%;
-  height: 855px;
+const StyledModal = styled.div`
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
   padding: 20px;
-  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  z-index: 1000;
+  min-width: 300px;
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+  &:hover {
+    color: rgba(57, 130, 226, 1);
+  }
 `;
 
 const SpaceBtwDiv = styled.div`
@@ -213,7 +303,7 @@ const SpaceBtwDiv = styled.div`
   position: relative;
   gap: 100px; /* 갭 조정 */
   width: 100%;
-  font-size: 19px;
+
   height: 67px;
   background: white;
   border-radius: 20px;
@@ -232,15 +322,16 @@ const RightAlignedItem = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 40px;
 `;
 
-const CenterDiv = styled.div<{ width?: string }>`
+const CenterDiv = styled.div<{ width?: string; bold?: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: ${(props) => props.width || 'auto'};
+  width: ${({ width }) => width || 'auto'};
+  font-weight: ${({ bold }) => (bold ? 'bold' : 'normal')};
 `;
-
 const FlexDiv = styled.div`
   img {
     width: 30px;
@@ -249,6 +340,17 @@ const FlexDiv = styled.div`
   }
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 20px;
+`;
+const FlexStartDiv = styled.div`
+  img {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+  }
+  display: flex;
+  justify-content: flex-start;
   align-items: center;
   gap: 20px;
 `;

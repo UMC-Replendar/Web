@@ -11,7 +11,7 @@ const friendRegister = () => {
   const [searchNickname, setSearchNickname] = useState('');
 
   //친구등록검색api호출
-  const { data, isLoading, isError } = useGetData(
+  const { data, isLoading } = useGetData(
     mq ? `/api/friends/search?nickname=${mq}` : ''
   );
 
@@ -19,7 +19,7 @@ const friendRegister = () => {
   const friendData = hasData ? data[0] : null;
 
   //친구요청api호출
-  const mutation = useMutation({
+  const sendFriendRequestMutation = useMutation({
     mutationFn: (friendId: number) => sendFriendRequest(friendId),
     onSuccess: () => {
       alert('친구 요청이 성공적으로 보내졌습니다.');
@@ -79,7 +79,9 @@ const friendRegister = () => {
             <FlexDiv>
               <SearchBtn
                 width={'134px'}
-                onClick={() => mutation.mutate(friendData.friendId)}
+                onClick={() =>
+                  sendFriendRequestMutation.mutate(friendData.friendId)
+                }
               >
                 친구요청
               </SearchBtn>
@@ -95,8 +97,7 @@ export default friendRegister;
 
 const Container = styled.div`
   width: 100%;
-
-  height: 855px;
+  padding: 20px;
 `;
 
 const FlexAlignStart = styled.div`

@@ -5,7 +5,8 @@ import { Task } from '../../../types';
 import useAuthStore from '../../../store/authStore';
 import { axiosInstance } from '../../../apis/axios-instance';
 import axios from 'axios';
-
+import { useNavigate } from 'react-router-dom';
+import taskIcon from '../../../assets/images/InfoIcons/Task.svg';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -100,12 +101,13 @@ const ImportantTaskPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { token } = useAuthStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchImportantTasks = async () => {
       if (!token) {
-        setError('로그인이 필요합니다.');
-        window.location.href = '/login';
+        alert('로그인이 필요합니다.');
+        navigate('/');
         return;
       }
 
@@ -146,44 +148,12 @@ const ImportantTaskPage: React.FC = () => {
     fetchImportantTasks();
   }, [token]);
 
-  useEffect(() => {
-    if (tasks.length === 0) {
-      console.log('예제 데이터 적용');
-      setTasks([
-        {
-          date: '2025-02-10',
-          StoredTaskdelay: undefined,
-          description: 'React 프로젝트 제출',
-          time: '12:00',
-          delay: '',
-          status: '미완료',
-        },
-        {
-          date: '2025-02-15',
-          StoredTaskdelay: undefined,
-          description: 'TypeScript 강의 듣기',
-          time: '12:00',
-          delay: '',
-          status: '미완료',
-        },
-        {
-          date: '2025-02-20',
-          StoredTaskdelay: undefined,
-          description: '스터디 리포트 작성',
-          time: '12:00',
-          delay: '',
-          status: '미완료',
-        },
-      ]);
-    }
-  }, [tasks]);
-
   if (loading) return <p>로딩 중...</p>;
   if (error) return <p>오류 발생: {error}</p>;
   return (
     <Container>
       <Wrapper>
-        <Image src="src/assets/images/Worked.svg" alt="Task Icon" />
+        <Image src={taskIcon} alt="Task Icon" />
         <Text>중요한 과제</Text>
       </Wrapper>
 
@@ -197,7 +167,7 @@ const ImportantTaskPage: React.FC = () => {
                   <TaskText>{task.time}</TaskText>
                   <TaskText>{task.description}</TaskText>
                 </TaskDetails>
-                <BlueButton status={task.status}>{task.status}</BlueButton>
+                <BlueButton status={undefined}>{task.status}</BlueButton>
               </TaskItem>
             </WhiteBox>
           );

@@ -127,7 +127,7 @@ const DepartmentSearchModal: React.FC = ({}) => {
         code: string;
         message: string;
         result: { id: number; majorName: string }[];
-      }>(`/api/majors?schoolId=${selectedSchoolId}&keyword=${searchTerm}`);
+      }>(`/api/major?schoolId=${selectedSchoolId}&keyword=${searchTerm}`);
 
       const formattedDepartments = response.data.result.map((dept) => ({
         id: dept.id,

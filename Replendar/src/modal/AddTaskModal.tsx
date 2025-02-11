@@ -406,7 +406,7 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
     if (JSON.stringify(data) !== JSON.stringify(friendData)) {
       setFriendData(data);
     }
-  }, [data]);
+  }, [data, openFriendModal]);
 
   useEffect(() => {
     resetFriends();

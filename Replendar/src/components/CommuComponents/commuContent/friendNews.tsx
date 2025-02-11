@@ -1,12 +1,16 @@
 import styled from 'styled-components';
-import { useState } from 'react';
 import BlueButton from '../../blueButton';
+import { useInView } from 'react-intersection-observer';
+import ClipLoader from 'react-spinners/ClipLoader';
+import { useGetInfiniteData } from '../../../hooks/useGetInfiniteData';
+import { useEffect } from 'react';
+import { IFriendNewsContent, IPage } from '../../../types';
+import useModalStore from '../../../store/modalStore';
+import AddTaskModal from '../../../modal/AddTaskModal';
 
 const Container = styled.div`
   width: 100%;
-  height: 855px;
   padding: 20px;
-  overflow-y: auto;
 `;
 
 const FlexDiv = styled.div`
@@ -39,76 +43,80 @@ const CenterDiv = styled.div`
   height: 67px;
 `;
 
-const FriendNews: React.FC<{ expanded: string }> = ({ expanded }) => {
-  const visibleItems = expanded === 'true' ? 20 : 5;
+const Scroll = styled.div`
+  width: 100vw;
+  height: 50px;
+  margin-top: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+`;
 
-  //임시데이터
-  const [registerStates, setRegisterStates] = useState<boolean[]>(
-    Array(data.length).fill(false)
-  );
+//time 오늘 날짜랑 계산해서 추가?
+const FriendNews: React.FC<{ expanded: string }> = () => {
+  const {
+    data,
+    isPending,
+    isError,
+    error,
+    isFetching,
+    hasNextPage,
+    fetchNextPage,
+  } = useGetInfiniteData(`/api/activity/friend`, 5);
 
-  const toggleRegister = (index: number) => {
-    setRegisterStates((prevStates) =>
-      prevStates.map((state, i) => (i === index ? !state : state))
-    );
-  };
+  const { ref, inView } = useInView({ threshold: 0 });
+
+  const { openModal } = useModalStore();
+
+  useEffect(() => {
+    if (inView) {
+      !isFetching && hasNextPage && fetchNextPage();
+    }
+  }, [isFetching, hasNextPage, fetchNextPage, inView]);
+
+  if (isPending) {
+    return <div>스켈레톤</div>;
+  }
+  if (isError) {
+    return <h1>{error.message}</h1>;
+  }
+
   return (
     <Container>
-      {data.slice(0, visibleItems).map((item, index) => (
-        <FlexDiv key={index}>
-          <CenterDiv>{item.time}</CenterDiv>
-          <CenterDiv>{item.message}</CenterDiv>
-          <RightAlignedItem>
-            {registerStates[index] ? (
-              <BlueButton status="등록됨">등록됨</BlueButton>
-            ) : (
-              <BlueButton onClick={() => toggleRegister(index)}>
-                내 일정에 등록
-              </BlueButton>
-            )}
-          </RightAlignedItem>
-        </FlexDiv>
-      ))}
+      {data?.pages?.map((page: IPage<IFriendNewsContent>) =>
+        page.content.map((item: IFriendNewsContent) => (
+          <FlexDiv key={item.createdAt}>
+            <CenterDiv>{item.time}</CenterDiv>
+            <CenterDiv>{item.createdAt}</CenterDiv>
+            <CenterDiv>{item.content}</CenterDiv>
+            <RightAlignedItem>
+              {item.registered ? (
+                <BlueButton status="등록됨">등록됨</BlueButton>
+              ) : (
+                <BlueButton
+                  onClick={() =>
+                    openModal(
+                      <AddTaskModal
+                        onTaskAdded={() =>
+                          console.log('과제가 추가되었습니다.')
+                        }
+                      />
+                    )
+                  }
+                >
+                  내 일정에 등록
+                </BlueButton>
+              )}
+            </RightAlignedItem>
+          </FlexDiv>
+        ))
+      )}
+      {isFetching && <div>스켈레톤</div>}
+      <Scroll ref={ref} className="scroll">
+        {isFetching && <ClipLoader color={'blace'} />}
+      </Scroll>
     </Container>
   );
 };
 
 export default FriendNews;
-
-//임시데이터
-const data = [
-  { time: '10분 전', message: '홍길동님이 자바스크립트 과제를 완료하였습니다' },
-  { time: '15분 전', message: '이순신님이 CSS 스타일링 과제를 완료하였습니다' },
-  {
-    time: '20분 전',
-    message: '김유신님이 React 프로젝트 과제를 완료하였습니다',
-  },
-  { time: '25분 전', message: '박문수님이 HTML 마크업 과제를 완료하였습니다' },
-  { time: '30분 전', message: '정약용님이 API 호출 과제를 완료하였습니다' },
-  { time: '35분 전', message: '강감찬님이 배열 메소드 과제를 완료하였습니다' },
-  { time: '40분 전', message: '윤봉길님이 DOM 조작 과제를 완료하였습니다' },
-  { time: '45분 전', message: '홍정호님이 웹 접근성 과제를 완료하였습니다' },
-  { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
-  { time: '35분 전', message: '강감찬님이 배열 메소드 과제를 완료하였습니다' },
-  { time: '40분 전', message: '윤봉길님이 DOM 조작 과제를 완료하였습니다' },
-  { time: '45분 전', message: '홍정호님이 웹 접근성 과제를 완료하였습니다' },
-  { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
-  { time: '55분 전', message: '유관순님이 비동기 처리 과제를 완료하였습니다' },
-  { time: '55분 전', message: '유관순님이 비동기 처리 과제를 완료하였습니다' },
-
-  { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
-  { time: '35분 전', message: '강감찬님이 배열 메소드 과제를 완료하였습니다' },
-  { time: '40분 전', message: '윤봉길님이 DOM 조작 과제를 완료하였습니다' },
-  { time: '45분 전', message: '홍정호님이 웹 접근성 과제를 완료하였습니다' },
-  { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
-  { time: '55분 전', message: '유관순님이 비동기 처리 과제를 완료하였습니다' },
-  { time: '55분 전', message: '유관순님이 비동기 처리 과제를 완료하였습니다' },
-
-  { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
-  { time: '35분 전', message: '강감찬님이 배열 메소드 과제를 완료하였습니다' },
-  { time: '40분 전', message: '윤봉길님이 DOM 조작 과제를 완료하였습니다' },
-  { time: '45분 전', message: '홍정호님이 웹 접근성 과제를 완료하였습니다' },
-  { time: '50분 전', message: '임꺽정님이 CSS Flexbox 과제를 완료하였습니다' },
-  { time: '55분 전', message: '유관순님이 비동기 처리 과제를 완료하였습니다' },
-  { time: '55분 전', message: '유관순님이 비동기 처리 과제를 완료하였습니다' },
-];
