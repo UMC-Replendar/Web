@@ -221,7 +221,7 @@ function OngoingTasks() {
   const completeTaskMutation = useMutation({
     mutationFn: async (assId: number) => {
       await axios.patch(
-        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment/complete/${assId}`,
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment/complete/${assId}?assId=${assId}`,
         {},
         {
           headers: { Authorization: `${token}` },
@@ -231,10 +231,22 @@ function OngoingTasks() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks', userId] }); // 과제 목록 갱신
     },
+    onError: (error) => {
+      console.error('과제 완료 처리 중 오류 발생:', error);
+      alert('과제 완료 처리 중 문제가 발생했습니다.');
+    },
   });
 
   const handleCompleteTask = (assId: number) => {
-    completeTaskMutation.mutate(assId);
+    completeTaskMutation.mutate(assId, {
+      onSuccess: () => {
+        console.log(`과제 완료: ${assId}`);
+        setTimeout(() => {
+          closeModal();
+          queryClient.invalidateQueries({ queryKey: ['tasks', userId] });
+        }, 100);
+      },
+    });
   };
 
   const handleEditTask = (task: any) => {
