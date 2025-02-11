@@ -33,7 +33,7 @@ const useGetData = (url: string, options?: object) => {
     isError,
     error,
   } = useQuery({
-    queryKey: [url],
+    queryKey: [url, options],
     queryFn: getData,
     enabled: !!url,
   });

@@ -7,12 +7,12 @@ import UnLockIcon from '../assets/images/UnLockIcon.svg';
 import ToggleSwitch from '../components/OngoingComponents/ToggleSwitch';
 import GrayPlusIcon from '../assets/images/GrayPlusIcon.svg';
 import SelectFriendsModal from './SelectFriendsModal';
-import useTaskStore from '../store/useTaskStore';
 import useModalStore from '../store/modalStore';
 import useFriendsStore from '../store/useFriendStore';
 import useGetData from '../hooks/useGetData';
-import useAuthStore from '../store/authStore';
-import axios from 'axios';
+import useTaskStore from '../store/useTaskStore';
+import { Task } from '../store/useTaskStore';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 // MUI DatePicker 관련 Import 추가
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -326,6 +326,9 @@ interface AddTaskModalProps {
 
 function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
   const { closeModal } = useModalStore();
+  const { addTask } = useTaskStore();
+  const queryClient = useQueryClient();
+
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [taskName, setTaskName] = useState('');
   const [deadline, setDeadline] = useState<Dayjs | null>(dayjs());
@@ -334,7 +337,54 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
   const [isOn, setIsOn] = useState(false); // 알림 설정
   const [alarmCycles, setAlarmCycles] = useState<string[]>([]);
   const [memo, setMemo] = useState('');
-  const { token } = useAuthStore();
+
+  const userId = localStorage.getItem('id');
+
+  // Mutation을 사용하여 addTask 실행
+  const addTaskMutation = useMutation({
+    mutationFn: async (taskData: Omit<Task, 'assignmentId'>) => {
+      return await addTask(taskData);
+    },
+    onSuccess: (newTask) => {
+      console.log('과제 추가 완료:', newTask);
+      queryClient.invalidateQueries({ queryKey: ['tasks', userId] });
+      onTaskAdded();
+      closeModal();
+    },
+    onError: (error) => {
+      console.error('과제 추가 중 오류 발생:', error);
+      alert('과제 추가 중 문제가 발생했습니다.');
+    },
+  });
+
+  const handleComplete = async () => {
+    if (!taskName.trim()) {
+      alert('과제명을 입력해주세요.');
+      return;
+    }
+    if (!deadline) {
+      alert('마감일을 선택해주세요.');
+      return;
+    }
+
+    const formattedDeadline =
+      deadline && time ? `${deadline.format('YYYY/MM/DD')} ${time}` : '';
+
+    const taskData: Omit<Task, 'assignmentId'> = {
+      title: taskName,
+      endDate: formattedDeadline,
+      notification: isOn ? 'ON' : 'OFF',
+      visibility: isPublic ? 'ON' : 'OFF',
+      notifyCycle: alarmCycles.length > 0 ? alarmCycles : [],
+      shareIds: friendData ? friendData.map((friend) => friend.friendId) : [],
+      memo: memo.trim() === '' ? '' : memo,
+      favorite: isBookmarked ? 'ACTIVE' : 'INACTIVE',
+      originAssId: null,
+      lectureAssignmentId: null,
+    };
+
+    addTaskMutation.mutate(taskData);
+  };
 
   const {
     isFriendModalOpen,
@@ -345,8 +395,6 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
     friendData,
     resetFriends,
   } = useFriendsStore();
-
-  const userId = localStorage.getItem('id');
 
   const { data } = useGetData(`/api/assignment/share?userId=${userId}`);
 
@@ -366,54 +414,6 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
 
   const toggleBookmark = () => {
     setIsBookmarked((prev) => !prev);
-  };
-
-  const handleComplete = async () => {
-    if (!taskName.trim()) {
-      alert('과제명을 입력해주세요.');
-      return;
-    }
-    if (!deadline) {
-      alert('마감일을 선택해주세요.');
-      return;
-    }
-
-    const formattedDeadline = deadline
-      ? deadline.format('YYYY/MM/DD HH:mm')
-      : null;
-
-    const taskData = {
-      title: taskName,
-      endDate: formattedDeadline,
-      notification: isOn ? 'ON' : 'OFF',
-      visibility: isPublic ? 'ON' : 'OFF',
-      notifyCycle: alarmCycles,
-      shareIds: friendData ? friendData.map((friend) => friend.friendId) : [],
-      memo: memo.trim() === '' ? '' : memo,
-      favorite: isBookmarked ? 'ACTIVE' : 'INACTIVE',
-      originAssId: null,
-      lectureAssignmentId: null,
-    };
-
-    console.log('📌 최종 전송 데이터:', JSON.stringify(taskData, null, 2));
-
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment`,
-        taskData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      console.log('과제 추가 성공:', response.data);
-      useTaskStore.getState().addTask(response.data);
-      onTaskAdded();
-      closeModal();
-    } catch (error) {
-      console.error('과제 추가 중 오류 발생:', error);
-      alert('과제 추가 처리 중 문제가 발생했습니다.');
-    }
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
