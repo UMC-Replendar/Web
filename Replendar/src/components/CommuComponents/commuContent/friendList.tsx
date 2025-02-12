@@ -7,7 +7,7 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const { data, isLoading, isError } = useGetData(url);
 
   if (isLoading) {
-    return <div>스켈레톤 이미지</div>;
+    return <h1>로딩</h1>;
   }
 
   if (isError) {
@@ -21,9 +21,10 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
   );
 };
 
+export default FriendList;
+
 const Container = styled.div`
   width: 100%;
 
   padding: 20px;
 `;
-export default FriendList;

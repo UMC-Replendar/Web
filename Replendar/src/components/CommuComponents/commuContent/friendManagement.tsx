@@ -57,11 +57,11 @@ const FriendManagement = () => {
   );
 
   if (isLoading) {
-    return <div>스켈레톤</div>;
+    return <h1>로딩</h1>;
+  }
 
-    if (isError) {
-      return <div>에러</div>;
-    }
+  if (isError) {
+    return <h1>에러</h1>;
   }
 
   return (

@@ -6,8 +6,6 @@ function useGetInfiniteData(url: string, size: number = 10) {
     const { data } = await axiosInstance.get(
       `${url}?page=${pageParam}&size=${size}`
     );
-    console.log(`현재 요청한 페이지: ${pageParam}`);
-    console.log(data.result);
 
     return data.result;
   };

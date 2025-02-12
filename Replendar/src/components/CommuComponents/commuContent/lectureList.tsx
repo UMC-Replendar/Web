@@ -5,18 +5,16 @@ import { useState } from 'react';
 import CommuModalContent from '../modalContents/commuModalContent';
 import useGetData from '../../../hooks/useGetData';
 import { ILecture } from '../../../types';
-//학년 정보 가져올 수 있으면 defaultValue 수정 데이터 YEAR 2이런식이랑 귀찮 나중에
+
 const LectureList = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [academicYear, setAcademicYear] = useState(1);
+  const [academicYear, setacademicYear] = useState(1);
 
   const handleOpenModal = () => {
     setIsOpen(!isOpen);
   };
 
-  const { data } = useGetData(
-    academicYear ? `/api/major/lectures/list/${academicYear}` : ''
-  );
+  const { data } = useGetData(`/api/major/lectures/list/${academicYear}`);
 
   return (
     <Container>
@@ -29,7 +27,7 @@ const LectureList = () => {
         </AddButtonDiv>
         <Select
           value={academicYear}
-          onChange={(e) => setAcademicYear(Number(e.target.value))}
+          onChange={(e) => setacademicYear(Number(e.target.value))}
         >
           <option value={1}>1학년</option>
           <option value={2}>2학년</option>

@@ -5,6 +5,7 @@ import ClipLoader from 'react-spinners/ClipLoader';
 import { useGetInfiniteData } from '../../../hooks/useGetInfiniteData';
 import { useEffect } from 'react';
 import { IDepartmentNewsContent, IPage } from '../../../types';
+import NewsSkeleton from '../../skeleton';
 
 const Container = styled.div`
   width: 100%;
@@ -74,7 +75,11 @@ const DepartmentNews = () => {
   //데이터를 처음 요청할 때부터 응답이 올 때까지 데이터를 기다리는 상태
   //  isFetching은 데이터가 이미 로드된 후 추가 데이터를 요청할 때
   if (isPending) {
-    return <div>스켈레톤</div>;
+    return (
+      <Container>
+        <NewsSkeleton count={5}></NewsSkeleton>
+      </Container>
+    );
   }
   if (isError) {
     return <h1>{error.message}</h1>;
@@ -99,7 +104,11 @@ const DepartmentNews = () => {
           </FlexDiv>
         ))
       )}
-      {isFetching && <div>스켈레톤</div>}
+      {isFetching && (
+        <Container>
+          <NewsSkeleton count={5}></NewsSkeleton>
+        </Container>
+      )}
       <Scroll ref={ref} className="scroll">
         {isFetching && <ClipLoader color={'#fff'}></ClipLoader>}
       </Scroll>

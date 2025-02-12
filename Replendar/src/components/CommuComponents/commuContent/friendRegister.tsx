@@ -5,6 +5,7 @@ import useGetData from '../../../hooks/useGetData';
 import { ProfileImage } from '../commuIcons';
 import { sendFriendRequest } from '../../../apis/commuApi';
 import { useMutation } from '@tanstack/react-query';
+import { FriendRegisterSkeleton } from '../../skeleton';
 
 const friendRegister = () => {
   const [mq, setMq] = useState('');
@@ -64,7 +65,7 @@ const friendRegister = () => {
         {!hasData && !!mq && !isLoading && (
           <FlexDiv width="900px">존재하지 않는 사용자입니다.</FlexDiv>
         )}
-        {!!mq && isLoading && <div>스켈레톤</div>}
+        {!!mq && isLoading && <FriendRegisterSkeleton />}
 
         {hasData ? (
           <>

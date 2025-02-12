@@ -105,3 +105,24 @@ export const groupDeleteFriend = async ({
   );
   return response.data.result;
 };
+
+//학과 과제 생성
+export const AddDepartmentAssignment = async ({
+  lectureId,
+  title,
+  content,
+  endDate,
+}: {
+  lectureId: number;
+  title: string;
+  content: string;
+  endDate: string;
+}) => {
+  const response = await axiosInstance.post(`/api/major/lectures`, {
+    lectureId,
+    title,
+    content,
+    endDate,
+  });
+  return response.data.result;
+};
