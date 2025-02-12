@@ -1,10 +1,11 @@
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SearchIcon from '../../../assets/images/search.svg';
 import useGetData from '../../../hooks/useGetData';
 import { ProfileImage } from '../commuIcons';
 import { sendFriendRequest } from '../../../apis/commuApi';
 import { useMutation } from '@tanstack/react-query';
+import { FriendRegisterSkeleton } from '../../skeleton';
 import Swal from 'sweetalert2';
 import useAuthStore from '../../../store/authStore';
 
@@ -75,13 +76,9 @@ const friendRegister = () => {
       </InputContainer>
       <EmptyDiv>
         {!hasData && !!mq && !isLoading && (
-          <FlexDiv width="900px">
-            {mq == nickname
-              ? '자기 자신은 검색할 수 없습니다.'
-              : '존재하지 않는 사용자입니다.'}
-          </FlexDiv>
+          <FlexDiv width="900px">존재하지 않는 사용자입니다.</FlexDiv>
         )}
-        {!!mq && isLoading && <div>스켈레톤</div>}
+        {!!mq && isLoading && <FriendRegisterSkeleton />}
 
         {hasData ? (
           <>

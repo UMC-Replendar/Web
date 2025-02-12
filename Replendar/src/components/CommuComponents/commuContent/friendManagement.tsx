@@ -16,7 +16,6 @@ import { deleteGroup } from '../../../apis/commuApi';
 import { useQueryClient } from '@tanstack/react-query';
 
 const FriendManagement = () => {
-  //expand mq없는 듯
   const { openModal } = useModalStore();
 
   const queryClient = useQueryClient();
@@ -40,8 +39,7 @@ const FriendManagement = () => {
 
   const DeleteGroupMutation = useMutation({
     mutationFn: (groupId: number) => deleteGroup(groupId),
-    onSuccess: (data) => {
-      alert(data);
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`/api/friend-groups`],
       });
@@ -57,11 +55,11 @@ const FriendManagement = () => {
   );
 
   if (isLoading) {
-    return <div>스켈레톤</div>;
+    return <h1>로딩</h1>;
+  }
 
-    if (isError) {
-      return <div>에러</div>;
-    }
+  if (isError) {
+    return <h1>에러</h1>;
   }
 
   return (

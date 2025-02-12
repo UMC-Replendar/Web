@@ -63,6 +63,6 @@ interface AcademicYearState {
 }
 
 export const useAcademicYearStore = create<AcademicYearState>((set) => ({
-  academicYear: 1, // 기본값 (1학년)
+  academicYear: 2, // 기본값 (1학년)
   setAcademicYear: (year) => set({ academicYear: year }),
 }));
