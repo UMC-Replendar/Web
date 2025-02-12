@@ -1,7 +1,8 @@
 import { create } from 'zustand';
-
 import { axiosInstance } from '../apis/axios-instance';
+import { NavigateFunction } from 'react-router-dom';
 
+// 프로필 데이터 타입 정의
 interface ProfileData {
   nickname: string | null;
   statusMessage: string | null;
@@ -14,28 +15,54 @@ interface ProfileData {
   important_taskCount: number;
 }
 
+// 프로필 관련 상태 관리
 interface ProfileStore {
   profile: ProfileData | null;
   loading: boolean;
-  fetchProfile: () => Promise<void>;
+  fetchProfile: (navigate: NavigateFunction) => Promise<void>;
+  updateProfileImage: (newImageUrl: string) => void;
 }
 
 export const useProfileStore = create<ProfileStore>((set) => ({
   profile: null,
   loading: true,
-  fetchProfile: async () => {
+
+  // 프로필 정보 가져오기
+  fetchProfile: async (navigate) => {
     try {
       const response = await axiosInstance.get('/api/user/mypage');
-      console.log('API 응답 데이터:', response.data);
-      console.log('API 응답 result:', response.data.result);
 
       if (response.data && response.data.result) {
         set({ profile: response.data.result, loading: false });
       } else {
         set({ loading: false });
+        alert('로그인이 필요합니다.');
+        navigate('/login');
       }
     } catch (error) {
       set({ loading: false });
+      alert('로그인이 필요합니다.');
+      navigate('/login');
     }
   },
+
+  // 프로필 사진 변경 시 상태 업데이트
+  updateProfileImage: (newImageUrl) => {
+    set((state) => ({
+      profile: state.profile
+        ? { ...state.profile, profileImageUrl: newImageUrl }
+        : null,
+    }));
+  },
+}));
+
+// 학년 관련 상태 관리
+interface AcademicYearState {
+  academicYear: number;
+  setAcademicYear: (year: number) => void;
+}
+
+export const useAcademicYearStore = create<AcademicYearState>((set) => ({
+  academicYear: 1, // 기본값 (1학년)
+  setAcademicYear: (year) => set({ academicYear: year }),
 }));

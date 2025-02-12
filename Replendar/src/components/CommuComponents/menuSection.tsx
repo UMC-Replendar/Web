@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 
 import MenuContent from './menuContent';
@@ -25,6 +25,13 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, menuItems }) => {
       expanded: !prevState.expanded,
     }));
 
+  const divRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (divRef.current && !menuState.expanded) {
+      divRef.current.scrollTop = 0; // 스크롤을 맨 위로 리셋
+    }
+  }, [menuState.expanded]);
+
   return (
     <div>
       <Gaph2>{title}</Gaph2>
@@ -48,7 +55,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, menuItems }) => {
           />
         </FlexDiv>
       </SpaceBtwDiv>
-      <StyledDiv expanded={menuState.expanded.toString()}>
+      <StyledDiv ref={divRef} expanded={menuState.expanded.toString()}>
         <MenuContent
           menuState={menuState.activeMenu}
           expanded={menuState.expanded.toString()}

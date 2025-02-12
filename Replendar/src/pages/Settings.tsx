@@ -16,7 +16,7 @@ function Settings() {
     // profile이 없을 때만 API 호출
     if (!profile) {
       console.log('프로필 데이터가 없음, fetchProfile 실행');
-      fetchProfile();
+      fetchProfile(navigate);
     } else {
       console.log('기존 프로필 데이터 사용');
     }

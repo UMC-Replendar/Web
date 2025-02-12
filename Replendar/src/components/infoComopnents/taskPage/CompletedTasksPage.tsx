@@ -6,6 +6,7 @@ import axios from 'axios';
 import useAuthStore from '../../../store/authStore';
 import WrokedIcon from '../../../assets/images/Worked.svg';
 import { axiosInstance } from '../../../apis/axios-instance';
+import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   display: flex;
@@ -90,12 +91,13 @@ const CompletedTasksPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { token } = useAuthStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCompletedTasks = async () => {
       if (!token) {
-        setError('로그인이 필요합니다.');
-        window.location.href = '/login';
+        alert('로그인이 필요합니다.');
+        navigate('/');
         return;
       }
       //페이지 방식 수정 필요
@@ -165,7 +167,7 @@ const CompletedTasksPage: React.FC = () => {
                     <TaskText>{task.time}</TaskText>
                     <TaskText>{task.description}</TaskText>
                   </TaskDetails>
-                  <BlueButton status={task.status}>
+                  <BlueButton status={undefined}>
                     {task.status ?? '미확인'}
                   </BlueButton>
                 </TaskItem>

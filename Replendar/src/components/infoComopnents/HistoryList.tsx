@@ -1,3 +1,6 @@
+//양식 확인용
+//연결은 HistoryPage.tsx 완성 후
+
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import BlueButton from '../blueButton';
@@ -79,8 +82,8 @@ function HistoryList() {
 
   return (
     <div>
-      <Title onClick={() => navigate('/history')}>히스토리</Title>
-      <HistoryContainer onClick={() => navigate('/history')}>
+      <Title onClick={() => navigate('/info/history')}>히스토리</Title>
+      <HistoryContainer onClick={() => navigate('/info/history')}>
         {historyEntries.map((entry, index) => (
           <HistoryEntryContainer key={index}>
             <HistoryDetails>

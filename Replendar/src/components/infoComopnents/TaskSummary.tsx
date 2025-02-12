@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-
+import workedIcon from '../../assets/images/Worked.svg';
+import taskIcon from '../../assets/images/InfoIcons/Task.svg';
 const SummaryContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -68,7 +69,7 @@ const TaskSummary: React.FC<TaskSummaryProps> = ({ taskData }) => {
   return (
     <SummaryContainer>
       <SummaryButton onClick={() => navigate('/info/completed')}>
-        <Icon src="src/assets/images/Worked.svg" alt="Completed Task Icon" />
+        <Icon src={workedIcon} alt="Completed Task Icon" />
         <TaskContainer>
           <TaskText>완료한 과제</TaskText>
           <TaskCount>{taskData.completed_TasksCount}</TaskCount>
@@ -76,10 +77,7 @@ const TaskSummary: React.FC<TaskSummaryProps> = ({ taskData }) => {
       </SummaryButton>
 
       <SummaryButton onClick={() => navigate('/info/stored')}>
-        <Icon
-          src="src/assets/images/InfoIcons/Task.svg"
-          alt="Stored Task Icon"
-        />
+        <Icon src={taskIcon} alt="Stored Task Icon" />
         <TaskContainer>
           <TaskText>보관한 과제</TaskText>
           <TaskCount>{taskData.store_TasksCount}</TaskCount>
@@ -87,10 +85,7 @@ const TaskSummary: React.FC<TaskSummaryProps> = ({ taskData }) => {
       </SummaryButton>
 
       <SummaryButton onClick={() => navigate('/info/notcompleted')}>
-        <Icon
-          src="src/assets/images/InfoIcons/Task.svg"
-          alt="Incomplete Task Icon"
-        />
+        <Icon src={taskIcon} alt="Incomplete Task Icon" />
         <TaskContainer>
           <TaskText>미완료 과제</TaskText>
           <TaskCount>{taskData.not_completedTasksCount}</TaskCount>
@@ -98,10 +93,7 @@ const TaskSummary: React.FC<TaskSummaryProps> = ({ taskData }) => {
       </SummaryButton>
 
       <SummaryButton onClick={() => navigate('/info/important')}>
-        <Icon
-          src="src/assets/images/InfoIcons/Task.svg"
-          alt="Important Task Icon"
-        />
+        <Icon src={taskIcon} alt="Important Task Icon" />
         <TaskContainer>
           <TaskText>중요한 과제</TaskText>
           <TaskCount>{taskData.important_taskCount}</TaskCount>

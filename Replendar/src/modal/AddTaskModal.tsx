@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import BookmarkIcon from '../assets/images/BookmarkIcon.svg';
 import BookmarkFilledIcon from '../assets/images/BookmarkFilledIcon.svg';
@@ -7,10 +7,12 @@ import UnLockIcon from '../assets/images/UnLockIcon.svg';
 import ToggleSwitch from '../components/OngoingComponents/ToggleSwitch';
 import GrayPlusIcon from '../assets/images/GrayPlusIcon.svg';
 import SelectFriendsModal from './SelectFriendsModal';
-import useTaskStore from '../store/useTaskStore';
 import useModalStore from '../store/modalStore';
 import useFriendsStore from '../store/useFriendStore';
 import useGetData from '../hooks/useGetData';
+import useTaskStore from '../store/useTaskStore';
+import { Task } from '../store/useTaskStore';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 // MUI DatePicker 관련 Import 추가
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -180,6 +182,7 @@ const StyledTimeInput = styled.input`
   padding: 8px 16px;
   justify-content: center;
   align-items: center;
+  text-align: center;
   border-radius: 5px;
   border: 1px solid #e8e8e8;
   background: white;
@@ -322,19 +325,67 @@ interface AddTaskModalProps {
 }
 
 function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
-  const { addTask } = useTaskStore();
   const { closeModal } = useModalStore();
+  const { addTask } = useTaskStore();
+  const queryClient = useQueryClient();
+
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [taskName, setTaskName] = useState('');
   const [deadline, setDeadline] = useState<Dayjs | null>(dayjs());
   const [time, setTime] = useState('');
   const [isPublic, setIsPublic] = useState(false); // 과제 공개 여부
   const [isOn, setIsOn] = useState(false); // 알림 설정
-  const [alarmCount, setAlarmCount] = useState<number | null>(null); // 알림 주기 설정
+  const [alarmCycles, setAlarmCycles] = useState<string[]>([]);
   const [memo, setMemo] = useState('');
 
-  //const [showFriendsModal, setShowFriendsModal] = useState(false);
-  //추가했어요
+  const userId = localStorage.getItem('id');
+
+  // Mutation을 사용하여 addTask 실행
+  const addTaskMutation = useMutation({
+    mutationFn: async (taskData: Omit<Task, 'assignmentId'>) => {
+      return await addTask(taskData);
+    },
+    onSuccess: (newTask) => {
+      console.log('과제 추가 완료:', newTask);
+      queryClient.invalidateQueries({ queryKey: ['tasks', userId] });
+      onTaskAdded();
+      closeModal();
+    },
+    onError: (error) => {
+      console.error('과제 추가 중 오류 발생:', error);
+      alert('과제 추가 중 문제가 발생했습니다.');
+    },
+  });
+
+  const handleComplete = async () => {
+    if (!taskName.trim()) {
+      alert('과제명을 입력해주세요.');
+      return;
+    }
+    if (!deadline) {
+      alert('마감일을 선택해주세요.');
+      return;
+    }
+
+    const formattedDeadline =
+      deadline && time ? `${deadline.format('YYYY/MM/DD')} ${time}` : '';
+
+    const taskData: Omit<Task, 'assignmentId'> = {
+      title: taskName,
+      endDate: formattedDeadline,
+      notification: isOn ? 'ON' : 'OFF',
+      visibility: isPublic ? 'ON' : 'OFF',
+      notifyCycle: alarmCycles.length > 0 ? alarmCycles : [],
+      shareIds: friendData ? friendData.map((friend) => friend.friendId) : [],
+      memo: memo.trim() === '' ? '' : memo,
+      favorite: isBookmarked ? 'ACTIVE' : 'INACTIVE',
+      originAssId: null,
+      lectureAssignmentId: null,
+    };
+
+    addTaskMutation.mutate(taskData);
+  };
+
   const {
     isFriendModalOpen,
     openFriendModal,
@@ -344,12 +395,6 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
     friendData,
     resetFriends,
   } = useFriendsStore();
-
-  const toggleBookmark = () => {
-    setIsBookmarked((prev) => !prev);
-  };
-
-  const userId = localStorage.getItem('id');
 
   const { data } = useGetData(`/api/assignment/share?userId=${userId}`);
 
@@ -367,34 +412,8 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
     resetFriends();
   }, [closeModal]);
 
-  const handleComplete = async () => {
-    if (!taskName.trim()) {
-      alert('과제명을 입력해주세요.');
-      return;
-    }
-    if (!deadline) {
-      alert('마감일을 선택해주세요.');
-      return;
-    }
-
-    console.log('과제 추가:', {
-      deadline: deadline.format('YYYY/MM/DD'),
-      time: time || '23:59',
-    });
-
-    await addTask({
-      assignmentId: Date.now(),
-      name: taskName,
-      deadline: deadline.format('YYYY/MM/DD'),
-      remainingTime: '',
-      color: '#7AC19A',
-      isToggled: false,
-      isBookmarked,
-      memo,
-    });
-
-    onTaskAdded();
-    closeModal();
+  const toggleBookmark = () => {
+    setIsBookmarked((prev) => !prev);
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -422,11 +441,17 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
   };
 
   const alarmOptions = [
-    { label: '3회', value: 3 },
-    { label: '24시간 전', value: 24 },
-    { label: '10시간 전', value: 10 },
-    { label: '1시간 전', value: 1 },
+    { label: '3일 전', value: 'DAY3' },
+    { label: '24시간 전', value: 'DAY1' },
+    { label: '10시간 전', value: 'H10' },
+    { label: '1시간 전', value: 'H1' },
   ];
+
+  const handleAlarmCycleToggle = (cycle: string) => {
+    setAlarmCycles((prev) =>
+      prev.includes(cycle) ? prev.filter((c) => c !== cycle) : [...prev, cycle]
+    );
+  };
 
   return (
     <ModalOverlay onClick={closeModal}>
@@ -511,8 +536,8 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
               {alarmOptions.map(({ label, value }) => (
                 <AlarmCycleSettingButton
                   key={value}
-                  isActive={alarmCount === value}
-                  onClick={() => setAlarmCount(value)}
+                  isActive={alarmCycles.includes(value)}
+                  onClick={() => handleAlarmCycleToggle(value)}
                 >
                   {label}
                 </AlarmCycleSettingButton>
@@ -555,7 +580,6 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
 
 export default AddTaskModal;
 
-//수정
 const SelectedFriendsList = styled.div`
   display: flex;
   align-items: center;
