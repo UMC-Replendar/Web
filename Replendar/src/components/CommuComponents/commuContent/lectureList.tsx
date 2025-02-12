@@ -1,20 +1,22 @@
 import styled from 'styled-components';
 import { AddButton } from '../../../pages/OngoingTasks';
 import PlusIcon from '../../../assets/images/PlusIcon.svg';
-import { useState } from 'react';
 import CommuModalContent from '../modalContents/commuModalContent';
 import useGetData from '../../../hooks/useGetData';
 import { ILecture } from '../../../types';
+import { useAcademicYearStore } from '../../../store/profileStore';
+import useModalStore from '../../../store/modalStore';
 
 const LectureList = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [academicYear, setacademicYear] = useState(1);
+  const { openModal } = useModalStore();
+  const { academicYear, setAcademicYear } = useAcademicYearStore();
+
+  const queryKey = `/api/major/lectures/list/${academicYear}`;
+  const { data } = useGetData(queryKey);
 
   const handleOpenModal = () => {
-    setIsOpen(!isOpen);
+    openModal(<CommuModalContent queryKey={queryKey} />);
   };
-
-  const { data } = useGetData(`/api/major/lectures/list/${academicYear}`);
 
   return (
     <Container>
@@ -27,7 +29,7 @@ const LectureList = () => {
         </AddButtonDiv>
         <Select
           value={academicYear}
-          onChange={(e) => setacademicYear(Number(e.target.value))}
+          onChange={(e) => setAcademicYear(Number(e.target.value))}
         >
           <option value={1}>1학년</option>
           <option value={2}>2학년</option>
@@ -56,13 +58,6 @@ const LectureList = () => {
           ))}
         </tbody>
       </table>
-      {isOpen && (
-        <Overlay onClick={() => setIsOpen(!isOpen)}>
-          <Modal onClick={(e) => e.stopPropagation()}>
-            <CommuModalContent></CommuModalContent>
-          </Modal>
-        </Overlay>
-      )}
     </Container>
   );
 };
@@ -133,28 +128,4 @@ const AddButtonDiv = styled.div`
   align-items: center;
   width: 95%;
   height: 67px;
-`;
-const Modal = styled.div`
-  position: absolute;
-  /*top: 830px;
-  left: 430px;*/
-  top: 400px;
-  left: 430px;
-  width: 600px;
-  height: 650px;
-  background-color: rgba(255, 255, 255, 1);
-  border: 1px solid #ccc;
-
-  border-radius: 10px;
-  padding: 30px;
-  flex-direction: column;
-  z-index:;
-`;
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
 `;

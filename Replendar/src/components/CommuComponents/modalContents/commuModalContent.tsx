@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import { PlusFriendsButton } from '../../../modal/AddTaskModal';
-//import GrayPlusIcon from '../../../assets/images/GrayPlusIcon.svg';
 import { useState } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
@@ -9,49 +8,25 @@ import { styled as muiStyled } from '@mui/material/styles';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 dayjs.locale('ko');
-import useFriendsStore from '../../../store/useFriendStore';
-import SelectFriendsModal from '../../../modal/SelectFriendsModal';
+import useModalStore from '../../../store/modalStore';
 import useGetData from '../../../hooks/useGetData';
 import { ILecture } from '../../../types';
 import { AddDepartmentAssignment } from '../../../apis/commuApi';
 import { useMutation } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
+import { useAcademicYearStore } from '../../../store/profileStore';
 
 const CommuModalContent: React.FC<{ queryKey: string }> = ({ queryKey }) => {
   const [academicYear, setacademicYear] = useState(1);
-  const [time, setTime] = useState('');
   const [selectedLecture, setSelectedLecture] = useState<number | null>(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [deadline, setDeadline] = useState<Dayjs | null>(dayjs());
 
-  const { isFriendModalOpen } = useFriendsStore();
+  const { closeModal } = useModalStore();
+  const { setAcademicYear } = useAcademicYearStore();
 
   const queryClient = useQueryClient();
-
-  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let inputTime = e.target.value.replace(/[^0-9]/g, '');
-
-    if (inputTime.length > 4) {
-      inputTime = inputTime.slice(0, 4);
-    }
-
-    let formattedTime = inputTime;
-    if (inputTime.length >= 2) {
-      formattedTime = `${inputTime.slice(0, 2)}:${inputTime.slice(2)}`;
-    }
-
-    setTime(formattedTime);
-  };
-
-  const handleTimeBlur = () => {
-    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-
-    if (!timeRegex.test(time)) {
-      alert('24시간 형식 (00:00 ~ 23:59)으로 입력하세요.');
-      setTime('');
-    }
-  };
 
   const { data: lectures } = useGetData(
     `/api/major/lectures/list/${academicYear}`
@@ -68,15 +43,17 @@ const CommuModalContent: React.FC<{ queryKey: string }> = ({ queryKey }) => {
       title: string;
       content: string;
       endDate: string;
-    }) => AddDepartmentAssignment({ lectureId, title, content, endDate }), // 메모 업데이트를 위한 API 호출
+    }) => AddDepartmentAssignment({ lectureId, title, content, endDate }),
     onSuccess: (data) => {
-      alert(data); // 메모 업데이트 성공 메시지
+      alert(data);
+      setAcademicYear(academicYear);
+      closeModal();
       queryClient.invalidateQueries({
-        queryKey: [queryKey], // 쿼리 캐시를 무효화하여 데이터를 최신 상태로 유지
+        queryKey: [queryKey],
       });
     },
     onError: (error: Error) => {
-      alert('학과 과제 추가하기에 실패했습니다'); // 메모 업데이트 실패 메시지
+      alert('학과 과제 추가하기에 실패했습니다');
       console.error(error);
     },
   });
@@ -103,7 +80,7 @@ const CommuModalContent: React.FC<{ queryKey: string }> = ({ queryKey }) => {
     const data = {
       lectureId: selectedLecture,
       title: title,
-      content: content.trim() || '내용 없음',
+      content: content.trim() || '',
       endDate: formattedDeadline,
     };
     console.log(data);
@@ -151,26 +128,14 @@ const CommuModalContent: React.FC<{ queryKey: string }> = ({ queryKey }) => {
       <FlexGroup>
         <Label>과제마감일</Label>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <InputContainer>
-            <DesktopDatePicker
-              value={deadline}
-              onChange={(newValue) => setDeadline(newValue || deadline)}
-              format="YYYY/MM/DD"
-              slots={{ textField: StyledTextField }}
-            />
-            <StyledTimeInput
-              type="text"
-              value={time}
-              placeholder="23:59"
-              onChange={handleTimeChange}
-              onBlur={handleTimeBlur}
-              maxLength={5}
-              required
-            />
-          </InputContainer>
+          <DesktopDatePicker
+            value={deadline}
+            onChange={(newValue) => setDeadline(newValue || deadline)}
+            format="YYYY/MM/DD"
+            slots={{ textField: StyledTextField }}
+          />
         </LocalizationProvider>
       </FlexGroup>
-      {isFriendModalOpen && <SelectFriendsModal />}
       <FlexGroup>
         <Label>메모</Label>
         <Memo
@@ -190,56 +155,14 @@ const CommuModalContent: React.FC<{ queryKey: string }> = ({ queryKey }) => {
   );
 };
 
-/*<FlexGroup>
-{' '}
-<Label>공유할 친구</Label>{' '}
-<PlusFriendsButton onClick={openFriendModal}>
-  <img src={GrayPlusIcon} alt="Gray Plus Icon" />
-  추가
-</PlusFriendsButton>
-{nicknames.length > 0 && (
-  <SelectedFriendsList>
-    {nicknames.map((nickname) => (
-      <FriendTag key={nickname}>{nickname}</FriendTag>
-    ))}
-  </SelectedFriendsList>
-)}
-</FlexGroup>*/
-
 export default CommuModalContent;
 
 const Select = styled.select`
-  width: 100px;
   width: 300px;
-
   background: white;
   border: none;
   outline: none;
   font-size: 19px;
-`;
-
-const StyledTimeInput = styled.input`
-  display: flex;
-  padding: 8px 16px;
-  justify-content: center;
-  align-items: center;
-  border-radius: 5px;
-  border: 1px solid #e8e8e8;
-  background: white;
-  color: #666666;
-  font-family: Pretendard;
-  font-size: 19px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 140%;
-
-  width: 86px;
-`;
-
-const InputContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 4px;
 `;
 
 const StyledTextField = muiStyled(TextField)({
@@ -298,7 +221,7 @@ const TransparentInput = styled.input`
   border: none;
   background-color: transparent;
   outline: none;
-  width: 300px;
+  width: 220px;
 
   font-family: Pretendard;
   font-size: 19px;

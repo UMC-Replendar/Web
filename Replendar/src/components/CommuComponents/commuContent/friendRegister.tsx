@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SearchIcon from '../../../assets/images/search.svg';
 import useGetData from '../../../hooks/useGetData';
 import { ProfileImage } from '../commuIcons';
@@ -10,12 +10,19 @@ import { FriendRegisterSkeleton } from '../../skeleton';
 const friendRegister = () => {
   const [mq, setMq] = useState('');
   const [searchNickname, setSearchNickname] = useState('');
+  const [resulMessage, setResultMessage] = useState('');
 
   //친구등록검색api호출
   const { data, isLoading } = useGetData(
     mq ? `/api/friends/search?nickname=${mq}` : ''
   );
 
+  useEffect(() => {
+    console.log('data', data);
+  }, [data]);
+  useEffect(() => {
+    console.log('mq', mq);
+  }, [mq]);
   const hasData = Array.isArray(data) && data.length > 0;
   const friendData = hasData ? data[0] : null;
 
@@ -63,7 +70,7 @@ const friendRegister = () => {
       </InputContainer>
       <EmptyDiv>
         {!hasData && !!mq && !isLoading && (
-          <FlexDiv width="900px">존재하지 않는 사용자입니다.</FlexDiv>
+          <FlexDiv width="900px">{data[0]}</FlexDiv>
         )}
         {!!mq && isLoading && <FriendRegisterSkeleton />}
 

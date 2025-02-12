@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react';
 import CommuModalContent from '../modalContents/commuModalContent';
 import useGetData from '../../../hooks/useGetData';
 import { ILectureList } from '../../../types';
+import { useAcademicYearStore } from '../../../store/profileStore';
+import useModalStore from '../../../store/modalStore';
 
 const Container = styled.div`
   width: 100%;
@@ -64,30 +66,6 @@ const AddButtonDiv = styled.div`
   width: 95%;
 `;
 
-const Modal = styled.div`
-  position: absolute;
-  /*top: 830px;
-  left: 430px;*/
-  top: 400px;
-  left: 430px;
-  width: 600px;
-  height: 650px;
-  background-color: rgba(255, 255, 255, 1);
-  border: 1px solid #ccc;
-
-  border-radius: 10px;
-  padding: 30px;
-  flex-direction: column;
-`;
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-`;
-
 const Select = styled.select`
   width: 100px;
   height: 30px;
@@ -111,16 +89,17 @@ const Sort = styled.label`
 
 const TaskList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const visibleItems = expanded === 'true' ? 10 : 3;
-  const [isOpen, setIsOpen] = useState(false);
-  const [academicYear, setacademicYear] = useState(1);
-  const [sortKey, setSortKey] = useState('professor');
+  const { openModal } = useModalStore();
 
-  const handleOpenModal = () => {
-    setIsOpen(!isOpen);
-  };
+  const { academicYear, setAcademicYear } = useAcademicYearStore();
+  const [sortKey, setSortKey] = useState('professor');
 
   const queryKey = `/api/major/lectures/sort/${sortKey}?sort=asc&academicYear=${academicYear}&majorId=`;
   const { data } = useGetData(queryKey);
+
+  const handleOpenModal = () => {
+    openModal(<CommuModalContent queryKey={queryKey} />);
+  };
 
   useEffect(() => {
     console.log(queryKey);
@@ -138,7 +117,7 @@ const TaskList: React.FC<{ expanded: string }> = ({ expanded }) => {
         <div>
           <Select
             value={academicYear}
-            onChange={(e) => setacademicYear(Number(e.target.value))}
+            onChange={(e) => setAcademicYear(Number(e.target.value))}
           >
             <option value="1">1학년</option>
             <option value="2">2학년</option>
@@ -190,13 +169,6 @@ const TaskList: React.FC<{ expanded: string }> = ({ expanded }) => {
           ))}
         </tbody>
       </table>
-      {isOpen && (
-        <Overlay onClick={() => setIsOpen(!isOpen)}>
-          <Modal onClick={(e) => e.stopPropagation()}>
-            <CommuModalContent queryKey={queryKey}></CommuModalContent>
-          </Modal>
-        </Overlay>
-      )}
     </Container>
   );
 };

@@ -104,11 +104,7 @@ const DepartmentNews = () => {
           </FlexDiv>
         ))
       )}
-      {isFetching && (
-        <Container>
-          <NewsSkeleton count={5}></NewsSkeleton>
-        </Container>
-      )}
+      {isFetching && <NewsSkeleton count={5}></NewsSkeleton>}
       <Scroll ref={ref} className="scroll">
         {isFetching && <ClipLoader color={'#fff'}></ClipLoader>}
       </Scroll>
