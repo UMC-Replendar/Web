@@ -71,7 +71,7 @@ const useTaskStore = create<TaskStore>((set) => ({
     const { token } = useAuthStore.getState();
     try {
       await axios.patch(
-        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignemnt/complete/${assId}`,
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment/complete/${assId}?assId=${assId}`,
         {},
         {
           headers: { Authorization: `${token}` },
