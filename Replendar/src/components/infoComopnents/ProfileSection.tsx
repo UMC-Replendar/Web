@@ -86,7 +86,7 @@ const ProfileSection: React.FC<ProfileProps> = ({ profileData }) => {
       console.error('상태 메시지 업데이트 실패:', error);
     }
   };
-
+  console.log(profileData.ongoingTasks);
   return (
     <ProfileContainer>
       {/* ProfileUpload 컴포넌트 사용*/}

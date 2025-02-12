@@ -6,6 +6,7 @@ import ProfileUpload from './ProfileUpload';
 import SchoolInfoForm from './SchoolInfoForm';
 import StatusMessage from './StatusMessage';
 import useDepartmentStore from '../../store/useDepartmentStore';
+import { useAcademicYearStore } from '../../store/profileStore';
 
 const nicknameRegex = /^[a-zA-Z\uAC00-\uD7A3]+$/;
 
@@ -96,9 +97,10 @@ const SignupForm: React.FC = () => {
     id: number;
     name: string;
   } | null>(null);
-  const { selectedDepartment, setSelectedDepartment } = useDepartmentStore();
 
-  const [grade, setGrade] = useState<string>('1학년');
+  //zustand 불러오기
+  const { selectedDepartment, setSelectedDepartment } = useDepartmentStore();
+  const { academicYear, setAcademicYear } = useAcademicYearStore();
 
   // 닉네임 입력 변경 시 처리
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,7 +133,12 @@ const SignupForm: React.FC = () => {
       };
     }
   };
-
+  // 학년 변경 시 Zustand로 저장
+  const handleGradeChange = (newGrade: string) => {
+    const year = parseInt(newGrade.replace('학년', ''), 10);
+    setAcademicYear(year);
+    console.log(year);
+  };
   // 닉네임 중복 확인
   const checkNicknameAvailability = async () => {
     if (!nicknameRegex.test(nickname)) {
@@ -159,7 +166,6 @@ const SignupForm: React.FC = () => {
       return;
     }
 
-    const academicYear = parseInt(grade.replace('학년', ''), 10);
     console.log(selectedDepartment);
     console.log('null아니지?', selectedDepartment?.id);
 
@@ -222,10 +228,10 @@ const SignupForm: React.FC = () => {
       <SchoolInfoForm
         selectedSchool={selectedSchool}
         selectedDepartment={selectedDepartment}
-        grade={grade}
+        grade={`${academicYear}학년`}
         onSchoolChange={setSelectedSchool}
         onDepartmentChange={setSelectedDepartment}
-        onGradeChange={setGrade}
+        onGradeChange={handleGradeChange}
       />
       <SubmitButton onClick={handleSubmit}>회원가입 완료</SubmitButton>
     </FormContainer>

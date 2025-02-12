@@ -82,8 +82,8 @@ function HistoryList() {
 
   return (
     <div>
-      <Title onClick={() => navigate('/history')}>히스토리</Title>
-      <HistoryContainer onClick={() => navigate('/history')}>
+      <Title onClick={() => navigate('/info/history')}>히스토리</Title>
+      <HistoryContainer onClick={() => navigate('/info/history')}>
         {historyEntries.map((entry, index) => (
           <HistoryEntryContainer key={index}>
             <HistoryDetails>
