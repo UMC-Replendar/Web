@@ -6,10 +6,6 @@ export default function NotifyPage() {
   const notices = [
     { date: '12 / 13', title: 'ver 1.01 Replendar 패치' },
     { date: '12 / 13', title: 'ver 1.01 Replendar 패치' },
-    { date: '12 / 13', title: 'ver 1.01 Replendar 패치' },
-    { date: '12 / 13', title: 'ver 1.01 Replendar 패치' },
-    { date: '12 / 13', title: 'ver 1.01 Replendar 패치' },
-    { date: '12 / 13', title: 'ver 1.01 Replendar 패치' },
   ];
 
   return (

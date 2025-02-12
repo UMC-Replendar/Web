@@ -5,6 +5,7 @@ import useAuthStore from '../store/authStore';
 import axios from 'axios';
 import { useProfileStore } from '../store/profileStore';
 import { useEffect } from 'react';
+import Swal from 'sweetalert2';
 
 function Settings() {
   const navigate = useNavigate();
@@ -23,59 +24,128 @@ function Settings() {
   }, [profile]);
 
   const LogoutClicked = async () => {
-    if (!window.confirm('정말로 로그아웃을 진행하시겠습니까?')) {
-      return;
-    }
+    const result = await Swal.fire({
+      icon: 'warning',
+      title: '정말로 로그아웃 하시겠습니까?',
+      confirmButtonColor: '#25C26C',
+      showCancelButton: true,
+      confirmButtonText: '네, 로그아웃 합니다.',
+      cancelButtonText: '취소',
+    });
 
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/user/logout`,
-        {},
-        {
-          headers: {
-            Authorization: `${token}`,
-          },
+    if (result.isConfirmed) {
+      // ✅ 2초 대기
+      Swal.fire({
+        title: '잠시만 기다려 주세요...',
+        text: '로그아웃을 처리 중입니다.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      setTimeout(async () => {
+        try {
+          const response = await axios.post(
+            `${import.meta.env.VITE_BACKEND_BASE_URL}/api/user/logout`,
+            {},
+            {
+              headers: {
+                Authorization: `${token}`,
+              },
+            }
+          );
+
+          if (response.data.isSuccess) {
+            Swal.fire({
+              icon: 'success',
+              title: '로그아웃 되었습니다!',
+              text: '잠시 후 로그인 화면으로 이동합니다.',
+              timer: 2000,
+              showConfirmButton: false,
+            });
+
+            // ✅ 2초 후 로그인 페이지로 이동
+            setTimeout(() => {
+              clearAuth();
+              navigate('/login');
+            }, 2000);
+          } else {
+            throw new Error(response.data.message || '로그아웃 실패');
+          }
+        } catch (error) {
+          console.error('로그아웃 실패:', error);
+          Swal.fire({
+            icon: 'error',
+            title: '로그아웃 실패',
+            text: '잠시 후 다시 시도해 주세요.',
+          });
         }
-      );
-      if (response.data.isSuccess) {
-        alert('로그아웃 되었습니다.');
-        clearAuth();
-        navigate('/login');
-      } else {
-        throw new Error(response.data.message || '로그아웃 실패');
-      }
-    } catch (error) {
-      console.error('로그아웃에 실패했습니다', error);
+      }, 2000);
     }
   };
 
   const handleWithdraw = async () => {
-    if (!window.confirm('정말로 회원 탈퇴를 진행하시겠습니까?')) {
-      return;
-    }
+    const result = await Swal.fire({
+      icon: 'warning',
+      title: '정말로 회원 탈퇴를 진행하시겠습니까?',
+      confirmButtonColor: '#25C26C',
 
-    try {
-      const response = await axios.delete(
-        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/user/withdraw`,
-        {
-          headers: {
-            Authorization: `${token}`,
-          },
+      text: '이 작업은 되돌릴 수 없습니다.',
+      showCancelButton: true,
+      confirmButtonText: '네, 탈퇴합니다',
+      cancelButtonText: '취소',
+    });
+
+    if (result.isConfirmed) {
+      Swal.fire({
+        title: '처리 중...',
+        text: '회원 탈퇴를 진행하고 있습니다.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      setTimeout(async () => {
+        try {
+          const response = await axios.delete(
+            `${import.meta.env.VITE_BACKEND_BASE_URL}/api/user/withdraw`,
+            {
+              headers: {
+                Authorization: `${token}`,
+              },
+            }
+          );
+
+          if (response.data.isSuccess) {
+            Swal.fire({
+              icon: 'success',
+              title: '회원탈퇴가 완료되었습니다.',
+              text: '잠시 후 로그인 화면으로 이동합니다.',
+              timer: 2000,
+              showConfirmButton: false,
+            });
+
+            setTimeout(() => {
+              clearAuth();
+              navigate('/login');
+            }, 2000);
+          } else {
+            throw new Error(response.data.message || '회원 탈퇴 실패');
+          }
+        } catch (error) {
+          console.error('회원 탈퇴 실패:', error);
+          Swal.fire({
+            icon: 'error',
+            title: '회원 탈퇴 실패',
+            text: '잠시 후 다시 시도해주세요.',
+          });
         }
-      );
-
-      if (response.data.isSuccess) {
-        alert('회원탈퇴 되었습니다.');
-        clearAuth();
-        navigate('/login');
-      } else {
-        throw new Error(response.data.message || '회원 탈퇴 실패');
-      }
-    } catch (error) {
-      console.error('회원 탈퇴 실패:', error);
-      alert('회원 탈퇴 중 오류가 발생했습니다.');
+      }, 2000);
     }
   };
+
   return (
     <SettingsWrapper>
       <TitleContainer>

@@ -102,8 +102,6 @@ const ProfileUpload: React.FC<ProfileUploadProps> = ({
       if (response.data.result) {
         const newImageUrl = `${response.data.result}?t=${new Date().getTime()}`; //캐싱 방지
 
-        alert('프로필 사진 업로드 성공!');
-
         //상태 업데이트
         updateProfileImage(newImageUrl);
 

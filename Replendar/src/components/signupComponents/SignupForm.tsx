@@ -7,6 +7,7 @@ import SchoolInfoForm from './SchoolInfoForm';
 import StatusMessage from './StatusMessage';
 import useDepartmentStore from '../../store/useDepartmentStore';
 import { useAcademicYearStore } from '../../store/profileStore';
+import Swal from 'sweetalert2';
 
 const nicknameRegex = /^[a-zA-Z\uAC00-\uD7A3]+$/;
 
@@ -150,19 +151,33 @@ const SignupForm: React.FC = () => {
     try {
       const result = await validateNickname(nickname);
 
-      setIsNicknameValid(result.isSuccess);
-      setErrorMessage(result.result);
+      if (result.isSuccess) {
+        setIsNicknameValid(result.isSuccess);
+        setErrorMessage(result.result);
+      } else {
+        setErrorMessage('이미 사용 중인 닉네임입니다.');
+      }
     } finally {
       setIsChecking(false);
     }
   };
   const handleSubmit = async () => {
     if (!isNicknameValid) {
-      alert('닉네임 중복 확인을 완료해주세요.');
+      Swal.fire({
+        icon: 'warning',
+        title: '닉네임 중복 확인 필요',
+        text: '닉네임 중복 확인을 완료해주세요.',
+        confirmButtonColor: '#25C26C',
+      });
       return;
     }
     if (!selectedSchool || !selectedDepartment) {
-      alert('학교와 학과를 선택해주세요.');
+      Swal.fire({
+        icon: 'warning',
+        title: '학교 및 학과 선택 필요',
+        confirmButtonColor: '#25C26C',
+        text: '학교와 학과를 선택해주세요.',
+      });
       return;
     }
 
@@ -186,13 +201,25 @@ const SignupForm: React.FC = () => {
       }
       const response = await axiosInstance.post('/api/user/signup', formData);
       console.log(response);
-      alert('회원가입이 완료되었습니다.');
-      navigate('/');
+
+      Swal.fire({
+        icon: 'success',
+        title: '회원가입 성공!',
+        text: '가입을 축하드립니다! 메인 페이지로 이동합니다.',
+        timer: 3000,
+        showConfirmButton: false,
+      });
+
+      setTimeout(() => {
+        navigate('/');
+      }, 3000);
     } catch (error: any) {
       console.log(error.response.data);
-      alert(
-        `회원가입 중 오류 발생: ${error.response?.data?.message || '서버 오류'}`
-      );
+      Swal.fire({
+        icon: 'error',
+        title: '회원가입 실패',
+        text: error.response?.data?.message || '서버 오류가 발생했습니다.',
+      });
     }
   };
 

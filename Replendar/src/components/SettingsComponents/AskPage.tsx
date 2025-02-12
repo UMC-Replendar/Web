@@ -5,6 +5,7 @@ import { useRef, useState } from 'react';
 import emailjs from '@emailjs/browser';
 import { useProfileStore } from '../../store/profileStore';
 import useDebounce from '../../hooks/useDebounce';
+import Swal from 'sweetalert2';
 
 export default function AskPage() {
   const form = useRef<HTMLFormElement>(null);
@@ -34,13 +35,27 @@ export default function AskPage() {
       );
 
       if (response.status === 200) {
-        alert('문의가 성공적으로 접수되었습니다.');
-        setEmail('');
-        setMessage(`닉네임: ${profile?.nickname || '리플레넝'} \n문의내용: `);
+        Swal.fire({
+          icon: 'success',
+          title: '문의 접수 완료',
+          text: '문의가 성공적으로 접수되었습니다.',
+          timer: 2000,
+          showConfirmButton: false,
+        }).then(() => {
+          setEmail('');
+          setMessage(`닉네임: ${profile?.nickname || '리플레넝'} \n문의내용: `);
+        });
       }
     } catch (error) {
       console.error('이메일 전송 실패:', error);
       alert('이메일 전송 중 오류가 발생했습니다.');
+      Swal.fire({
+        icon: 'error',
+        title: '이메일 전송에 실패했습니다',
+        text: `이메일 전송 중 오류가 발생했습니다. ${error}`,
+        timer: 2000,
+        confirmButtonColor: '#25C26C',
+      });
     }
   };
 
