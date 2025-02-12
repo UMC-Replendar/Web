@@ -5,9 +5,12 @@ import useGetData from '../../../hooks/useGetData';
 import { ProfileImage } from '../commuIcons';
 import { sendFriendRequest } from '../../../apis/commuApi';
 import { useMutation } from '@tanstack/react-query';
+import Swal from 'sweetalert2';
+import useAuthStore from '../../../store/authStore';
 
 const friendRegister = () => {
   const [mq, setMq] = useState('');
+  const { nickname } = useAuthStore();
   const [searchNickname, setSearchNickname] = useState('');
 
   //친구등록검색api호출
@@ -22,10 +25,20 @@ const friendRegister = () => {
   const sendFriendRequestMutation = useMutation({
     mutationFn: (friendId: number) => sendFriendRequest(friendId),
     onSuccess: () => {
-      alert('친구 요청이 성공적으로 보내졌습니다.');
+      Swal.fire({
+        icon: 'success',
+        text: `'${mq}' 님에게 친구 요청을 보냈습니다.`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
     },
     onError: (error: Error) => {
-      alert('친구 요청을 보내는 데 실패했습니다.');
+      Swal.fire({
+        icon: 'success',
+        title: '친구 요청을 보내는 데 실패했습니다.',
+        timer: 2000,
+        showConfirmButton: false,
+      });
       console.error(error);
     },
   });
@@ -62,7 +75,11 @@ const friendRegister = () => {
       </InputContainer>
       <EmptyDiv>
         {!hasData && !!mq && !isLoading && (
-          <FlexDiv width="900px">존재하지 않는 사용자입니다.</FlexDiv>
+          <FlexDiv width="900px">
+            {mq == nickname
+              ? '자기 자신은 검색할 수 없습니다.'
+              : '존재하지 않는 사용자입니다.'}
+          </FlexDiv>
         )}
         {!!mq && isLoading && <div>스켈레톤</div>}
 
@@ -123,6 +140,8 @@ const FlexDiv = styled.div<{ width?: string }>`
   align-items: center;
   height: 130px;
   width: ${(props) => props.width || 'auto'};
+  font-size: 20px;
+  color: red;
 `;
 const ProfileContainer = styled.div`
   background-color: white;

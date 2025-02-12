@@ -8,8 +8,6 @@ import PurpleTheme from '../../assets/images/SettingsPageIcons/PurpleTheme.svg';
 export default function ThemeSettingPage() {
   const { theme, setTheme } = useAuthStore(); // ✅ useAuthStore에서 theme 가져오기
 
-  console.log(theme);
-
   return (
     <Container>
       <TitleContainer>
@@ -23,7 +21,7 @@ export default function ThemeSettingPage() {
           onClick={() => setTheme('DEFAULT')} // ✅ 서버에 반영되도록 수정
         />
         <ThemeOption src={GreenTheme} selected={theme === 'DEFAULT'}>
-          <ThemeText>기본 테마</ThemeText>
+          <ThemeText></ThemeText>
         </ThemeOption>
       </OptionContainer>
 
@@ -33,7 +31,7 @@ export default function ThemeSettingPage() {
           onClick={() => setTheme('THEME1')} // ✅ 서버에 반영되도록 수정
         />
         <ThemeOption src={BlueTheme} selected={theme === 'THEME1'}>
-          <ThemeText>파랑 테마</ThemeText>
+          <ThemeText></ThemeText>
         </ThemeOption>
       </OptionContainer>
 
@@ -43,7 +41,7 @@ export default function ThemeSettingPage() {
           onClick={() => setTheme('THEME2')} // ✅ 서버에 반영되도록 수정
         />
         <ThemeOption src={PurpleTheme} selected={theme === 'THEME2'}>
-          <ThemeText>보라 테마</ThemeText>
+          <ThemeText></ThemeText>
         </ThemeOption>
       </OptionContainer>
     </Container>
