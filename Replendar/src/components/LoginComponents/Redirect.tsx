@@ -1,54 +1,66 @@
 import axios from 'axios';
 import { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
+import Swal from 'sweetalert2';
 
 export default function Redirect() {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
   const { setAuth, setTheme } = useAuthStore();
   const AUTHORIZE_CODE: string | null = new URLSearchParams(
     window.location.search
   ).get('code');
 
-  const getToken = () => {
+  const getToken = async () => {
     try {
-      axios
-        .get(`${import.meta.env.VITE_BACKEND_API_URL}?code=${AUTHORIZE_CODE}`)
-        .then((response) => {
-          console.log(response);
-          const { accessToken, id, nickName, email, theme } =
-            response.data.result;
-          if (response.data.isSuccess) {
-            setAuth(accessToken, email, id, nickName, theme);
-            setTheme(theme);
-            navigate('/signup');
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_API_URL}?code=${AUTHORIZE_CODE}`
+      );
 
-            alert('로그인에 성공했습니다');
-            if (!nickName) {
-              alert('Replendar에 처음이시군요. 회원가입부터 진행해주세요!');
-              navigate('/signup');
-            } else {
-              alert('Replendar에 오신 것을 환영합니다. ' + nickName + '님');
+      console.log(response);
+      const { accessToken, id, nickName, email, theme } = response.data.result;
 
-              if (pathname !== '/') {
-                navigate('/');
-              }
-              navigate('/');
-            }
-          } else {
-            throw new Error('토큰이 없습니다.');
-          }
+      if (response.data.isSuccess) {
+        setAuth(accessToken, email, id, nickName, theme);
+        setTheme(theme);
+
+        // ✅ SweetAlert 로그인 성공 메시지
+        await Swal.fire({
+          icon: 'success',
+          title: '로그인에 성공했습니다!',
+          text: nickName
+            ? `Replendar에 돌아오신 것을 환영합니다, ${nickName}님!`
+            : 'Replendar에 처음 오셨군요! 회원가입을 진행해주세요.',
+          timer: 3000,
+          showConfirmButton: false,
         });
+
+        if (!nickName) {
+          navigate('/signup');
+        } else {
+          navigate('/');
+        }
+      } else {
+        throw new Error('토큰이 없습니다.');
+      }
     } catch (error) {
       console.error('로그인 실패:', error);
-      alert('로그인에 실패했습니다.');
+
+      // ✅ SweetAlert 로그인 실패 메시지
+      await Swal.fire({
+        icon: 'error',
+        title: '로그인 실패',
+        text: '로그인에 실패하였습니다. 다시 시도해주세요.',
+        confirmButtonText: '확인',
+      });
+
       navigate('/login');
     }
   };
+
   useEffect(() => {
     getToken();
   }, []);
 
-  return <h1>리다이렉트 중입니다.</h1>;
+  return <h1></h1>;
 }
