@@ -10,19 +10,12 @@ import { FriendRegisterSkeleton } from '../../skeleton';
 const friendRegister = () => {
   const [mq, setMq] = useState('');
   const [searchNickname, setSearchNickname] = useState('');
-  const [resulMessage, setResultMessage] = useState('');
 
   //친구등록검색api호출
   const { data, isLoading } = useGetData(
     mq ? `/api/friends/search?nickname=${mq}` : ''
   );
 
-  useEffect(() => {
-    console.log('data', data);
-  }, [data]);
-  useEffect(() => {
-    console.log('mq', mq);
-  }, [mq]);
   const hasData = Array.isArray(data) && data.length > 0;
   const friendData = hasData ? data[0] : null;
 
