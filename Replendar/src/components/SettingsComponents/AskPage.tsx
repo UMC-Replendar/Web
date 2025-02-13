@@ -6,6 +6,7 @@ import emailjs from '@emailjs/browser';
 import { useProfileStore } from '../../store/profileStore';
 import useDebounce from '../../hooks/useDebounce';
 import Swal from 'sweetalert2';
+import { useThemeStore, themeBackground } from '../../store/useThemeStore';
 
 export default function AskPage() {
   const form = useRef<HTMLFormElement>(null);
@@ -15,6 +16,9 @@ export default function AskPage() {
   const [message, setMessage] = useState(
     `닉네임: ${profile?.nickname || '리플레넝'} \n문의내용: `
   );
+  const { selectedTheme } = useThemeStore();
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[1];
 
   const debouncedMessage = useDebounce(message, 500);
 
@@ -66,7 +70,11 @@ export default function AskPage() {
         <TitleSpan>문의하기</TitleSpan>
       </TitleContainer>
 
-      <FormContainer ref={form} onSubmit={handleSubmit}>
+      <FormContainer
+        background={backgroundColor}
+        ref={form}
+        onSubmit={handleSubmit}
+      >
         <Label>
           서비스 이용 중 불편한 사항이 있으셨다면 문의사항을 남겨주세요
           <EditIcon src={PencilIcon} />
@@ -124,8 +132,8 @@ export const TitleSpan = styled.span`
   line-height: 140%;
 `;
 
-const FormContainer = styled.form`
-  background: #fcf6f5;
+const FormContainer = styled.form<{ background: string }>`
+  background: ${({ background }) => background};
   border-radius: 20px;
   padding: 40px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);

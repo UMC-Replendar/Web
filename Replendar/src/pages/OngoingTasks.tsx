@@ -11,6 +11,7 @@ import useAuthStore from '../store/authStore';
 import useGetData from '../hooks/useGetData';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { useThemeStore, themeBackground } from '../store/useThemeStore';
 
 const PageWrapper = styled.div`
   margin-top: 79px;
@@ -30,13 +31,13 @@ const LeftTitles = styled.div`
   display: flex;
 `;
 
-const MainPageTitleBox = styled.div`
+const MainPageTitleBox = styled.div<{ background: string }>`
   display: flex;
   padding: 17px 20px;
   justify-content: center;
+  background: ${({ background }) => background};
   align-items: center;
   border-radius: 20px 20px 0px 0px;
-  background: #fcf6f5;
   width: 200px;
   height: fit-content;
   cursor: pointer;
@@ -94,9 +95,9 @@ const More = styled.div`
   }
 `;
 
-const TaskBox = styled.div<{ $isScrollable: boolean }>`
+const TaskBox = styled.div<{ $isScrollable: boolean; background: string }>`
   border-radius: 0px 20px 20px 20px;
-  background: #fcf6f5;
+  background: ${({ background }) => background};
   padding: 52px 64px;
   ${({ $isScrollable }) =>
     $isScrollable
@@ -202,6 +203,11 @@ function OngoingTasks() {
   const storedUserId = localStorage.getItem('id');
   const userId = storedUserId ? parseInt(storedUserId, 10) : null; // integer
 
+  const { selectedTheme } = useThemeStore(); // 현재 선택된 테마 가져오기
+
+  const themeColors = themeBackground[selectedTheme]; // 현재 테마 색상 배열
+  const backgroundColor = themeColors[1]; // 진행 중인 과제 바탕색 (index 1)
+
   // 진행 중인 과제 데이터 가져오기
   const {
     data: tasks = [],
@@ -269,10 +275,10 @@ function OngoingTasks() {
     <PageWrapper>
       <MainPageTitleWrapper>
         <LeftTitles>
-          <MainPageTitleBox>
+          <MainPageTitleBox background={backgroundColor}>
             <MainPageTitle>진행 중인 과제</MainPageTitle>
           </MainPageTitleBox>
-          <MainPageTitleBox style={{ background: '#E8E8E8' }}>
+          <MainPageTitleBox background={'#E8E8E8'}>
             <MainPageTitle>중요한 과제</MainPageTitle>
           </MainPageTitleBox>
         </LeftTitles>
@@ -313,7 +319,7 @@ function OngoingTasks() {
         </div>
       </MainPageTitleWrapper>
 
-      <TaskBox $isScrollable={tasks.length > 10}>
+      <TaskBox background={backgroundColor} $isScrollable={tasks.length > 10}>
         {tasks.slice(0, visibleTasksCount).map((task: any, index: number) => (
           <TaskItem
             key={task.assignmentId}

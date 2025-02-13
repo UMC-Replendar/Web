@@ -6,6 +6,7 @@ import taskIcon from '../../../assets/images/InfoIcons/Task.svg';
 import { useGetInfiniteData } from '../../../hooks/useGetInfiniteData';
 import { useInView } from 'react-intersection-observer';
 import ClipLoader from 'react-spinners/ClipLoader';
+import { useThemeStore, themeBackground } from '../../../store/useThemeStore';
 
 const Container = styled.div`
   display: flex;
@@ -17,8 +18,8 @@ const Container = styled.div`
   gap: 20px;
 `;
 
-const Box = styled.div`
-  background-color: #fcf6f5;
+const Box = styled.div<{ background: string }>`
+  background-color: ${({ background }) => background};
   box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
   width: 100%;
@@ -102,6 +103,10 @@ const NotCompletedTaskPage: React.FC = () => {
 
   const { ref, inView } = useInView({ threshold: 0 });
 
+  const { selectedTheme } = useThemeStore();
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[1];
+
   useEffect(() => {
     if (inView && hasNextPage && !isFetching) {
       fetchNextPage();
@@ -119,7 +124,7 @@ const NotCompletedTaskPage: React.FC = () => {
         <Text>미완료 과제</Text>
       </Wrapper>
 
-      <Box>
+      <Box background={backgroundColor}>
         {data?.pages?.flatMap((page: IPage<Task>) =>
           page.content.map((item: Task) => {
             console.log('과제 데이터:', item);

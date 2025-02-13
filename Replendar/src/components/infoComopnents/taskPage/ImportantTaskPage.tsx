@@ -6,6 +6,7 @@ import ClipLoader from 'react-spinners/ClipLoader';
 import { useGetInfiniteData } from '../../../hooks/useGetInfiniteData';
 import { IPage, Task } from '../../../types';
 import taskIcon from '../../../assets/images/InfoIcons/Task.svg';
+import { useThemeStore, themeBackground } from '../../../store/useThemeStore';
 
 const Container = styled.div`
   display: flex;
@@ -17,8 +18,8 @@ const Container = styled.div`
   gap: 20px;
 `;
 
-const Box = styled.div`
-  background-color: #fcf6f5;
+const Box = styled.div<{ background: string }>`
+  background-color: ${({ background }) => background};
   box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
   width: 100%;
@@ -107,6 +108,10 @@ const ImportantTaskPage: React.FC = () => {
 
   const { ref, inView } = useInView({ threshold: 0 });
 
+  const { selectedTheme } = useThemeStore();
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[1];
+
   useEffect(() => {
     if (inView && hasNextPage && !isFetching) {
       fetchNextPage();
@@ -123,7 +128,7 @@ const ImportantTaskPage: React.FC = () => {
         <Text>중요한 과제</Text>
       </Wrapper>
 
-      <Box>
+      <Box background={backgroundColor}>
         {data?.pages?.flatMap((page: IPage<Task>) =>
           page.content.map((item: Task, index) => {
             console.log('과제 데이터:', item);

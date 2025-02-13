@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-
+import { useThemeStore, themeBackground } from '../../store/useThemeStore';
 import MenuContent from './menuContent';
 import DownArrowIcon from '../../assets/images/DownArrowIcon.svg';
 import UpArrowIcon from '../../assets/images/UpArrowIcon.svg';
@@ -15,6 +15,10 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, menuItems }) => {
     activeMenu: menuItems[0],
     expanded: false,
   });
+
+  const { selectedTheme } = useThemeStore();
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[1];
 
   const handleMenuClick = (menu: string) =>
     setMenuState({ activeMenu: menu, expanded: false });
@@ -55,7 +59,11 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, menuItems }) => {
           />
         </FlexDiv>
       </SpaceBtwDiv>
-      <StyledDiv ref={divRef} expanded={menuState.expanded.toString()}>
+      <StyledDiv
+        background={backgroundColor}
+        ref={divRef}
+        expanded={menuState.expanded.toString()}
+      >
         <MenuContent
           menuState={menuState.activeMenu}
           expanded={menuState.expanded.toString()}
@@ -74,8 +82,8 @@ const FlexDiv = styled.div`
   font-size: 16px;
   gap: 6px;
 `;
-const StyledDiv = styled.div<{ expanded: string }>`
-  background: rgba(252, 246, 245, 1);
+const StyledDiv = styled.div<{ expanded: string; background: string }>`
+  background: ${({ background }) => background};
   width: 95%;
   overflow-y: ${({ expanded }) => (expanded === 'true' ? 'auto' : 'hidden')};
   border-radius: 20px;
@@ -87,7 +95,7 @@ const StyledDiv = styled.div<{ expanded: string }>`
 
   height: ${(props) => (props.expanded === 'true' ? '855px' : '380px')};
 
-transition: height 0.3s ease-out;>
+  transition: height 0.3s ease-out;
 `;
 
 const CustomBtn = styled.button<{ isSelected: boolean }>`

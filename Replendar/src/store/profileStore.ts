@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 import { create } from 'zustand';
 import { axiosInstance } from '../apis/axios-instance';
 import { NavigateFunction } from 'react-router-dom';
@@ -36,13 +37,25 @@ export const useProfileStore = create<ProfileStore>((set) => ({
         set({ profile: response.data.result, loading: false });
       } else {
         set({ loading: false });
-        alert('로그인이 필요합니다.');
-        navigate('/login');
+        Swal.fire({
+          icon: 'warning',
+          title: '로그인 해주세요',
+          text: '로그인이 필요한 서비스입니다.',
+          confirmButtonColor: '#7AC19A',
+        }).then(() => {
+          navigate('/login');
+        });
       }
     } catch (error) {
       set({ loading: false });
-      alert('로그인이 필요합니다.');
-      navigate('/login');
+      Swal.fire({
+        icon: 'error',
+        title: `로그인 해주세요`,
+        text: `로그인이 필요한 서비스입니다. (${error})`,
+        confirmButtonColor: '#7AC19A',
+      }).then(() => {
+        navigate('/login');
+      });
     }
   },
 
