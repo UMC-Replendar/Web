@@ -19,6 +19,8 @@ index
 3번은 메인-과제2번색
 4번은 메인-과제3번색
 5번은 사이드바 hover시에 색
+
+alert confirmbutton text: 3번
 */
 export const themeBackground = {
   DEFAULT: ['#2bae66', '#D9D9D9', '#2BAE66', '#25C26C', '#7AC19A', '#00893D'],
