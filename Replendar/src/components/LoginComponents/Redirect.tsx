@@ -28,7 +28,7 @@ export default function Redirect() {
           icon: 'success',
           title: '로그인에 성공했습니다!',
           text: nickName
-            ? `Replendar에 돌아오신 것을 환영합니다. ${{ nickName }}님!`
+            ? `Replendar에 돌아오신 것을 환영합니다. ${nickName}님!`
             : 'Replendar에 처음 오셨군요! 회원가입을 진행해주세요.',
           timer: 3000,
           showConfirmButton: false,

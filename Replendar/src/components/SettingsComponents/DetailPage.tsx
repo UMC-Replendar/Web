@@ -1,15 +1,21 @@
 import { Container, TitleContainer, TitleIcon, TitleSpan } from './AskPage';
 import DetailIcon from '../../assets/images/SettingsPageIcons/DetailIcon.svg';
 import styled from 'styled-components';
+import { useThemeStore, themeBackground } from '../../store/useThemeStore';
 
 export default function DetailPage() {
+  const { selectedTheme } = useThemeStore();
+
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[1];
+
   return (
     <Container>
       <TitleContainer>
         <TitleIcon src={DetailIcon} />
         <TitleSpan>이용약관</TitleSpan>
       </TitleContainer>
-      <DetailContainer>
+      <DetailContainer background={backgroundColor}>
         <Title>제1조(목적)</Title>이 약관은 Replendar (이하 '회사' 라고
         합니다)가 제공하는 제반 서비스의 이용과 관련하여 회사와 회 원과의 권리,
         의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
@@ -250,16 +256,15 @@ export default function DetailPage() {
   );
 }
 
-const DetailContainer = styled.div`
-  background: #fdf9f7;
+const DetailContainer = styled.div<{ background: string }>`
+  background: ${({ background }) => background};
   border-radius: 20px;
   padding: 40px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  max-width: 1562px; /* 고정된 width */
-  height: 771px; /* 고정된 height */
-  background-color: #fcf6f5;
-  overflow-y: auto; /* 길이가 넘칠 경우 스크롤 가능 */
-  word-break: break-word; /* 긴 단어가 넘칠 경우 줄바꿈 */
+  max-width: 1562px;
+  height: 771px;
+  overflow-y: auto;
+  word-break: break-word;
   font-size: 20px;
 `;
 

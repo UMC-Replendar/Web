@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 import { axiosInstance } from '../../apis/axios-instance';
 import BlueButton from '../blueButton';
+import { useThemeStore, themeBackground } from '../../store/useThemeStore';
 
 const Container = styled.div`
   width: 100%;
@@ -28,11 +29,11 @@ const Menu = styled.div`
   gap: 10px;
 `;
 
-const Button = styled.button<{ active: boolean }>`
+const Button = styled.button<{ active: boolean; background: string }>`
   height: 38px;
   width: 135px;
   padding: 8px 8px;
-  background-color: ${(props) => (props.active ? 'green' : '#E8E8E8')};
+  background-color: ${(props) => (props.active ? props.background : '#E8E8E8')};
   border-radius: 50px;
   border: none;
   color: ${(props) => (props.active ? 'white' : '#666666')};
@@ -41,14 +42,14 @@ const Button = styled.button<{ active: boolean }>`
   font-weight: 500;
   cursor: pointer;
   &:hover {
-    background-color: green;
+    background-color: ${({ background }) => background};
     color: white;
   }
 `;
 
-const ContentBox = styled.div`
+const ContentBox = styled.div<{ background: string }>`
   padding: 34.5px 109px 67.5px 37px;
-  background: #fcf6f5;
+  background: ${({ background }) => background};
   box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
   width: calc(100% - 146px);
@@ -83,6 +84,11 @@ const HistoryDetails = styled.div`
 
 const HistoryPage: React.FC = () => {
   const [activeMenu, setActiveMenu] = useState<string>('전체');
+
+  const { selectedTheme } = useThemeStore();
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[1];
+  const buttonColor = themeColors[0];
 
   const apiUrl = (() => {
     switch (activeMenu) {
@@ -124,6 +130,7 @@ const HistoryPage: React.FC = () => {
       <Menu>
         {['전체', '친구소식', '과제알림', '기타'].map((menu) => (
           <Button
+            background={buttonColor}
             key={menu}
             active={activeMenu === menu}
             onClick={() => setActiveMenu(menu)}
@@ -132,7 +139,7 @@ const HistoryPage: React.FC = () => {
           </Button>
         ))}
       </Menu>
-      <ContentBox>
+      <ContentBox background={backgroundColor}>
         {data.length > 0 ? (
           data.map(
             (

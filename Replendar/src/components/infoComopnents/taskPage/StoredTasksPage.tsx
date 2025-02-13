@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
 import { Task, IPage } from '../../../types';
+import { useThemeStore, themeBackground } from '../../../store/useThemeStore';
 
 import taskIcon from '../../../assets/images/InfoIcons/Task.svg';
 import { useGetInfiniteData } from '../../../hooks/useGetInfiniteData';
@@ -19,8 +20,8 @@ const Container = styled.div`
   gap: 20px;
 `;
 
-const Box = styled.div`
-  background-color: #fcf6f5;
+const Box = styled.div<{ background: string }>`
+  background-color: ${({ background }) => background};
   box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
   width: 100%;
@@ -102,6 +103,10 @@ const StoredTaskPage: React.FC = () => {
 
   const { ref, inView } = useInView({ threshold: 0 });
 
+  const { selectedTheme } = useThemeStore();
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[1];
+
   useEffect(() => {
     if (inView && hasNextPage && !isFetching) {
       fetchNextPage();
@@ -119,7 +124,7 @@ const StoredTaskPage: React.FC = () => {
         <Text>보관한 과제</Text>
       </Wrapper>
 
-      <Box>
+      <Box background={backgroundColor}>
         <GridContainer>
           <div>마감일</div>
           <div>유효 여부</div>

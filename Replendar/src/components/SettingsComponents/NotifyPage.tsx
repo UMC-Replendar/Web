@@ -1,6 +1,7 @@
 import { Container, TitleContainer, TitleIcon, TitleSpan } from './AskPage';
 import NotifyIcon from '../../assets/images/SettingsPageIcons/NotifyIcon.svg';
 import styled from 'styled-components';
+import { useThemeStore, themeBackground } from '../../store/useThemeStore';
 
 export default function NotifyPage() {
   const notices = [
@@ -8,13 +9,17 @@ export default function NotifyPage() {
     { date: '12 / 13', title: 'ver 1.01 Replendar 패치' },
   ];
 
+  const { selectedTheme } = useThemeStore();
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[1];
+
   return (
     <Container>
       <TitleContainer>
         <TitleIcon src={NotifyIcon} alt="공지사항 아이콘" />
         <TitleSpan>공지사항</TitleSpan>
       </TitleContainer>
-      <NoticeContainer>
+      <NoticeContainer background={backgroundColor}>
         <NoticeTable>
           <TableHeader>날짜</TableHeader>
           <TableHeader>제목</TableHeader>
@@ -35,8 +40,8 @@ export default function NotifyPage() {
 
 // 스타일 정의
 
-const NoticeContainer = styled.div`
-  background: #fcf6f5;
+const NoticeContainer = styled.div<{ background: string }>`
+  background: ${({ background }) => background};
   border-radius: 20px;
   padding: 40px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
@@ -57,7 +62,7 @@ const TableHeader = styled.th`
   font-weight: bold;
   color: #333;
   padding: 15px;
-  background-color: #fcf6f5;
+  border-bottom: 1px solid #eee;
 `;
 
 const TableRow = styled.tr``;
@@ -70,5 +75,5 @@ const TableCell = styled.td`
   font-style: normal;
   font-weight: 500;
   line-height: 140%;
-  /* border-bottom: 1px solid #eee; */
+  border-bottom: 1px solid #eee;
 `;

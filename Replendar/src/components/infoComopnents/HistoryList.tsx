@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { axiosInstance } from '../../apis/axios-instance';
 import BlueButton from '../blueButton';
 import Plus from '../../assets/images/PlusIcon.svg';
+import { useThemeStore, themeBackground } from '../../store/useThemeStore';
 
 const Title = styled.p`
   color: black;
@@ -14,11 +15,11 @@ const Title = styled.p`
   margin-bottom: 17px;
 `;
 
-const HistoryContainer = styled.div`
+const HistoryContainer = styled.div<{ background: string }>`
   width: 100%;
   height: auto;
   padding: 34.5px 109px 39.5px 37px;
-  background: #fcf6f5;
+  background: ${({ background }) => background};
   box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
   display: flex;
@@ -79,6 +80,9 @@ const MoreContainer = styled.div`
 
 const HistoryList = () => {
   const navigate = useNavigate();
+  const { selectedTheme } = useThemeStore();
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[1];
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['history-preview'],
@@ -106,7 +110,7 @@ const HistoryList = () => {
         </MoreContainer>
       </TitleWrapper>
 
-      <HistoryContainer>
+      <HistoryContainer background={backgroundColor}>
         {data.length > 0 ? (
           data.map((entry: any, index: number) => (
             <HistoryEntryContainer key={index}>
