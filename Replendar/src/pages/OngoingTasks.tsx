@@ -30,13 +30,14 @@ const LeftTitles = styled.div`
   display: flex;
 `;
 
-const MainPageTitleBox = styled.div`
+const MainPageTitleBox = styled.div<{ isSelected: boolean }>`
   display: flex;
   padding: 17px 20px;
   justify-content: center;
   align-items: center;
   border-radius: 20px 20px 0px 0px;
-  background: #fcf6f5;
+  background: ${({ isSelected }) => (isSelected ? '#fcf6f5' : '#e8e8e8')};
+  color: ${({ isSelected }) => (isSelected ? 'black' : '#7e7f7f')};
   width: 200px;
   height: fit-content;
   cursor: pointer;
@@ -196,13 +197,10 @@ function TaskItem({ task, onComplete, onEdit }: TaskProps) {
 
 function OngoingTasks() {
   const { isOpen, openModal, closeModal, modalContent } = useModalStore();
-  const { token } = useAuthStore();
+  const { token, id: userId } = useAuthStore();
   const queryClient = useQueryClient();
 
-  const storedUserId = localStorage.getItem('id');
-  const userId = storedUserId ? parseInt(storedUserId, 10) : null; // integer
-
-  // 진행 중인 과제 데이터 가져오기
+  // 진행 중인 과제 API
   const {
     data: tasks = [],
     isLoading,
@@ -210,6 +208,10 @@ function OngoingTasks() {
   } = useGetData(`/api/assignment?userId=${userId}`, {
     headers: { Authorization: `${token}` },
   });
+
+  const [selectedTab, setSelectedTab] = useState<'ongoing' | 'important'>(
+    'ongoing'
+  );
 
   const [visibleTasksCount, setVisibleTasksCount] = useState(3);
 
@@ -269,10 +271,16 @@ function OngoingTasks() {
     <PageWrapper>
       <MainPageTitleWrapper>
         <LeftTitles>
-          <MainPageTitleBox>
+          <MainPageTitleBox
+            isSelected={selectedTab === 'ongoing'}
+            onClick={() => setSelectedTab('ongoing')}
+          >
             <MainPageTitle>진행 중인 과제</MainPageTitle>
           </MainPageTitleBox>
-          <MainPageTitleBox style={{ background: '#E8E8E8' }}>
+          <MainPageTitleBox
+            isSelected={selectedTab === 'important'}
+            onClick={() => setSelectedTab('important')}
+          >
             <MainPageTitle>중요한 과제</MainPageTitle>
           </MainPageTitleBox>
         </LeftTitles>
