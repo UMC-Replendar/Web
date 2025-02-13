@@ -1,12 +1,12 @@
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import BlueButton from '../../blueButton';
-import { Task } from '../../../types';
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import useAuthStore from '../../../store/authStore';
-import WrokedIcon from '../../../assets/images/Worked.svg';
-import { axiosInstance } from '../../../apis/axios-instance';
-import { useNavigate } from 'react-router-dom';
+import { useInView } from 'react-intersection-observer';
+import ClipLoader from 'react-spinners/ClipLoader';
+import { useGetInfiniteData } from '../../../hooks/useGetInfiniteData';
+import { IPage, Task } from '../../../types';
+import taskIcon from '../../../assets/images/InfoIcons/Task.svg';
+import { useThemeStore, themeBackground } from '../../../store/useThemeStore';
 
 const Container = styled.div`
   display: flex;
@@ -17,9 +17,13 @@ const Container = styled.div`
   margin-top: 70px;
   gap: 20px;
 `;
+const Image = styled.img`
+  width: 30px;
+  height: 30px;
+`;
 
-const Box = styled.div`
-  background-color: #fcf6f5;
+const Box = styled.div<{ background: string }>`
+  background-color: ${({ background }) => background};
   box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
   width: 100%;
@@ -32,17 +36,6 @@ const Wrapper = styled.div`
   align-items: center;
   gap: 20px;
   margin-bottom: 20px;
-`;
-
-const Image = styled.img`
-  width: 30px;
-  height: 30px;
-`;
-
-const Text = styled.div`
-  font-weight: bold;
-  font-size: 28px;
-  font-family: Pretendard, sans-serif;
 `;
 
 const WhiteBox = styled.div`
@@ -66,7 +59,11 @@ const TaskDetails = styled.div`
   width: 40%;
   justify-content: space-between;
 `;
-
+const Text = styled.div`
+  font-weight: bold;
+  font-size: 28px;
+  font-family: Pretendard, sans-serif;
+`;
 const TaskText = styled.div`
   color: black;
   font-size: 19px;
@@ -86,97 +83,75 @@ const DelayMessage = styled.div<{ isEarly: boolean }>`
   margin-top: 5px;
 `;
 
+const Scroll = styled.div`
+  width: 100vw;
+  height: 50px;
+  margin-top: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+`;
+
 const CompletedTasksPage: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const { token } = useAuthStore();
-  const navigate = useNavigate();
+  const { selectedTheme } = useThemeStore();
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[1];
+
+  const { data, isPending, isFetching, hasNextPage, fetchNextPage } =
+    useGetInfiniteData(`/api/assignment/complete`, 5);
+
+  const { ref, inView } = useInView({ threshold: 0 });
 
   useEffect(() => {
-    const fetchCompletedTasks = async () => {
-      if (!token) {
-        alert('로그인이 필요합니다.');
-        navigate('/');
-        return;
-      }
-      //페이지 방식 수정 필요
-      const queryParams = new URLSearchParams({
-        page: '1',
-        size: '5',
-        sort: 'completionTime',
-      }).toString();
+    if (inView && hasNextPage && !isFetching) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetching, fetchNextPage]);
 
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await axiosInstance.get(
-          `/api/assignment/complete?${queryParams}`
-        );
-
-        console.log('API 응답:', response.data);
-
-        //임시
-        const fetchedTasks = response.data.result.content.map((item: any) => ({
-          date: item.date || '미정',
-          time: item.time || '미정',
-          description: item.description || '설명 없음',
-          delay: item.delay || '지연 정보 없음',
-          status: item.status === '' ? undefined : item.status,
-        }));
-
-        setTasks(fetchedTasks);
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          setError(error.response?.data?.message || '서버 오류 발생');
-        } else {
-          setError('예기치 않은 오류가 발생했습니다.');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCompletedTasks();
-  }, [token]);
-
-  if (loading) return <p>로딩 중...</p>;
-  if (error) return <p>오류 발생: {error}</p>;
+  if (isPending) {
+    return <div>스켈레톤 UI (로딩 중...)</div>;
+  }
 
   return (
     <Container>
       <Wrapper>
-        <Image src={WrokedIcon} alt="Task Icon" />
+        <Image src={taskIcon} alt="Task Icon" />
         <Text>완료한 과제</Text>
       </Wrapper>
 
-      <Box>
-        {tasks.length === 0 ? (
-          <p>
-            완료된 과제가 없습니다. <br />
-            완료된 과제가 있을 때 넘겨받은 content 구조 보고 수정 필요할 듯
-          </p>
-        ) : (
-          tasks.map((task, index) => {
-            const isEarly = task.delay.includes('빨랐습니다');
+      <Box background={backgroundColor}>
+        {data?.pages?.flatMap((page: IPage<Task>) =>
+          page.content.map((item: Task) => {
+            console.log('과제 데이터:', item);
+
+            const isEarly = !item.due_datetime.includes('-'); // "-"가 없으면 빠른 제출
+            const formattedTime = item.due_datetime.replace('-', '').trim(); // "-" 제거하여 순수 시간만 표시
+
+            const delayMessage = `과제 제출이 ${
+              isEarly
+                ? `${formattedTime} 빨랐습니다`
+                : `${formattedTime} 늦었습니다`
+            }`;
+
             return (
-              <WhiteBox key={index}>
+              <WhiteBox key={item.completionTime}>
                 <TaskItem>
                   <TaskDetails>
-                    <TaskText>{task.date}</TaskText>
-                    <TaskText>{task.time}</TaskText>
-                    <TaskText>{task.description}</TaskText>
+                    <TaskText>{item.due_date || '미정'}</TaskText>
+                    <TaskText>{item.due_time || '미정'}</TaskText>
+                    <TaskText>{item.title || '과제 없음'}</TaskText>
                   </TaskDetails>
-                  <BlueButton status={undefined}>
-                    {task.status ?? '미확인'}
-                  </BlueButton>
+                  <BlueButton status="완료">완료</BlueButton>
                 </TaskItem>
-                <DelayMessage isEarly={isEarly}>{task.delay}</DelayMessage>
+                <DelayMessage isEarly={isEarly}>{delayMessage}</DelayMessage>
               </WhiteBox>
             );
           })
         )}
       </Box>
+
+      {isFetching && <div>스켈레톤 UI (추가 로딩 중...)</div>}
+      <Scroll ref={ref}>{isFetching && <ClipLoader color={'black'} />}</Scroll>
     </Container>
   );
 };

@@ -5,6 +5,13 @@ export interface Task {
   description: string;
   delay: string;
   status: string;
+  title: string;
+  createdAt: string;
+  due_time: string;
+  due_date: string;
+  completionTime: string;
+  due_datetime: string;
+  dueDate: string;
 }
 
 // 기존 StoredTask 정의 (마감일과 유효성만 포함)

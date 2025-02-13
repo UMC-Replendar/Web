@@ -7,6 +7,7 @@ interface BlueBtnProps {
     | '완료'
     | '미완료'
     | '그룹에서 삭제하기'
+    | string
     | undefined;
   onClick?: () => void;
   children: React.ReactNode;
@@ -33,6 +34,7 @@ const BlueBtn = styled.button<{
     | '완료'
     | '미완료'
     | '그룹에서 삭제하기'
+    | string
     | undefined;
 }>`
   border-radius: 50px;

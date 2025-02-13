@@ -3,7 +3,8 @@ import { NineDots } from '../CommuComponents/commuIcons';
 import useGetData from '../../hooks/useGetData';
 import { useState } from 'react';
 import { SmallToggleSwitch } from '../../modal/EditTaskModal';
-import { ProfileImage } from '../CommuComponents/commuIcons';
+import DefaultProfileImg from '../../assets/images/SideBarIcons/DefaultProfileImg.svg';
+import { useProfileStore } from '../../store/profileStore';
 import { IFriendList } from '../../types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -33,6 +34,7 @@ const FriendListRender: React.FC<{
     note: '',
   });
 
+  const { profile } = useProfileStore();
   const [isEditing, setIsEditing] = useState(false);
   const [updatedNote, setUpdatedNote] = useState<string>('');
   const [calendarShow, setCalendarShow] = useState(false);
@@ -150,8 +152,6 @@ const FriendListRender: React.FC<{
             <>
               <StyledModal>
                 <FlexStartDiv>
-                  <ProfileImage width={'30'} height={'30'} />
-
                   <CenterDiv width="100px" bold>
                     {item.nickname}
                   </CenterDiv>
@@ -174,8 +174,7 @@ const FriendListRender: React.FC<{
           )}
           <SpaceBtwDiv>
             <FlexDiv>
-              <ProfileImage width={'30'} height={'30'} />
-
+              <ProfileImg src={item.profileImageUrl || DefaultProfileImg} />
               <CenterDiv width="100px">{item.nickname}</CenterDiv>
             </FlexDiv>
 
@@ -271,6 +270,17 @@ const FriendListRender: React.FC<{
 };
 
 export default FriendListRender;
+
+const ProfileImg = styled.div<{ src: string }>`
+  width: 34px;
+  height: 34px;
+  border-radius: 300px;
+  background-image: url(${(props) => props.src});
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: #d9d9d9;
+`;
 
 const StyledModal = styled.div`
   position: fixed;

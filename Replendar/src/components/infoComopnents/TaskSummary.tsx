@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import workedIcon from '../../assets/images/Worked.svg';
 import taskIcon from '../../assets/images/InfoIcons/Task.svg';
+import { useThemeStore, themeBackground } from '../../store/useThemeStore';
+
 const SummaryContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -9,7 +11,7 @@ const SummaryContainer = styled.div`
   width: 100%;
 `;
 
-const SummaryButton = styled.button`
+const SummaryButton = styled.button<{ background: string }>`
   display: flex;
   align-items: center;
   padding: 31.5px 26px;
@@ -19,7 +21,7 @@ const SummaryButton = styled.button`
   border: none;
   border-radius: 20px;
   cursor: pointer;
-  background-color: #fcf6f5;
+  background-color: ${({ background }) => background};
   box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
   justify-content: center;
   align-items: center;
@@ -65,10 +67,17 @@ interface TaskSummaryProps {
 
 const TaskSummary: React.FC<TaskSummaryProps> = ({ taskData }) => {
   const navigate = useNavigate();
+  const { selectedTheme } = useThemeStore();
+
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[1];
 
   return (
     <SummaryContainer>
-      <SummaryButton onClick={() => navigate('/info/completed')}>
+      <SummaryButton
+        background={backgroundColor}
+        onClick={() => navigate('/info/completed')}
+      >
         <Icon src={workedIcon} alt="Completed Task Icon" />
         <TaskContainer>
           <TaskText>완료한 과제</TaskText>
@@ -76,7 +85,10 @@ const TaskSummary: React.FC<TaskSummaryProps> = ({ taskData }) => {
         </TaskContainer>
       </SummaryButton>
 
-      <SummaryButton onClick={() => navigate('/info/stored')}>
+      <SummaryButton
+        background={backgroundColor}
+        onClick={() => navigate('/info/stored')}
+      >
         <Icon src={taskIcon} alt="Stored Task Icon" />
         <TaskContainer>
           <TaskText>보관한 과제</TaskText>
@@ -84,7 +96,10 @@ const TaskSummary: React.FC<TaskSummaryProps> = ({ taskData }) => {
         </TaskContainer>
       </SummaryButton>
 
-      <SummaryButton onClick={() => navigate('/info/notcompleted')}>
+      <SummaryButton
+        background={backgroundColor}
+        onClick={() => navigate('/info/notcompleted')}
+      >
         <Icon src={taskIcon} alt="Incomplete Task Icon" />
         <TaskContainer>
           <TaskText>미완료 과제</TaskText>
@@ -92,7 +107,10 @@ const TaskSummary: React.FC<TaskSummaryProps> = ({ taskData }) => {
         </TaskContainer>
       </SummaryButton>
 
-      <SummaryButton onClick={() => navigate('/info/important')}>
+      <SummaryButton
+        background={backgroundColor}
+        onClick={() => navigate('/info/important')}
+      >
         <Icon src={taskIcon} alt="Important Task Icon" />
         <TaskContainer>
           <TaskText>중요한 과제</TaskText>

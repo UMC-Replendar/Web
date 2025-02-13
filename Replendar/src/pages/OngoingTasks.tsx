@@ -11,6 +11,7 @@ import useAuthStore from '../store/authStore';
 import useGetData from '../hooks/useGetData';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { useThemeStore, themeBackground } from '../store/useThemeStore';
 
 const PageWrapper = styled.div`
   margin-top: 79px;
@@ -30,13 +31,14 @@ const LeftTitles = styled.div`
   display: flex;
 `;
 
-const MainPageTitleBox = styled.div<{ isSelected: boolean }>`
+
+const MainPageTitleBox = styled.div<{ isSelected: boolean;  background: string }>`
   display: flex;
   padding: 17px 20px;
   justify-content: center;
   align-items: center;
   border-radius: 20px 20px 0px 0px;
-  background: ${({ isSelected }) => (isSelected ? '#fcf6f5' : '#e8e8e8')};
+  background: ${(props) => (props.isSelected ? props.background : '#e8e8e8')};
   color: ${({ isSelected }) => (isSelected ? 'black' : '#7e7f7f')};
   width: 200px;
   height: fit-content;
@@ -95,9 +97,9 @@ const More = styled.div`
   }
 `;
 
-const TaskBox = styled.div<{ $isScrollable: boolean }>`
+const TaskBox = styled.div<{ $isScrollable: boolean; background: string }>`
   border-radius: 0px 20px 20px 20px;
-  background: #fcf6f5;
+  background: ${({ background }) => background};
   padding: 52px 64px;
   ${({ $isScrollable }) =>
     $isScrollable
@@ -200,7 +202,14 @@ function OngoingTasks() {
   const { token, id: userId } = useAuthStore();
   const queryClient = useQueryClient();
 
-  // 진행 중인 과제 API
+
+
+  const { selectedTheme } = useThemeStore(); // 현재 선택된 테마 가져오기
+
+  const themeColors = themeBackground[selectedTheme]; // 현재 테마 색상 배열
+  const backgroundColor = themeColors[1]; // 진행 중인 과제 바탕색 (index 1)
+
+  // 진행 중인 과제 데이터 가져오기
   const {
     data: tasks = [],
     isLoading,
@@ -271,15 +280,18 @@ function OngoingTasks() {
     <PageWrapper>
       <MainPageTitleWrapper>
         <LeftTitles>
+
           <MainPageTitleBox
             isSelected={selectedTab === 'ongoing'}
             onClick={() => setSelectedTab('ongoing')}
+            background={backgroundColor}
           >
             <MainPageTitle>진행 중인 과제</MainPageTitle>
           </MainPageTitleBox>
           <MainPageTitleBox
             isSelected={selectedTab === 'important'}
             onClick={() => setSelectedTab('important')}
+            background={backgroundColor}
           >
             <MainPageTitle>중요한 과제</MainPageTitle>
           </MainPageTitleBox>
@@ -321,7 +333,7 @@ function OngoingTasks() {
         </div>
       </MainPageTitleWrapper>
 
-      <TaskBox $isScrollable={tasks.length > 10}>
+      <TaskBox background={backgroundColor} $isScrollable={tasks.length > 10}>
         {tasks.slice(0, visibleTasksCount).map((task: any, index: number) => (
           <TaskItem
             key={task.assignmentId}

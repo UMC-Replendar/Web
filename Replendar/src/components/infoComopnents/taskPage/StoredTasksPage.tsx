@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import useAuthStore from '../../../store/authStore';
-import { Task } from '../../../types';
-import { axiosInstance } from '../../../apis/axios-instance';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+
+import { Task, IPage } from '../../../types';
+import { useThemeStore, themeBackground } from '../../../store/useThemeStore';
+
 import taskIcon from '../../../assets/images/InfoIcons/Task.svg';
+import { useGetInfiniteData } from '../../../hooks/useGetInfiniteData';
+import { useInView } from 'react-intersection-observer';
+import ClipLoader from 'react-spinners/ClipLoader';
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -17,8 +20,8 @@ const Container = styled.div`
   gap: 20px;
 `;
 
-const Box = styled.div`
-  background-color: #fcf6f5;
+const Box = styled.div<{ background: string }>`
+  background-color: ${({ background }) => background};
   box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
   width: 100%;
@@ -85,60 +88,34 @@ const TaskStatus = styled.div<{ isValid: boolean }>`
   font-weight: 500;
 `;
 
+const Scroll = styled.div`
+  width: 100vw;
+  height: 50px;
+  margin-top: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+`;
+
 const StoredTaskPage: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const { token } = useAuthStore();
-  const navigate = useNavigate();
+  const { data, isPending, isFetching, hasNextPage, fetchNextPage } =
+    useGetInfiniteData(`/api/assignment/store`, 5);
+
+  const { ref, inView } = useInView({ threshold: 0 });
+
+  const { selectedTheme } = useThemeStore();
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[1];
 
   useEffect(() => {
-    const fetchStoredTasks = async () => {
-      if (!token) {
-        alert('로그인이 필요합니다.');
-        navigate('/');
-        return;
-      }
+    if (inView && hasNextPage && !isFetching) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetching, fetchNextPage]);
 
-      const queryParams = new URLSearchParams({
-        page: '1',
-        size: '5',
-        sort: 'createdAt',
-      }).toString();
-
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await axiosInstance.get(
-          `/api/assignment/store?${queryParams}`
-        );
-
-        console.log('API 응답:', response.data);
-
-        // ✅ API 응답 데이터 매핑
-        const fetchedTasks = response.data.result.content.map((item: any) => ({
-          date: item.deadline || '미정',
-          delay: item.isValid ? '유효' : '만료됨',
-          description: item.title || '과제 없음',
-        }));
-
-        setTasks(fetchedTasks);
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          setError(error.response?.data?.message || '서버 오류 발생');
-        } else {
-          setError('예기치 않은 오류가 발생했습니다.');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStoredTasks();
-  }, [token]);
-
-  if (loading) return <p>로딩 중...</p>;
-  if (error) return <p>오류 발생: {error}</p>;
+  if (isPending) {
+    return <div>스켈레톤 UI (로딩 중...)</div>;
+  }
 
   return (
     <Container>
@@ -147,26 +124,37 @@ const StoredTaskPage: React.FC = () => {
         <Text>보관한 과제</Text>
       </Wrapper>
 
-      <Box>
+      <Box background={backgroundColor}>
         <GridContainer>
           <div>마감일</div>
           <div>유효 여부</div>
           <div>과제명</div>
         </GridContainer>
 
-        {tasks.map((task, index) => {
-          const isValid = task.delay === '유효';
-          return (
-            <WhiteBox key={index}>
-              <TaskRow>
-                <div>{task.date}</div>
-                <TaskStatus isValid={isValid}>{task.delay}</TaskStatus>
-                <div>{task.description}</div>
-              </TaskRow>
-            </WhiteBox>
-          );
-        })}
+        {data?.pages?.flatMap((page: IPage<Task>) =>
+          page.content.map((item: Task) => {
+            console.log('과제 데이터:', item);
+
+            const now = new Date(); // 현재 시간
+            const dueDate = new Date(item.due_date); // 마감일 변환
+            const isValid = now < dueDate; // 현재 시간보다 이후면 유효
+
+            return (
+              <WhiteBox key={item.createdAt}>
+                <TaskRow>
+                  <div>{item.due_date}</div>
+                  <TaskStatus isValid={isValid}>
+                    {isValid ? '유효' : '만료됨'}
+                  </TaskStatus>
+                  <div>{item.title}</div>
+                </TaskRow>
+              </WhiteBox>
+            );
+          })
+        )}
       </Box>
+      {isFetching && <div>스켈레톤 UI (추가 로딩 중...)</div>}
+      <Scroll ref={ref}>{isFetching && <ClipLoader color={'black'} />}</Scroll>
     </Container>
   );
 };

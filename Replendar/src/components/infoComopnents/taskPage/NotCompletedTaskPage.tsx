@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import BlueButton from '../../blueButton';
-import { Task } from '../../../types';
-import useAuthStore from '../../../store/authStore';
-import { axiosInstance } from '../../../apis/axios-instance';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { IPage, Task } from '../../../types';
 import taskIcon from '../../../assets/images/InfoIcons/Task.svg';
+import { useGetInfiniteData } from '../../../hooks/useGetInfiniteData';
+import { useInView } from 'react-intersection-observer';
+import ClipLoader from 'react-spinners/ClipLoader';
+import { useThemeStore, themeBackground } from '../../../store/useThemeStore';
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -17,8 +18,8 @@ const Container = styled.div`
   gap: 20px;
 `;
 
-const Box = styled.div`
-  background-color: #fcf6f5;
+const Box = styled.div<{ background: string }>`
+  background-color: ${({ background }) => background};
   box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
   width: 100%;
@@ -52,17 +53,27 @@ const WhiteBox = styled.div`
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 1px;
 `;
+
 const TaskDetails = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-between;
   align-items: center;
 `;
+
 const TaskItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 0;
+`;
+const Scroll = styled.div`
+  width: 100vw;
+  height: 50px;
+  margin-top: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
 `;
 
 const TaskText = styled.div`
@@ -73,77 +84,38 @@ const TaskText = styled.div`
   word-wrap: break-word;
   text-align: left;
 
-  /* 개별 요소 너비 설정 */
   &:nth-child(1) {
-    /* 날짜 */
-    flex-basis: 10%;
+    flex-basis: 20%;
     text-align: center;
   }
 
   &:nth-child(2) {
-    /* 과제명 */
     flex-basis: 60%;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap; /* 너무 길 경우 한 줄로 */
+    white-space: nowrap;
   }
 `;
-
 const NotCompletedTaskPage: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const { token } = useAuthStore();
-  const navigate = useNavigate();
+  const { data, isPending, isFetching, hasNextPage, fetchNextPage } =
+    useGetInfiniteData(`/api/assignment/unfinished`, 5);
+
+  const { ref, inView } = useInView({ threshold: 0 });
+
+  const { selectedTheme } = useThemeStore();
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[1];
 
   useEffect(() => {
-    const fetchUnfinishedTasks = async () => {
-      if (!token) {
-        alert('로그인이 필요합니다.');
-        navigate('/');
-        return;
-      }
+    if (inView && hasNextPage && !isFetching) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetching, fetchNextPage]);
 
-      const queryParams = new URLSearchParams({
-        page: '1',
-        size: '5',
-        sort: 'dueDate',
-      }).toString();
-
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await axiosInstance.get(
-          `/api/assignment/unfinished?${queryParams}`
-        );
-
-        console.log('API 응답:', response.data);
-
-        // ✅ API 응답 데이터 매핑
-        const fetchedTasks = response.data.result.content.map((item: any) => ({
-          date: item.deadline || '미정',
-          delay: item.isValid ? '유효' : '만료됨',
-          description: item.title || '과제 없음',
-        }));
-
-        setTasks(fetchedTasks);
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          setError(error.response?.data?.message || '서버 오류 발생');
-        } else {
-          setError('예기치 않은 오류가 발생했습니다.');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUnfinishedTasks();
-  }, [token]);
-
-  if (loading) return <p>로딩 중...</p>;
-  if (error) return <p>오류 발생: {error}</p>;
+  if (isPending) {
+    return <div>스켈레톤 UI (로딩 중...)</div>;
+  }
 
   return (
     <Container>
@@ -152,22 +124,26 @@ const NotCompletedTaskPage: React.FC = () => {
         <Text>미완료 과제</Text>
       </Wrapper>
 
-      <Box>
-        {tasks.map((task, index) => {
-          return (
-            <WhiteBox key={index}>
-              <TaskItem>
-                <TaskDetails>
-                  <TaskText>{task.date}</TaskText>
-
-                  <TaskText>{task.description}</TaskText>
-                </TaskDetails>
-                <BlueButton status={undefined}>{task.status}</BlueButton>
-              </TaskItem>
-            </WhiteBox>
-          );
-        })}
+      <Box background={backgroundColor}>
+        {data?.pages?.flatMap((page: IPage<Task>) =>
+          page.content.map((item: Task) => {
+            console.log('과제 데이터:', item);
+            return (
+              <WhiteBox key={item.dueDate}>
+                <TaskItem>
+                  <TaskDetails>
+                    <TaskText>{item.due_date}</TaskText>
+                    <TaskText>{item.title}</TaskText>
+                  </TaskDetails>
+                  <BlueButton status="미완료">미완료</BlueButton>
+                </TaskItem>
+              </WhiteBox>
+            );
+          })
+        )}
       </Box>
+      {isFetching && <div>스켈레톤 UI (추가 로딩 중...)</div>}
+      <Scroll ref={ref}>{isFetching && <ClipLoader color={'black'} />}</Scroll>
     </Container>
   );
 };

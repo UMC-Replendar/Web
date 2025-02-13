@@ -6,12 +6,17 @@ import axios from 'axios';
 import { useProfileStore } from '../store/profileStore';
 import { useEffect } from 'react';
 import Swal from 'sweetalert2';
+import { useThemeStore, themeBackground } from '../store/useThemeStore';
 
 function Settings() {
   const navigate = useNavigate();
   const { clearAuth } = useAuthStore();
   const { token } = useAuthStore();
   const { profile, fetchProfile } = useProfileStore();
+
+  const { selectedTheme } = useThemeStore();
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[1];
 
   useEffect(() => {
     // profile이 없을 때만 API 호출
@@ -152,7 +157,7 @@ function Settings() {
         <SettingsIcon src={Setting} />
         <SettingsTitle>환경설정</SettingsTitle>
       </TitleContainer>
-      <ComponentContainer>
+      <ComponentContainer background={backgroundColor}>
         <SectionContainer>
           <SectionTitle>계정</SectionTitle>
           <FirstSectionLink>
@@ -203,7 +208,7 @@ const SettingsWrapper = styled.div`
   gap: 50px;
 `;
 
-const ComponentContainer = styled.div`
+const ComponentContainer = styled.div<{ background: string }>`
   display: flex;
   width: 431px;
   height: 755px;
@@ -213,7 +218,7 @@ const ComponentContainer = styled.div`
   flex-shrink: 0;
   padding: 65px 30px 0px 30px;
   border-radius: 20px;
-  background: var(--bg, #fcf6f5);
+  background: ${({ background }) => background};
 
   /* bg 1 */
   box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.25);

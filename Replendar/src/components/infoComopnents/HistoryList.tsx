@@ -1,16 +1,10 @@
-//양식 확인용
-//연결은 HistoryPage.tsx 완성 후
-
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { axiosInstance } from '../../apis/axios-instance';
 import BlueButton from '../blueButton';
-
-interface HistoryEntry {
-  date: string;
-  time: string;
-  task: string;
-  status: '완료' | '미완료';
-}
+import Plus from '../../assets/images/PlusIcon.svg';
+import { useThemeStore, themeBackground } from '../../store/useThemeStore';
 
 const Title = styled.p`
   color: black;
@@ -18,23 +12,19 @@ const Title = styled.p`
   font-family: Pretendard;
   font-weight: 500;
   line-height: 39.2px;
-  word-wrap: break-word;
   margin-bottom: 17px;
-  cursor: pointer;
 `;
 
-const HistoryContainer = styled.div`
+const HistoryContainer = styled.div<{ background: string }>`
   width: 100%;
-  height: 100%;
+  height: auto;
   padding: 34.5px 109px 39.5px 37px;
-  background: #fcf6f5;
+  background: ${({ background }) => background};
   box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  cursor: pointer;
 `;
 
 const HistoryEntryContainer = styled.div`
@@ -51,7 +41,7 @@ const HistoryEntryContainer = styled.div`
 
 const HistoryDetails = styled.div`
   display: flex;
-  gap: 100px;
+  gap: 30px;
   align-items: center;
 `;
 
@@ -59,48 +49,87 @@ const HistoryText = styled.div`
   font-size: 19px;
   font-family: Pretendard, sans-serif;
   font-weight: 500;
-  line-height: 26.6px;
   color: black;
 `;
 
-function HistoryList() {
+const More = styled.img`
+  margin-top: 8px;
+  width: 10px;
+  height: 10px;
+`;
+
+const MoreText = styled.p`
+  font-size: 14px;
+  color: gray;
+`;
+
+const TitleWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const MoreContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: auto;
+  justify-content: flex-end;
+  cursor: pointer;
+`;
+
+const HistoryList = () => {
   const navigate = useNavigate();
-  const historyEntries: HistoryEntry[] = [
-    {
-      date: '11/02',
-      time: '23:55',
-      task: '000님이 ~~~~~~~하기 과제',
-      status: '완료',
+  const { selectedTheme } = useThemeStore();
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[1];
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['history-preview'],
+    queryFn: async () => {
+      const response = await axiosInstance.get('/api/activity', {
+        params: { page: 1, size: 3, sort: 'CreatedAt' },
+      });
+      return response.data.content || [];
     },
-    {
-      date: '11/02',
-      time: '23:55',
-      task: '000님이 ~~~~~~~하기 과제',
-      status: '미완료',
-    },
-  ];
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+  });
+
+  if (isLoading) return <div>로딩 중...</div>;
+  if (isError) return <div>데이터를 불러오는 중 오류 발생!</div>;
 
   return (
     <div>
-      <Title onClick={() => navigate('/info/history')}>히스토리</Title>
-      <HistoryContainer onClick={() => navigate('/info/history')}>
-        {historyEntries.map((entry, index) => (
-          <HistoryEntryContainer key={index}>
-            <HistoryDetails>
-              <HistoryText>{entry.date}</HistoryText>
-              <HistoryText>{entry.time}</HistoryText>
-              <HistoryText>{entry.task}</HistoryText>
-            </HistoryDetails>
-            <BlueButton
-              status={entry.status === '완료' ? '등록됨' : '내 일정에 등록'}
-            >
-              {entry.status}
-            </BlueButton>
-          </HistoryEntryContainer>
-        ))}
+      <TitleWrapper>
+        <Title>히스토리</Title>
+
+        <MoreContainer>
+          <MoreText onClick={() => navigate('/info/history')}>더보기</MoreText>
+          <More onClick={() => navigate('/info/history')} src={Plus} />
+        </MoreContainer>
+      </TitleWrapper>
+
+      <HistoryContainer background={backgroundColor}>
+        {data.length > 0 ? (
+          data.map((entry: any, index: number) => (
+            <HistoryEntryContainer key={index}>
+              <HistoryDetails>
+                <HistoryText>{entry.date}</HistoryText>
+                <HistoryText>{entry.time}</HistoryText>
+                <HistoryText>{entry.content}</HistoryText> {/* 3개만 표시 */}
+              </HistoryDetails>
+              <BlueButton status={entry.check ? '등록됨' : '내 일정에 등록'}>
+                {entry.check ? '등록됨' : '내 일정에 등록'}
+              </BlueButton>
+            </HistoryEntryContainer>
+          ))
+        ) : (
+          <div>기록이 없습니다.</div>
+        )}
       </HistoryContainer>
     </div>
   );
-}
+};
 
 export default HistoryList;
