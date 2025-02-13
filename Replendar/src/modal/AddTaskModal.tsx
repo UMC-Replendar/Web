@@ -11,6 +11,7 @@ import useModalStore from '../store/modalStore';
 import useFriendsStore from '../store/useFriendStore';
 import useGetData from '../hooks/useGetData';
 import useTaskStore from '../store/useTaskStore';
+import useAuthStore from '../store/authStore';
 import { Task } from '../store/useTaskStore';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -338,7 +339,15 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
   const [alarmCycles, setAlarmCycles] = useState<string[]>([]);
   const [memo, setMemo] = useState('');
 
-  const userId = localStorage.getItem('id');
+  const { id: userId } = useAuthStore();
+
+  if (!userId) {
+    console.error('userId가 존재하지 않습니다. 로그인이 필요한 기능입니다.');
+    alert('로그인이 필요합니다.');
+    return;
+  }
+
+  const { data } = useGetData(`/api/assignment/share?userId=${userId}`);
 
   // Mutation을 사용하여 addTask 실행
   const addTaskMutation = useMutation({
@@ -395,8 +404,6 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
     friendData,
     resetFriends,
   } = useFriendsStore();
-
-  const { data } = useGetData(`/api/assignment/share?userId=${userId}`);
 
   useEffect(() => {
     updateFriendsData();
