@@ -99,6 +99,12 @@ const useTaskStore = create<TaskStore>((set) => ({
   fetchTasks: async (userId) => {
     const { token } = useAuthStore.getState();
 
+    if (!userId) {
+      console.error('userId가 존재하지 않습니다. 로그인 여부를 확인해주세요.');
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment?userId=${userId}`,

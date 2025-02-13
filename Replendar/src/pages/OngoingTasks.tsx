@@ -31,13 +31,15 @@ const LeftTitles = styled.div`
   display: flex;
 `;
 
-const MainPageTitleBox = styled.div<{ background: string }>`
+
+const MainPageTitleBox = styled.div<{ isSelected: boolean;  background: string }>`
   display: flex;
   padding: 17px 20px;
   justify-content: center;
-  background: ${({ background }) => background};
   align-items: center;
   border-radius: 20px 20px 0px 0px;
+  background: ${(props) => (props.isSelected ? props.background : '#e8e8e8')};
+  color: ${({ isSelected }) => (isSelected ? 'black' : '#7e7f7f')};
   width: 200px;
   height: fit-content;
   cursor: pointer;
@@ -197,11 +199,10 @@ function TaskItem({ task, onComplete, onEdit }: TaskProps) {
 
 function OngoingTasks() {
   const { isOpen, openModal, closeModal, modalContent } = useModalStore();
-  const { token } = useAuthStore();
+  const { token, id: userId } = useAuthStore();
   const queryClient = useQueryClient();
 
-  const storedUserId = localStorage.getItem('id');
-  const userId = storedUserId ? parseInt(storedUserId, 10) : null; // integer
+
 
   const { selectedTheme } = useThemeStore(); // 현재 선택된 테마 가져오기
 
@@ -216,6 +217,10 @@ function OngoingTasks() {
   } = useGetData(`/api/assignment?userId=${userId}`, {
     headers: { Authorization: `${token}` },
   });
+
+  const [selectedTab, setSelectedTab] = useState<'ongoing' | 'important'>(
+    'ongoing'
+  );
 
   const [visibleTasksCount, setVisibleTasksCount] = useState(3);
 
@@ -275,10 +280,19 @@ function OngoingTasks() {
     <PageWrapper>
       <MainPageTitleWrapper>
         <LeftTitles>
-          <MainPageTitleBox background={backgroundColor}>
+
+          <MainPageTitleBox
+            isSelected={selectedTab === 'ongoing'}
+            onClick={() => setSelectedTab('ongoing')}
+            background={backgroundColor}
+          >
             <MainPageTitle>진행 중인 과제</MainPageTitle>
           </MainPageTitleBox>
-          <MainPageTitleBox background={'#E8E8E8'}>
+          <MainPageTitleBox
+            isSelected={selectedTab === 'important'}
+            onClick={() => setSelectedTab('important')}
+            background={backgroundColor}
+          >
             <MainPageTitle>중요한 과제</MainPageTitle>
           </MainPageTitleBox>
         </LeftTitles>
