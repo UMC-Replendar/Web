@@ -5,9 +5,10 @@ import BlueButton from '../../blueButton';
 import { useState, useEffect } from 'react';
 import CommuModalContent from '../modalContents/commuModalContent';
 import useGetData from '../../../hooks/useGetData';
-import { ILectureList } from '../../../types';
+import { ITaskList } from '../../../types';
 import { useAcademicYearStore } from '../../../store/profileStore';
 import useModalStore from '../../../store/modalStore';
+import AddTaskModal from '../../../modal/AddTaskModal';
 
 const Container = styled.div`
   width: 100%;
@@ -149,7 +150,7 @@ const TaskList: React.FC<{ expanded: string }> = ({ expanded }) => {
           </tr>
         </thead>
         <tbody>
-          {data.slice(0, visibleItems).map((item: ILectureList) => (
+          {data.slice(0, visibleItems).map((item: ITaskList) => (
             <tr key={item.lectureAssignmentId}>
               <td>{item.academicYear}</td>
               <td>{item.created_date}</td>
@@ -162,7 +163,20 @@ const TaskList: React.FC<{ expanded: string }> = ({ expanded }) => {
                 {item.check === 'CHECK' ? (
                   <BlueButton status="등록됨">등록됨</BlueButton>
                 ) : (
-                  <BlueButton>내 일정에 등록</BlueButton>
+                  <BlueButton
+                    onClick={() =>
+                      openModal(
+                        <AddTaskModal
+                          lectureAssignmentId={item.lectureAssignmentId}
+                          onTaskAdded={() =>
+                            console.log('과제가 추가되었습니다.')
+                          }
+                        />
+                      )
+                    }
+                  >
+                    내 일정에 등록
+                  </BlueButton>
                 )}
               </td>
             </tr>

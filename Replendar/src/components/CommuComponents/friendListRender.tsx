@@ -34,7 +34,6 @@ const FriendListRender: React.FC<{
     note: '',
   });
 
-  const { profile } = useProfileStore();
   const [isEditing, setIsEditing] = useState(false);
   const [updatedNote, setUpdatedNote] = useState<string>('');
   const [calendarShow, setCalendarShow] = useState(false);
