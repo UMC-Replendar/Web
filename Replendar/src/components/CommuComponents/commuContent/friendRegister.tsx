@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import SearchIcon from '../../../assets/images/search.svg';
 import useGetData from '../../../hooks/useGetData';
 import { ProfileImage } from '../commuIcons';
@@ -7,11 +7,9 @@ import { sendFriendRequest } from '../../../apis/commuApi';
 import { useMutation } from '@tanstack/react-query';
 import { FriendRegisterSkeleton } from '../../skeleton';
 import Swal from 'sweetalert2';
-import useAuthStore from '../../../store/authStore';
 
 const friendRegister = () => {
   const [mq, setMq] = useState('');
-  const { nickname } = useAuthStore();
   const [searchNickname, setSearchNickname] = useState('');
 
   //친구등록검색api호출

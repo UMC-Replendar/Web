@@ -1,13 +1,18 @@
 import FriendListRender from '../friendListRender';
 import useGetData from '../../../hooks/useGetData';
 import styled from 'styled-components';
+import { FriendListSkeleton } from '../../skeleton.tsx';
 
 const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const url = expanded ? `/api/friends` : `/api/friends?limit=5`;
   const { data, isLoading, isError } = useGetData(url);
 
   if (isLoading) {
-    return <h1>로딩</h1>;
+    return (
+      <Container>
+        <FriendListSkeleton count={2} />
+      </Container>
+    );
   }
 
   if (isError) {
@@ -17,6 +22,8 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
   return (
     <Container>
       <FriendListRender data={data} queryKey={url} />
+
+      <FriendListSkeleton count={2} />
     </Container>
   );
 };
