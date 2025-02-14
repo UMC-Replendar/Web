@@ -4,7 +4,6 @@ import useGetData from '../../hooks/useGetData';
 import { useState } from 'react';
 import { SmallToggleSwitch } from '../../modal/EditTaskModal';
 import DefaultProfileImg from '../../assets/images/SideBarIcons/DefaultProfileImg.svg';
-import { useProfileStore } from '../../store/profileStore';
 import { IFriendList } from '../../types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
