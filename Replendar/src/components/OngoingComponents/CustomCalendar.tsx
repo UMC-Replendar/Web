@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import PreviousArrowIcon from '/src/assets/images/PreviousArrowIcon.svg';
 import NextArrowIcon from '/src/assets/images/NextArrowIcon.svg';
 import Calendar from 'react-calendar';
+import { useThemeStore, themeBackground } from '../../store/useThemeStore';
 
 const CalendarWrapper = styled.div`
   margin-top: 66px;
@@ -152,7 +153,7 @@ const TaskMarkerContainer = styled.div`
   }
 `;
 
-const TaskMarker = styled.div`
+const TaskMarker = styled.div<{ background: string }>`
   display: flex;
   height: 25px;
   padding: 8px;
@@ -161,7 +162,7 @@ const TaskMarker = styled.div`
   align-items: flex-start;
   align-self: stretch;
   border-radius: 50px 0px 0px 50px;
-  background: #2bae66;
+  background: ${({ background }) => background};
   color: white;
   font-family: Pretendard;
   font-size: 11px;
@@ -177,6 +178,10 @@ interface CustomCalendarProps {
 function CustomCalendar({ tasks }: CustomCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date()); // 선택한 날짜
   const [viewDate, setViewDate] = useState(new Date()); // 캘린더에 표시되는 월
+
+  const { selectedTheme } = useThemeStore();
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[0];
 
   const getMonthYearText = (date: Date) => {
     const year = date.getFullYear();
@@ -251,7 +256,9 @@ function CustomCalendar({ tasks }: CustomCalendarProps) {
             return (
               <TaskMarkerContainer>
                 {tasksForDate.slice(0, 2).map((task, index) => (
-                  <TaskMarker key={index}>{task.name}</TaskMarker>
+                  <TaskMarker background={backgroundColor} key={index}>
+                    {task.name}
+                  </TaskMarker>
                 ))}
                 {tasksForDate.length > 2 && (
                   <span>총 {tasksForDate.length}개</span>
