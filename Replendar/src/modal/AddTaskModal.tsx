@@ -447,12 +447,7 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
     }
   };
 
-  const alarmOptions = [
-    { label: '3일 전', value: 'DAY3' },
-    { label: '24시간 전', value: 'DAY1' },
-    { label: '10시간 전', value: 'H10' },
-    { label: '1시간 전', value: 'H1' },
-  ];
+  const alarmOptions = [{ label: '1시간 전', value: 'H1' }];
 
   const handleAlarmCycleToggle = (cycle: string) => {
     setAlarmCycles((prev) =>
