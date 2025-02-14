@@ -8,8 +8,6 @@ import StatusMessage from './StatusMessage';
 import useDepartmentStore from '../../store/useDepartmentStore';
 import { useAcademicYearStore } from '../../store/profileStore';
 import Swal from 'sweetalert2';
-import useNotificationPermission from '../../hooks/useNotification';
-import UseNotificationPermission from '../../hooks/useNotification';
 
 const nicknameRegex = /^[a-zA-Z\uAC00-\uD7A3]+$/;
 
@@ -203,7 +201,7 @@ const SignupForm: React.FC = () => {
       }
       const response = await axiosInstance.post('/api/user/signup', formData);
       console.log(response);
-      UseNotificationPermission();
+
       Swal.fire({
         icon: 'success',
         title: '회원가입 성공!',

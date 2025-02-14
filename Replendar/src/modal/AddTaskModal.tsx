@@ -22,6 +22,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TextField } from '@mui/material';
 import { styled as muiStyled } from '@mui/material/styles';
 import dayjs, { Dayjs } from 'dayjs';
+import UseNotificationPermission from '../hooks/useNotification';
 dayjs.locale('ko');
 
 const ModalOverlay = styled.div`
@@ -329,7 +330,7 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
   const { closeModal } = useModalStore();
   const { addTask } = useTaskStore();
   const queryClient = useQueryClient();
-
+  const notifiypermission = UseNotificationPermission();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [taskName, setTaskName] = useState('');
   const [deadline, setDeadline] = useState<Dayjs | null>(dayjs());
@@ -375,6 +376,7 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
       alert('마감일을 선택해주세요.');
       return;
     }
+    console.log(notifiypermission);
 
     const formattedDeadline =
       deadline && time ? `${deadline.format('YYYY/MM/DD')} ${time}` : '';
