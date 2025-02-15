@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import useAuthStore from './authStore';
 import axios from 'axios';
+import { useProfileStore } from './profileStore';
 
 export interface Task {
   assignmentId: number;
@@ -46,6 +47,7 @@ const useTaskStore = create<TaskStore>((set) => ({
       set((state) => ({
         tasks: [...state.tasks, newTask],
       }));
+      useProfileStore.getState().refreshProfile(); // 자동 프로필 갱신 추가 -> 내정보 업데이트용
 
       return newTask;
     } catch (error) {
@@ -81,6 +83,7 @@ const useTaskStore = create<TaskStore>((set) => ({
       set((state) => ({
         tasks: state.tasks.filter((task) => task.assignmentId !== assId),
       }));
+      useProfileStore.getState().refreshProfile(); // 자동 프로필 갱신 추가 -> 내정보 업데이트용
 
       console.log(`과제 완료 처리 성공: ${assId}`);
     } catch (error) {

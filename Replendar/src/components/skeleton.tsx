@@ -18,9 +18,9 @@ const SkeletonContainer = styled.div`
   gap: 1px;
 `;
 
-const SkeletonItem = styled.div`
+const SkeletonItem = styled.div<{ gap?: string }>`
   display: flex;
-  gap: 100px;
+  gap: ${({ gap }) => gap || '100px'};
   height: 67px;
   background-color: #f0f0f0;
   border-radius: 20px;
@@ -101,6 +101,17 @@ export const FriendRegisterSkeleton = () => (
   </SkeletonContainer>
 );
 
+export const FriendListSkeleton = ({ count = 5 }: { count?: number }) => (
+  <SkeletonContainer>
+    {[...Array(count)].map((_, index) => (
+      <SkeletonItem key={index} gap="60px">
+        <SkeletonProfileImage />
+        <SkeletonText width="100px" />
+        <SkeletonText width="150px" />
+      </SkeletonItem>
+    ))}
+  </SkeletonContainer>
+);
 const NewsSkeleton = ({ count = 5 }: { count?: number }) => (
   <SkeletonContainer>
     {[...Array(count)].map((_, index) => (
