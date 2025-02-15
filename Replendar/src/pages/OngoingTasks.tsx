@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import AddTaskModal from '../modal/AddTaskModal';
 import CustomCalendar from '../components/OngoingComponents/CustomCalendar';
@@ -31,8 +31,10 @@ const LeftTitles = styled.div`
   display: flex;
 `;
 
-
-const MainPageTitleBox = styled.div<{ isSelected: boolean;  background: string }>`
+const MainPageTitleBox = styled.div<{
+  isSelected: boolean;
+  background: string;
+}>`
   display: flex;
   padding: 17px 20px;
   justify-content: center;
@@ -133,6 +135,7 @@ const TaskBlock = styled.div<{ color: string }>`
   border-radius: 50px;
   background-color: ${({ color }) => color};
   width: 100%;
+  cursor: pointer;
 `;
 
 const TaskInfo = styled.div`
@@ -202,14 +205,12 @@ function OngoingTasks() {
   const { token, id: userId } = useAuthStore();
   const queryClient = useQueryClient();
 
-
-
   const { selectedTheme } = useThemeStore(); // 현재 선택된 테마 가져오기
 
   const themeColors = themeBackground[selectedTheme]; // 현재 테마 색상 배열
   const backgroundColor = themeColors[1]; // 진행 중인 과제 바탕색 (index 1)
 
-  // 진행 중인 과제 데이터 가져오기
+  // 진행 중인 과제 API
   const {
     data: tasks = [],
     isLoading,
@@ -260,15 +261,27 @@ function OngoingTasks() {
     });
   };
 
-  const handleEditTask = (task: any) => {
+  const [selectedAssId, setSelectedAssId] = useState<number | null>(null);
+
+  const { data: taskData } = useGetData(`/api/assignment/${selectedAssId}`, {
+    headers: { Authorization: `${token}` },
+  });
+
+  const handleEditTask = (assId: number) => {
+    setSelectedAssId(assId);
+  };
+
+  useEffect(() => {
+    if (!taskData || !selectedAssId) return;
+
     openModal(
       <EditTaskModal
-        task={task}
+        assId={selectedAssId}
         onClose={closeModal}
-        onComplete={() => handleCompleteTask(task)}
+        onComplete={() => handleCompleteTask(selectedAssId)}
       />
     );
-  };
+  }, [taskData, selectedAssId]);
 
   if (isLoading) return <div>로딩 중...</div>;
   if (isError) return <div>데이터를 불러오는 데 실패했습니다.</div>;
@@ -280,7 +293,6 @@ function OngoingTasks() {
     <PageWrapper>
       <MainPageTitleWrapper>
         <LeftTitles>
-
           <MainPageTitleBox
             isSelected={selectedTab === 'ongoing'}
             onClick={() => setSelectedTab('ongoing')}
