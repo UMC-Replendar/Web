@@ -64,7 +64,7 @@ const FriendListRender: React.FC<{
 
   const deleteFriendmutation = useMutation({
     mutationFn: ({ friendId }: { friendId: number }) => deleteFriend(friendId),
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKey],
       });
@@ -83,7 +83,7 @@ const FriendListRender: React.FC<{
   const patchNoteMutation = useMutation({
     mutationFn: ({ friendId, note }: { friendId: number; note: string }) =>
       patchNote({ friendId, note }), // 메모 업데이트를 위한 API 호출
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`/api/friends/note?friendId=${modalState.selectedId}`], // 쿼리 캐시를 무효화하여 데이터를 최신 상태로 유지
       });
@@ -123,7 +123,7 @@ const FriendListRender: React.FC<{
 
     onSuccess: () => {
       Swal.fire({
-        icon: 'error',
+        icon: 'success',
         text: '친구가 삭제되었습니다',
         timer: 2000,
         showConfirmButton: false,
