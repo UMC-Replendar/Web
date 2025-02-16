@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import DownArrow from '../../../assets/images/downArrow.svg';
 import UpArrow from '../../../assets/images/upArrow.svg';
 import { AddButton } from '../../../pages/OngoingTasks';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PlusIcon } from '../commuIcons';
 import FriendListRender from '../friendListRender';
 import useModalStore from '../../../store/modalStore';
@@ -17,7 +17,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { GroupSkeleton } from '../../skeleton';
 import Swal from 'sweetalert2';
 
-const FriendManagement = () => {
+const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
   const { openModal } = useModalStore();
 
   const queryClient = useQueryClient();
@@ -38,7 +38,12 @@ const FriendManagement = () => {
   };
 
   const { data, isLoading } = useGetData(`/api/friend-groups`);
-
+  const displayedData = expanded === 'true' ? data : data.slice(0, 4);
+  useEffect(() => {
+    console.log(data.length);
+    console.log('expand', expanded);
+  }, [expanded]);
+  const visibleCount = expanded === 'true' ? data.length : 4;
   const DeleteGroupMutation = useMutation({
     mutationFn: (groupId: number) => deleteGroup(groupId),
     onSuccess: () => {
@@ -71,7 +76,7 @@ const FriendManagement = () => {
       </AddButtonDiv>
       {isLoading && <GroupSkeleton count={4} />}
 
-      {data.map((group: IGroupList) => (
+      {displayedData.slice(0, visibleCount).map((group: IGroupList) => (
         <div key={group.groupId}>
           <SpaceBtwDiv
             status={
@@ -131,7 +136,6 @@ const AddButtonDiv = styled.div`
 const Container = styled.div`
   width: 100%;
   padding: 20px;
-  overflow-y: auto;
 `;
 
 const SpaceBtwDiv = styled.div<{ status: string }>`
@@ -146,6 +150,7 @@ const SpaceBtwDiv = styled.div<{ status: string }>`
   padding: 0px 30px;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 1px;
+
   &:nth-child(10),
   &:nth-child(11) {
     margin-bottom: 1.5px; /* 얼탱없네 얘네 */

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { FriendListSkeleton } from '../../skeleton.tsx';
 
 const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
-  const url = expanded ? `/api/friends` : `/api/friends?limit=5`;
+  const url = expanded === 'true' ? `/api/friends` : `/api/friends?limit=5`;
   const { data, isLoading } = useGetData(url);
 
   if (isLoading) {

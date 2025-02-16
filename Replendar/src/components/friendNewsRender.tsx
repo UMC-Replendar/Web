@@ -20,11 +20,22 @@ const FlexDiv = styled.div`
   padding: 0px 30px;
   background: white;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-  &:nth-child(7),
+
+  &:nth-child(5),
   &:nth-child(8) {
-    margin-bottom: 1.5px; /* 얼탱없네 얘네 */
   }
 `;
+
+/* &:first-child {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+  }
+
+  &:nth-last-child(2) {
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+  }
+ */
 
 const RightAlignedItem = styled.div`
   margin-left: auto;

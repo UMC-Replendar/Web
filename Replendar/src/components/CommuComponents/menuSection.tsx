@@ -110,6 +110,15 @@ const CustomBtn = styled.button<{ isSelected: boolean }>`
   padding: 0px;
   box-shadow: 0px 5px 15.7px 0px rgba(177, 198, 187, 0.4);
   margin-bottom: 15px;
+  cursor: pointer;
+  transition:
+    background 0.3s,
+    color 0.3s;
+
+  &:hover {
+    background: rgba(102, 102, 102, 1);
+    color: white;
+  }
 `;
 
 const BtnContainer = styled.div`

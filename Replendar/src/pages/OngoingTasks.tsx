@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import AddTaskModal from '../modal/AddTaskModal';
 import CustomCalendar from '../components/OngoingComponents/CustomCalendar';
-import PlusIcon from '../assets/images/PlusIcon.svg';
+import { PlusIcon } from '../components/CommuComponents/commuIcons';
 import DownArrowIcon from '../assets/images/DownArrowIcon.svg';
 import UpArrowIcon from '../assets/images/UpArrowIcon.svg';
 import EditTaskModal from '../modal/EditTaskModal';
@@ -73,7 +73,14 @@ export const AddButton = styled.button`
   font-weight: 500;
   line-height: 140%;
   cursor: pointer;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
 
+  &:hover {
+    background: rgba(102, 102, 102, 1);
+    color: white;
+  }
   img {
     width: 15px;
     height: 15px;
@@ -414,7 +421,7 @@ function OngoingTasks() {
             }
           >
             과제 추가하기
-            <img src={PlusIcon} alt="Plus Icon" />
+            <PlusIcon fill="currentColor" />
           </AddButton>
 
           {tasks.length > 3 && (

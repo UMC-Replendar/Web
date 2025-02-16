@@ -333,7 +333,6 @@ const SpaceBtwDiv = styled.div`
   position: relative;
   gap: 100px; /* 갭 조정 */
   width: 100%;
-
   height: 67px;
   background: white;
   border-radius: 20px;
@@ -356,6 +355,7 @@ const RightAlignedItem = styled.div`
 `;
 
 const CenterDiv = styled.div<{ width?: string; bold?: boolean }>`
+  font-size: 19px;
   display: flex;
   justify-content: center;
   align-items: center;

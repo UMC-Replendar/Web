@@ -1,8 +1,6 @@
 import styled from 'styled-components';
 import { AddButton } from '../../../pages/OngoingTasks';
-import PlusIcon from '../../../assets/images/PlusIcon.svg';
 import BlueButton from '../../blueButton';
-import { useState } from 'react';
 import CommuModalContent from '../modalContents/commuModalContent';
 import useGetData from '../../../hooks/useGetData';
 import { ITaskList } from '../../../types';
@@ -10,6 +8,7 @@ import { useAcademicYearStore } from '../../../store/profileStore';
 import useModalStore from '../../../store/modalStore';
 import AddTaskModal from '../../../modal/AddTaskModal';
 import { TaskListSkeleton } from '../../skeleton';
+import { PlusIcon } from '../commuIcons';
 
 const Container = styled.div`
   width: 100%;
@@ -95,7 +94,7 @@ const StyledTd = styled.td`
   width: 100%;
 `;
 
-const TaskList: React.FC = () => {
+const TaskList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const { openModal } = useModalStore();
 
   const { academicYear, setAcademicYear, sortKey, setSortKey } =
@@ -103,6 +102,8 @@ const TaskList: React.FC = () => {
 
   const queryKey = `/api/major/lectures/sort/${sortKey}?sort=asc&academicYear=${academicYear}&majorId=`;
   const { data, isLoading } = useGetData(queryKey);
+
+  const displayedData = expanded === 'true' ? data : data.slice(0, 3);
 
   const handleOpenModal = () => {
     openModal(<CommuModalContent queryKey={queryKey} />);
@@ -112,10 +113,9 @@ const TaskList: React.FC = () => {
     <Container>
       <SpaceBtwDiv>
         <AddButtonDiv>
-          {' '}
           <AddButton onClick={handleOpenModal}>
             과제 추가하기
-            <img src={PlusIcon} alt="Plus Icon" />
+            <PlusIcon fill="currentColor" />
           </AddButton>
         </AddButtonDiv>
 
@@ -169,9 +169,9 @@ const TaskList: React.FC = () => {
               </StyledTd>
             </tr>
           ) : (
-            data.map((item: ITaskList) => (
+            displayedData.map((item: ITaskList) => (
               <tr key={item.lectureAssignmentId}>
-                <td>{item.academicYear}</td>
+                <td>{item.academicYear.replace('YEAR_', '')}</td>
                 <td>{item.created_date}</td>
                 <td>{item.professor}</td>
                 <td>{item.lectureName}</td>

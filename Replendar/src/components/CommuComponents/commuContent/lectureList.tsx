@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { AddButton } from '../../../pages/OngoingTasks';
-import PlusIcon from '../../../assets/images/PlusIcon.svg';
+import { PlusIcon } from '../commuIcons';
 import CommuModalContent from '../modalContents/commuModalContent';
 import useGetData from '../../../hooks/useGetData';
 import { ILecture } from '../../../types';
@@ -8,12 +8,14 @@ import { useAcademicYearStore } from '../../../store/profileStore';
 import useModalStore from '../../../store/modalStore';
 import { LectureListSkeleton } from '../../skeleton';
 
-const LectureList = () => {
+const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const { openModal } = useModalStore();
   const { academicYear, setAcademicYear } = useAcademicYearStore();
 
   const queryKey = `/api/major/lectures/list/${academicYear}`;
   const { data, isLoading } = useGetData(queryKey);
+
+  const displayedData = expanded === 'true' ? data : data.slice(0, 3);
 
   const handleOpenModal = () => {
     openModal(<CommuModalContent queryKey={queryKey} />);
@@ -25,7 +27,7 @@ const LectureList = () => {
         <AddButtonDiv>
           <AddButton onClick={handleOpenModal}>
             과제 추가하기
-            <img src={PlusIcon} alt="Plus Icon" />
+            <PlusIcon fill="currentColor" />
           </AddButton>
         </AddButtonDiv>
         <Select
@@ -64,9 +66,9 @@ const LectureList = () => {
               </StyledTd>
             </tr>
           ) : (
-            data.map((item: ILecture, index: number) => (
+            displayedData.map((item: ILecture, index: number) => (
               <tr key={index}>
-                <td>{item.academicYear}</td>
+                <td>{item.academicYear.replace('YEAR_', '')}</td>
 
                 <td>{item.professor}</td>
                 <td>{item.lectureName}</td>
