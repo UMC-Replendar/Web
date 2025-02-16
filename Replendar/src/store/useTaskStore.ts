@@ -21,7 +21,7 @@ interface TaskStore {
   tasks: Task[];
   setTasks: (tasks: Task[]) => void; // 전체 과제 목록 업데이트
   addTask: (taskData: Omit<Task, 'assignmentId'>) => Promise<Task>; // 새로운 과제 추가
-  updateTask: (updatedTask: Task) => void; // 특정 과제 수정
+  editTask: (assignmentId: number, updatedTask: Partial<Task>) => void; // 특정 과제 수정
   deleteTask: (assignmentId: number) => void; // 특정 과제 삭제
   completeTask: (assignmentId: number) => Promise<void>; // 특정 과제 완료 처리
   fetchTasks: (userId: number) => Promise<void>; // 로그인, 강제 새로고침 할 때 실행
@@ -57,10 +57,10 @@ const useTaskStore = create<TaskStore>((set) => ({
     }
   },
 
-  updateTask: (updatedTask) =>
+  editTask: (assignmentId: number, updatedTask: Partial<Task>) =>
     set((state) => ({
       tasks: state.tasks.map((task) =>
-        task.assignmentId === updatedTask.assignmentId ? updatedTask : task
+        task.assignmentId === assignmentId ? { ...task, ...updatedTask } : task
       ),
     })),
 
@@ -92,13 +92,6 @@ const useTaskStore = create<TaskStore>((set) => ({
     }
   },
 
-  // editTask: (assignmentId, updatedTask) =>
-  //   set((state) => ({
-  //     tasks: state.tasks.map((task) =>
-  //       task.assignmentId === assignmentId ? { ...task, ...updatedTask } : task
-  //     ),
-  //   })),
-
   fetchTasks: async (userId) => {
     const { token } = useAuthStore.getState();
 
@@ -109,18 +102,23 @@ const useTaskStore = create<TaskStore>((set) => ({
     }
 
     try {
-      const response = await axios.get(
+      const { data } = await axios.get(
         `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment?userId=${userId}`,
         {
           headers: { Authorization: `${token}` },
         }
       );
-      set({ tasks: response.data });
 
-      console.log('과제 목록 불러오기 성공:', response.data);
+      if (data?.isSuccess && Array.isArray(data.result)) {
+        set({ tasks: data.result });
+        console.log('과제 목록 불러오기 성공:', data.result);
+      } else {
+        console.error('API 응답 오류:', data);
+        alert('과제 목록을 불러오는 중 오류가 발생했습니다.');
+      }
     } catch (error) {
       console.error('과제 목록을 불러오는 중 오류 발생:', error);
-      alert(`과제 목록을 불러오는 중 문제가 발생했습니다.`);
+      alert('과제 목록을 불러오는 중 문제가 발생했습니다.');
     }
   },
 }));
