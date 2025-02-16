@@ -1,6 +1,14 @@
 import MenuSection from '../components/CommuComponents/menuSection';
 import styled from 'styled-components';
 
+// const Container = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   margin: 68px 0px 68px 0px;
+//   width: 100%;
+//   gap: 59px;
+//   padding: 0 50px;
+// `;
 const Container = styled.div`
   display: flex;
   flex-direction: column;
