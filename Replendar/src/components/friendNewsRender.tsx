@@ -13,6 +13,7 @@ const FlexDiv = styled.div`
   display: flex;
   gap: 100px;
   width: 100%;
+
   font-size: 19px;
   margin-bottom: 1px;
   border-radius: 20px;
@@ -58,7 +59,9 @@ const FriendNewsRender = () => {
     hasNextPage,
     fetchNextPage,
   } = useGetInfiniteData(`/api/activity/friend`, 5);
-
+  useEffect(() => {
+    console.log('Data', data);
+  }, [data]);
   const { ref, inView } = useInView({ threshold: 0 });
 
   const { openModal } = useModalStore();
@@ -75,7 +78,6 @@ const FriendNewsRender = () => {
   if (isError) {
     return <h1>{error.message}</h1>;
   }
-
   return (
     <>
       {data?.pages?.map((page: IPage<IFriendNewsContent>) =>
@@ -91,6 +93,7 @@ const FriendNewsRender = () => {
                   onClick={() =>
                     openModal(
                       <AddTaskModal
+                        assId={item.assId}
                         onTaskAdded={() =>
                           console.log('과제가 추가되었습니다.')
                         }

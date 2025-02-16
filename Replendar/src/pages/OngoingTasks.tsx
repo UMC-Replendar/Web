@@ -8,10 +8,10 @@ import UpArrowIcon from '../assets/images/UpArrowIcon.svg';
 import EditTaskModal from '../modal/EditTaskModal';
 import useModalStore from '../store/modalStore';
 import useAuthStore from '../store/authStore';
-import useGetData from '../hooks/useGetData';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useThemeStore, themeBackground } from '../store/useThemeStore';
+import useDebounce from '../hooks/useDebounce';
 
 const PageWrapper = styled.div`
   margin-top: 79px;
@@ -176,17 +176,47 @@ interface TaskProps {
     due_date: string;
     due_time: string;
     memo: string;
+    notification: string;
   };
   onComplete: (assignmentId: number) => void;
   onEdit: (task: TaskProps['task']) => void;
 }
 
+//과제 시간이 마이너스가 되면 조회 목록에서 삭제해야하는데...
 function TaskItem({ task, onComplete, onEdit }: TaskProps) {
+  const [dueTime, setDueTime] = useState(task.due_time);
+  const [dueTimeNumbers, setDueTimeNumbers] = useState<number[]>([]);
+
+  const sendNotification = (message: string) => {
+    if (Notification.permission === 'granted') {
+      new Notification('과제 마감 알림', { body: message });
+    }
+  };
+
+  useEffect(() => {
+    setDueTime(task.due_time);
+    const timeNumbers = task.due_time.match(/-?\d+/g)?.map(Number) || [];
+    if (timeNumbers) {
+      setDueTimeNumbers(timeNumbers.map(Number));
+      if (
+        task.notification == 'ON' &&
+        dueTimeNumbers[0] == 0 &&
+        dueTimeNumbers[1] == 1 &&
+        dueTimeNumbers[2] == 0 &&
+        dueTimeNumbers[3] == 0
+      ) {
+        sendNotification(`'${task.title}' 과제 마감 알림!`);
+      }
+    } else {
+      setDueTimeNumbers([0, 0, 0, 0]); // 기본값
+    }
+  }, [task.due_time]);
+
   return (
     <TaskBlockContainer onClick={() => onEdit(task)}>
       <TaskBlock color={task.color}>
         <TaskInfo>{task.title}</TaskInfo>
-        <TaskInfo>{task.due_time}</TaskInfo>
+        <TaskInfo>{dueTime}</TaskInfo>
       </TaskBlock>
       <TaskCompleteButton
         onClick={(e) => {
@@ -206,14 +236,79 @@ function OngoingTasks() {
   const queryClient = useQueryClient();
 
   const { selectedTheme } = useThemeStore(); // 현재 선택된 테마 가져오기
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[1];
 
-  const themeColors = themeBackground[selectedTheme]; // 현재 테마 색상 배열
-  const backgroundColor = themeColors[1]; // 진행 중인 과제 바탕색 (index 1)
+  const debouncedUserId = useDebounce(userId, 1000);
 
-  // 진행 중인 과제 API
-  const { data: tasks = [] } = useGetData(`/api/assignment?userId=${userId}`, {
-    headers: { Authorization: `${token}` },
-  });
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+
+  const deleteTasks = async (assid: number) => {
+    try {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment?assId=${assid}`,
+        {
+          headers: { Authorization: `${token}` },
+        }
+      );
+      console.log(response.data, assid);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // console.log(tasks);
+  const fetchTasks = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment?userId=${debouncedUserId}`,
+        {
+          headers: { Authorization: `${token}` },
+        }
+      );
+      if (Array.isArray(response.data.result)) {
+        const filteredTasks = response.data.result.filter((task: any) => {
+          // ✅ 정규식을 사용하여 숫자만 추출
+          const timeNumbers = task.due_time.match(/-?\d+/g)?.map(Number) || [];
+          if (timeNumbers[0] < 0) {
+            console.log(task.assignmentId);
+            deleteTasks(task.assignmentId);
+          }
+          // ✅ 모든 시간이 0 이하(음수 포함)라면 과제 제외
+          return !timeNumbers.some((num: number) => num < 0);
+        });
+
+        setTasks(filteredTasks); // ✅ 필터링된 과제만 저장
+      } else {
+        console.warn('⚠️ API 응답이 배열이 아님:', response.data);
+        setTasks([]);
+      }
+    } catch (error) {
+      console.error('❌ 과제 데이터 가져오기 실패:', error);
+      setTasks([]);
+    }
+  };
+
+  useEffect(() => {
+    if (!debouncedUserId) return;
+
+    setIsLoading(true);
+    fetchTasks()
+      .then(() => setIsLoading(false))
+      .catch(() => {
+        setIsError(true);
+        setIsLoading(false);
+      });
+
+    // 1초마다 실행
+    const interval = setInterval(() => {
+      fetchTasks();
+    }, 1000);
+
+    return () => clearInterval(interval); // ✅ 컴포넌트 언마운트 시 정리
+  }, [debouncedUserId]);
 
   const [selectedTab, setSelectedTab] = useState<'ongoing' | 'important'>(
     'ongoing'
@@ -259,17 +354,13 @@ function OngoingTasks() {
 
   const [selectedAssId, setSelectedAssId] = useState<number | null>(null);
 
-  const { data: taskData } = useGetData(`/api/assignment/${selectedAssId}`, {
-    headers: { Authorization: `${token}` },
-  });
-
   const handleEditTask = (assId: number) => {
     console.log('과제 선택됨:', assId);
     setSelectedAssId(assId);
   };
 
   useEffect(() => {
-    if (!taskData || !selectedAssId) return;
+    if (!selectedAssId) return;
 
     openModal(
       <EditTaskModal
@@ -278,10 +369,15 @@ function OngoingTasks() {
         onComplete={() => handleCompleteTask(selectedAssId)}
       />
     );
-  }, [taskData, selectedAssId]);
+  }, [selectedAssId]);
 
   // 과제 색상 지정
-  const taskColors = ['#2BAE66', '#2BAE66', '#25C26C', '#25C26C'];
+  const taskColors = [
+    themeColors[5],
+    themeColors[2],
+    themeColors[3],
+    themeColors[4],
+  ];
 
   return (
     <PageWrapper>
@@ -345,7 +441,7 @@ function OngoingTasks() {
             key={task.assignmentId}
             task={{
               ...task,
-              color: index < 4 ? taskColors[index] : '#7AC19A',
+              color: index < 4 ? taskColors[index] : themeColors[4],
             }}
             onComplete={handleCompleteTask}
             onEdit={() => handleEditTask(task.assignmentId)}

@@ -29,6 +29,7 @@ export interface IFriendList {
   ongoingAssignments: number;
   buddyStatus: 'YES' | 'NO';
   friendNote: string;
+  profileImageUrl: string;
 }
 
 export interface IGroupList {
@@ -100,4 +101,15 @@ export interface IPage<T> {
   first: boolean; // 첫 페이지 여부
   numberOfElements: number; // 현재 페이지에 포함된 요소 수
   empty: boolean; // 페이지가 비었는지 여부
+}
+
+export interface ITaskList {
+  title: string; // 과제명
+  professor: string; // 교수명
+  lectureName: string; // 강의명
+  academicYear: string; // 학년 (예: YEAR_4)
+  created_date: string; // 생성일 (ISO 8601 형식)
+  due_date: string; // 마감일 (YYYY-MM-DD 형식)
+  check: 'UNCHECK' | 'CHECK'; // 체크 상태
+  lectureAssignmentId: number; // 과제 ID
 }

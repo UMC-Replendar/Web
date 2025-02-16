@@ -21,7 +21,7 @@ const MenuContent: React.FC<MenuContentProps> = ({ menuState, expanded }) => {
       content = <FriendList expanded={expanded} />;
       break;
     case '친구소식':
-      content = <FriendNews expanded={expanded} />;
+      content = <FriendNews />;
       break;
     case '친구관리':
       content = <FriendManagement />;

@@ -22,6 +22,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TextField } from '@mui/material';
 import { styled as muiStyled } from '@mui/material/styles';
 import dayjs, { Dayjs } from 'dayjs';
+import UseNotificationPermission from '../hooks/useNotification';
 dayjs.locale('ko');
 
 const ModalOverlay = styled.div`
@@ -323,13 +324,19 @@ const ActionButtons = styled.div`
 
 interface AddTaskModalProps {
   onTaskAdded: () => void;
+  assId?: number;
+  lectureAssignmentId?: number;
 }
 
-function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
+function AddTaskModal({
+  onTaskAdded,
+  assId,
+  lectureAssignmentId,
+}: AddTaskModalProps) {
   const { closeModal } = useModalStore();
   const { addTask } = useTaskStore();
   const queryClient = useQueryClient();
-
+  const notifiypermission = UseNotificationPermission();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [taskName, setTaskName] = useState('');
   const [deadline, setDeadline] = useState<Dayjs | null>(dayjs());
@@ -348,6 +355,55 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
   }
 
   const { data } = useGetData(`/api/assignment/share?userId=${userId}`);
+
+  const { data: lectureAssignmentData } = useGetData(
+    lectureAssignmentId ? `/api/major/lectures/get/${lectureAssignmentId}` : ''
+  );
+  const { data: assignmentData } = useGetData(
+    assId ? `/api/assignment/${assId}` : ''
+  );
+
+  useEffect(() => {
+    if (
+      Array.isArray(lectureAssignmentData) &&
+      lectureAssignmentData.length > 0
+    ) {
+      const { title, due_date, due_time, content } = lectureAssignmentData[0];
+      setTaskName(title);
+      setDeadline(dayjs(due_date));
+      setTime(due_time);
+      setMemo(content);
+    }
+  }, [lectureAssignmentData]);
+  useEffect(() => {
+    if (Array.isArray(assignmentData) && assignmentData.length > 0) {
+      console.log(assignmentData);
+      const {
+        title,
+        due_date,
+        memo,
+        notification,
+        visibility,
+        notifyCycle,
+        shareFriend,
+        favorite,
+      } = assignmentData[0];
+      const [date, time] = due_date.split(' ');
+
+      setTaskName(title);
+      setDeadline(dayjs(date));
+      setTime(time);
+      setMemo(memo);
+      setIsOn(notification === 'ON' ? true : false);
+      setIsPublic(visibility === 'ON' ? true : false);
+      setAlarmCycles(notifyCycle);
+      toggleAllFriends(shareFriend);
+      setIsBookmarked(favorite === 'ACTIVE' ? true : false);
+    }
+  }, [assignmentData]);
+  useEffect(() => {
+    console.log('taskNaem:', taskName);
+  }, [taskName]);
 
   // Mutation을 사용하여 addTask 실행
   const addTaskMutation = useMutation({
@@ -375,6 +431,7 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
       alert('마감일을 선택해주세요.');
       return;
     }
+    console.log(notifiypermission);
 
     const formattedDeadline =
       deadline && time ? `${deadline.format('YYYY/MM/DD')} ${time}` : '';
@@ -389,12 +446,11 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
       memo: memo.trim() === '' ? '' : memo,
       favorite: isBookmarked ? 'ACTIVE' : 'INACTIVE',
       originAssId: null,
-      lectureAssignmentId: null,
+      lectureAssignmentId: lectureAssignmentId ? lectureAssignmentId : null,
     };
 
     addTaskMutation.mutate(taskData);
   };
-
   const {
     isFriendModalOpen,
     openFriendModal,
@@ -403,6 +459,7 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
     setFriendData,
     friendData,
     resetFriends,
+    toggleAllFriends,
   } = useFriendsStore();
 
   useEffect(() => {
@@ -447,12 +504,7 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
     }
   };
 
-  const alarmOptions = [
-    { label: '3일 전', value: 'DAY3' },
-    { label: '24시간 전', value: 'DAY1' },
-    { label: '10시간 전', value: 'H10' },
-    { label: '1시간 전', value: 'H1' },
-  ];
+  const alarmOptions = [{ label: '1시간 전', value: 'H1' }];
 
   const handleAlarmCycleToggle = (cycle: string) => {
     setAlarmCycles((prev) =>
@@ -493,7 +545,7 @@ function AddTaskModal({ onTaskAdded }: AddTaskModalProps) {
               <InputContainer>
                 <DesktopDatePicker
                   value={deadline}
-                  onChange={(newValue) => setDeadline(newValue || deadline)}
+                  onChange={(newValue) => setDeadline(newValue)}
                   format="YYYY/MM/DD"
                   slots={{ textField: StyledTextField }}
                 />

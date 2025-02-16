@@ -303,24 +303,20 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
   if (isLoading) return <div>로딩 중...</div>;
   if (isError || !task) return <div>과제 정보를 불러올 수 없습니다.</div>;
 
-  const [title] = useState(task?.title ?? '');
+  const [title] = useState(task.title);
   const [dueDate, setDueDate] = useState<Dayjs | null>(
-    task?.due_date ? dayjs(task.due_date.split(' ')[0]) : null
+    dayjs(task.due_date.split(' ')[0])
   );
-  const [time, setTime] = useState(
-    task?.due_date ? task.due_date.split(' ')[1] : ''
-  );
+  const [time, setTime] = useState(task.due_date.split(' ')[1] ?? '');
   const [notifyCycle, setNotifyCycle] = useState<string[]>(
-    task?.notifyCycle ?? []
+    task.notifyCycle ?? []
   );
   const [notification, setNotification] = useState<'ON' | 'OFF'>(
-    task?.notification ?? 'OFF'
+    task.notification
   );
-  const [visibility, setVisibility] = useState<'ON' | 'OFF'>(
-    task?.visibility ?? 'OFF'
-  );
-  const [memo, setMemo] = useState(task?.memo ?? '');
-  const [isBookmarked, setIsBookmarked] = useState(task?.favorite === 'ACTIVE');
+  const [visibility, setVisibility] = useState<'ON' | 'OFF'>(task.visibility);
+  const [memo, setMemo] = useState(task.memo);
+  const [isBookmarked, setIsBookmarked] = useState(task.favorite === 'ACTIVE');
 
   // 과제 수정 API
   const editTaskMutation = useMutation({
