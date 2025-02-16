@@ -32,16 +32,16 @@ const LeftTitles = styled.div`
 `;
 
 const MainPageTitleBox = styled.div<{
-  isSelected: boolean;
-  background: string;
+  $isSelected: boolean;
+  $background: string;
 }>`
   display: flex;
   padding: 17px 20px;
   justify-content: center;
   align-items: center;
   border-radius: 20px 20px 0px 0px;
-  background: ${(props) => (props.isSelected ? props.background : '#e8e8e8')};
-  color: ${({ isSelected }) => (isSelected ? 'black' : '#7e7f7f')};
+  background: ${(props) => (props.$isSelected ? props.$background : '#e8e8e8')};
+  color: ${({ $isSelected }) => ($isSelected ? 'black' : '#7e7f7f')};
   width: 200px;
   height: fit-content;
   cursor: pointer;
@@ -99,9 +99,9 @@ const More = styled.div`
   }
 `;
 
-const TaskBox = styled.div<{ $isScrollable: boolean; background: string }>`
+const TaskBox = styled.div<{ $isScrollable: boolean; $background: string }>`
   border-radius: 0px 20px 20px 20px;
-  background: ${({ background }) => background};
+  background: ${({ $background }) => $background};
   padding: 52px 64px;
   ${({ $isScrollable }) =>
     $isScrollable
@@ -236,18 +236,8 @@ function OngoingTasks() {
   const queryClient = useQueryClient();
 
   const { selectedTheme } = useThemeStore(); // 현재 선택된 테마 가져오기
-
   const themeColors = themeBackground[selectedTheme];
   const backgroundColor = themeColors[1];
-
-  // 진행 중인 과제 API
-  // const {
-  //   data: tasks = [],
-  //   isLoading,
-  //   isError,
-  // } = useGetData(`/api/assignment?userId=${userId}`, {
-  //   headers: { Authorization: `${token}` },
-  // });
 
   const debouncedUserId = useDebounce(userId, 1000);
 
@@ -279,7 +269,7 @@ function OngoingTasks() {
         }
       );
       if (Array.isArray(response.data.result)) {
-        const filteredTasks = response.data.result.filter((task) => {
+        const filteredTasks = response.data.result.filter((task: any) => {
           // ✅ 정규식을 사용하여 숫자만 추출
           const timeNumbers = task.due_time.match(/-?\d+/g)?.map(Number) || [];
           if (timeNumbers[0] < 0) {
@@ -287,7 +277,7 @@ function OngoingTasks() {
             deleteTasks(task.assignmentId);
           }
           // ✅ 모든 시간이 0 이하(음수 포함)라면 과제 제외
-          return !timeNumbers.some((num) => num < 0);
+          return !timeNumbers.some((num: number) => num < 0);
         });
 
         setTasks(filteredTasks); // ✅ 필터링된 과제만 저장
@@ -364,16 +354,13 @@ function OngoingTasks() {
 
   const [selectedAssId, setSelectedAssId] = useState<number | null>(null);
 
-  const { data: taskData } = useGetData(`/api/assignment/${selectedAssId}`, {
-    headers: { Authorization: `${token}` },
-  });
-
   const handleEditTask = (assId: number) => {
+    console.log('과제 선택됨:', assId);
     setSelectedAssId(assId);
   };
 
   useEffect(() => {
-    if (!taskData || !selectedAssId) return;
+    if (!selectedAssId) return;
 
     openModal(
       <EditTaskModal
@@ -382,10 +369,7 @@ function OngoingTasks() {
         onComplete={() => handleCompleteTask(selectedAssId)}
       />
     );
-  }, [taskData, selectedAssId]);
-
-  if (isLoading) return <div>로딩 중...</div>;
-  if (isError) return <div>데이터를 불러오는 데 실패했습니다.</div>;
+  }, [selectedAssId]);
 
   // 과제 색상 지정
   const taskColors = [
@@ -400,16 +384,16 @@ function OngoingTasks() {
       <MainPageTitleWrapper>
         <LeftTitles>
           <MainPageTitleBox
-            isSelected={selectedTab === 'ongoing'}
+            $isSelected={selectedTab === 'ongoing'}
             onClick={() => setSelectedTab('ongoing')}
-            background={backgroundColor}
+            $background={backgroundColor}
           >
             <MainPageTitle>진행 중인 과제</MainPageTitle>
           </MainPageTitleBox>
           <MainPageTitleBox
-            isSelected={selectedTab === 'important'}
+            $isSelected={selectedTab === 'important'}
             onClick={() => setSelectedTab('important')}
-            background={backgroundColor}
+            $background={backgroundColor}
           >
             <MainPageTitle>중요한 과제</MainPageTitle>
           </MainPageTitleBox>
@@ -451,7 +435,7 @@ function OngoingTasks() {
         </div>
       </MainPageTitleWrapper>
 
-      <TaskBox background={backgroundColor} $isScrollable={tasks.length > 10}>
+      <TaskBox $background={backgroundColor} $isScrollable={tasks.length > 10}>
         {tasks.slice(0, visibleTasksCount).map((task: any, index: number) => (
           <TaskItem
             key={task.assignmentId}
