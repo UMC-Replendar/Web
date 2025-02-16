@@ -28,10 +28,6 @@ const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
     new Array(data.length).fill(false)
   );
 
-  const { data: TaskData } = useGetData(
-    lectureId ? `/api/major/lectures/get/${lectureId}` : ''
-  );
-
   const toggleGroup = (index: number) => {
     setShowTasks((prev) => {
       const newShowTasks = [...prev];

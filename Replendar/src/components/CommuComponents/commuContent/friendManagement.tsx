@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import DownArrow from '../../../assets/images/downArrow.svg';
 import UpArrow from '../../../assets/images/upArrow.svg';
 import { AddButton } from '../../../pages/OngoingTasks';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { PlusIcon } from '../commuIcons';
 import FriendListRender from '../friendListRender';
 import useModalStore from '../../../store/modalStore';
@@ -39,16 +39,19 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
 
   const { data, isLoading } = useGetData(`/api/friend-groups`);
   const displayedData = expanded === 'true' ? data : data.slice(0, 4);
-  useEffect(() => {
-    console.log(data.length);
-    console.log('expand', expanded);
-  }, [expanded]);
-  const visibleCount = expanded === 'true' ? data.length : 4;
+
   const DeleteGroupMutation = useMutation({
     mutationFn: (groupId: number) => deleteGroup(groupId),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`/api/friend-groups`],
+      });
+
+      Swal.fire({
+        icon: 'success',
+        text: '그룹이 삭제되었습니다',
+        timer: 2000,
+        showConfirmButton: false,
       });
     },
     onError: (error: Error) => {
@@ -76,7 +79,7 @@ const FriendManagement: React.FC<{ expanded: string }> = ({ expanded }) => {
       </AddButtonDiv>
       {isLoading && <GroupSkeleton count={4} />}
 
-      {displayedData.slice(0, visibleCount).map((group: IGroupList) => (
+      {displayedData.map((group: IGroupList) => (
         <div key={group.groupId}>
           <SpaceBtwDiv
             status={

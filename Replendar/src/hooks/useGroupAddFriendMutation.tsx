@@ -19,6 +19,12 @@ export const useGroupAddFriendMutation = () => {
     onSuccess: () => {
       closeModal();
       queryClient.invalidateQueries({ queryKey: [`/api/friend-groups`] });
+      Swal.fire({
+        icon: 'success',
+        text: '그룹에 친구가 추가되었습니다',
+        timer: 2000,
+        showConfirmButton: false,
+      });
     },
 
     onError: (error: Error) => {
