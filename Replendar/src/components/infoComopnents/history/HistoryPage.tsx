@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useQuery } from '@tanstack/react-query';
-import { axiosInstance } from '../../../apis/axios-instance';
-import BlueButton from '../../blueButton';
 import { useThemeStore, themeBackground } from '../../../store/useThemeStore';
-import FriendNewsRender from '../../friendNewsRender';
+
+import HistoryAll from './HistoryAll';
+import HistoryFriend from './HistoryFriend';
+import HistoryAssignment from './HistoryAssignment';
+import HistoryEtc from './HistoryEtc';
 
 const Container = styled.div`
   width: 100%;
@@ -48,83 +49,25 @@ const Button = styled.button<{ active: boolean; background: string }>`
   }
 `;
 
-const ContentBox = styled.div<{ background: string }>`
-  padding: 34.5px 109px 67.5px 37px;
-  background: ${({ background }) => background};
-  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
-  border-radius: 20px;
-  width: calc(100% - 146px);
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-`;
-
-const HistoryWhiteBox = styled.div`
-  background-color: white;
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1px;
-  margin-top: 1px;
-`;
-
-const HistoryItem = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-`;
-
-const HistoryDetails = styled.div`
-  display: flex;
-  gap: 100px;
-  font-size: 19px;
-  font-family: Pretendard, sans-serif;
-  font-weight: 500;
-  color: black;
-`;
-
 const HistoryPage: React.FC = () => {
   const [activeMenu, setActiveMenu] = useState<string>('전체');
 
   const { selectedTheme } = useThemeStore();
   const themeColors = themeBackground[selectedTheme];
-  const backgroundColor = themeColors[1];
   const buttonColor = themeColors[0];
 
-  const apiUrl = (() => {
+  const renderContent = () => {
     switch (activeMenu) {
       case '친구소식':
-        return '/api/activity/friend';
+        return <HistoryFriend />;
       case '과제알림':
-        return '/api/activity/assignment/notify';
+        return <HistoryAssignment />;
       case '기타':
-        return '/api/activity'; // 이후 공지사항 관련 API 연결
+        return <HistoryEtc />;
       default:
-        return '/api/activity'; // 전체 API
+        return <HistoryAll />;
     }
-  })();
-
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['activity', activeMenu], // 메뉴별 캐싱
-    queryFn: async () => {
-      const response = await axiosInstance.get(apiUrl, {
-        params: { page: 1, size: 15, sort: 'CreatedAt' },
-      });
-
-      console.log(`${activeMenu} API Response:`, response.data);
-
-      // 전체 API는 response.data.content, 나머지는 response.data.result.content
-      return activeMenu === '전체'
-        ? response.data.content || []
-        : response.data.result?.content || [];
-    },
-    staleTime: 1000 * 60 * 5, // 5분 동안 데이터 캐싱 유지
-    refetchOnWindowFocus: false, // 창 포커스 변경 시 리패치 비활성화
-  });
-
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>데이터를 불러오는 중 오류 발생!</div>;
+  };
 
   return (
     <Container>
@@ -141,33 +84,7 @@ const HistoryPage: React.FC = () => {
           </Button>
         ))}
       </Menu>
-      <ContentBox background={backgroundColor}>
-        {activeMenu === '친구소식' ? (
-          <FriendNewsRender /> // 친구소식 메뉴에서만 표시
-        ) : data.length > 0 ? (
-          data.map(
-            (
-              item: any,
-              index: number // 다른 메뉴에서는 기존 데이터 렌더링
-            ) => (
-              <HistoryWhiteBox key={index}>
-                <HistoryItem>
-                  <HistoryDetails>
-                    <div>{item.date}</div>
-                    <div>{item.time}</div>
-                    <div>{item.content}</div>
-                  </HistoryDetails>
-                  <BlueButton status={item.check ? '등록됨' : '내 일정에 등록'}>
-                    {item.check ? '등록됨' : '내 일정에 등록'}
-                  </BlueButton>
-                </HistoryItem>
-              </HistoryWhiteBox>
-            )
-          )
-        ) : (
-          <div>기록이 없습니다.</div>
-        )}
-      </ContentBox>
+      {renderContent()}
     </Container>
   );
 };

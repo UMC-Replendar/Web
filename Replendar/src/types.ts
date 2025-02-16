@@ -77,6 +77,19 @@ export interface IFriendNewsContent {
   type: string;
   isRegistered: boolean;
 }
+export interface IHistoryAllContent {
+  date: string;
+  time: string;
+  check: 'CHECK'; // "CHECK" 문자열 고정
+  friendRequestId: 0;
+  senderId: 0;
+  friendId: 0;
+  assId: 0;
+  content: string;
+  createdAt: string; // ISO 날짜 형식
+  type: string;
+  isRegistered: boolean;
+}
 
 export interface ISort {
   empty: boolean; // 정렬 정보 (비어있는지 여부)
