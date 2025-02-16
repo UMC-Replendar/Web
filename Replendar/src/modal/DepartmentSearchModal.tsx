@@ -5,6 +5,7 @@ import { axiosInstance } from '../apis/axios-instance';
 import useSchoolStore from '../store/schoolStore';
 import DepartmentRegisterModal from './DepartmentRegisterModal';
 import useDepartmentStore from '../store/useDepartmentStore';
+import Swal from 'sweetalert2';
 
 const ModalWrapper = styled.div`
   padding: 20px;
@@ -143,7 +144,12 @@ const DepartmentSearchModal: React.FC = ({}) => {
   };
 
   const handleSelectDepartment = (dept: { id: number; name: string }) => {
-    alert(`${dept.name}를 선택하였습니다.`);
+    Swal.fire({
+      icon: 'info',
+      text: `${dept.name}를 선택하였습니다.`,
+      showConfirmButton: false,
+      timer: 2000,
+    });
 
     setSelectedDepartment(dept);
     closeModal();

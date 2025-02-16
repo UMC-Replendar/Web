@@ -7,6 +7,7 @@ import SelectFriendsModal from '../../../modal/SelectFriendsModal';
 import useGetData from '../../../hooks/useGetData';
 import useFriendsStore from '../../../store/useFriendStore';
 import { useGroupAddFriendMutation } from '../../../hooks/useGroupAddFriendMutation';
+import Swal from 'sweetalert2';
 
 const AddGroup: React.FC<{ groupId: number }> = ({ groupId }) => {
   const { closeModal } = useModalStore();
@@ -33,7 +34,7 @@ const AddGroup: React.FC<{ groupId: number }> = ({ groupId }) => {
   }, [isFriendModalOpen]);
 
   const { data } = useGetData(
-    `/api/friend-groups/${groupId}/available-friends`
+    isFriendModalOpen ? `/api/friend-groups/${groupId}/available-friends` : ''
   );
 
   useEffect(() => {
@@ -44,7 +45,12 @@ const AddGroup: React.FC<{ groupId: number }> = ({ groupId }) => {
 
   const handleGroupAddFriend = () => {
     if (nicknames.length === 0) {
-      alert('그룹에 추가할 친구를 선택하세요');
+      Swal.fire({
+        icon: 'warning',
+        text: '그룹에 추가할 친구를 선택하세요',
+        timer: 2000,
+        showConfirmButton: false,
+      });
       return;
     }
 

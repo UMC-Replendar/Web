@@ -1,14 +1,14 @@
 import styled from 'styled-components';
 import { AddButton } from '../../../pages/OngoingTasks';
-import PlusIcon from '../../../assets/images/PlusIcon.svg';
 import BlueButton from '../../blueButton';
-import { useState, useEffect } from 'react';
 import CommuModalContent from '../modalContents/commuModalContent';
 import useGetData from '../../../hooks/useGetData';
 import { ITaskList } from '../../../types';
 import { useAcademicYearStore } from '../../../store/profileStore';
 import useModalStore from '../../../store/modalStore';
 import AddTaskModal from '../../../modal/AddTaskModal';
+import { TaskListSkeleton } from '../../skeleton';
+import { PlusIcon } from '../commuIcons';
 
 const Container = styled.div`
   width: 100%;
@@ -88,33 +88,37 @@ const Sort = styled.label`
   align-items: center;
 `;
 
+const StyledTd = styled.td`
+  background-color: transparent;
+  padding: 0;
+  width: 100%;
+`;
+
 const TaskList: React.FC<{ expanded: string }> = ({ expanded }) => {
-  const visibleItems = expanded === 'true' ? 10 : 3;
   const { openModal } = useModalStore();
 
-  const { academicYear, setAcademicYear } = useAcademicYearStore();
-  const [sortKey, setSortKey] = useState('professor');
+  const { academicYear, setAcademicYear, sortKey, setSortKey } =
+    useAcademicYearStore();
 
   const queryKey = `/api/major/lectures/sort/${sortKey}?sort=asc&academicYear=${academicYear}&majorId=`;
-  const { data } = useGetData(queryKey);
+  const { data, isLoading } = useGetData(queryKey);
+
+  const displayedData = expanded === 'true' ? data : data.slice(0, 3);
 
   const handleOpenModal = () => {
     openModal(<CommuModalContent queryKey={queryKey} />);
   };
 
-  useEffect(() => {
-    console.log(queryKey);
-  }, [queryKey]);
   return (
     <Container>
       <SpaceBtwDiv>
         <AddButtonDiv>
-          {' '}
           <AddButton onClick={handleOpenModal}>
             과제 추가하기
-            <img src={PlusIcon} alt="Plus Icon" />
+            <PlusIcon fill="currentColor" />
           </AddButton>
         </AddButtonDiv>
+
         <div>
           <Select
             value={academicYear}
@@ -150,37 +154,52 @@ const TaskList: React.FC<{ expanded: string }> = ({ expanded }) => {
           </tr>
         </thead>
         <tbody>
-          {data.slice(0, visibleItems).map((item: ITaskList) => (
-            <tr key={item.lectureAssignmentId}>
-              <td>{item.academicYear}</td>
-              <td>{item.created_date}</td>
-              <td>{item.professor}</td>
-              <td>{item.lectureName}</td>
-              <td>{item.title}</td>
-              <td>{item.due_date}</td>
+          {isLoading ? (
+            <tr>
+              <StyledTd
+                colSpan={7}
+                style={{
+                  backgroundColor: 'transparent',
+                  padding: 0,
 
-              <td>
-                {item.check === 'CHECK' ? (
-                  <BlueButton status="등록됨">등록됨</BlueButton>
-                ) : (
-                  <BlueButton
-                    onClick={() =>
-                      openModal(
-                        <AddTaskModal
-                          lectureAssignmentId={item.lectureAssignmentId}
-                          onTaskAdded={() =>
-                            console.log('과제가 추가되었습니다.')
-                          }
-                        />
-                      )
-                    }
-                  >
-                    내 일정에 등록
-                  </BlueButton>
-                )}
-              </td>
+                  width: '100%',
+                }}
+              >
+                <TaskListSkeleton count={3} />
+              </StyledTd>
             </tr>
-          ))}
+          ) : (
+            displayedData.map((item: ITaskList) => (
+              <tr key={item.lectureAssignmentId}>
+                <td>{item.academicYear.replace('YEAR_', '')}</td>
+                <td>{item.created_date}</td>
+                <td>{item.professor}</td>
+                <td>{item.lectureName}</td>
+                <td>{item.title}</td>
+                <td>{item.due_date}</td>
+                <td>
+                  {item.check === 'CHECK' ? (
+                    <BlueButton status="등록됨">등록됨</BlueButton>
+                  ) : (
+                    <BlueButton
+                      onClick={() =>
+                        openModal(
+                          <AddTaskModal
+                            lectureAssignmentId={item.lectureAssignmentId}
+                            onTaskAdded={() =>
+                              console.log('과제가 추가되었습니다.')
+                            }
+                          />
+                        )
+                      }
+                    >
+                      내 일정에 등록
+                    </BlueButton>
+                  )}
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </Container>

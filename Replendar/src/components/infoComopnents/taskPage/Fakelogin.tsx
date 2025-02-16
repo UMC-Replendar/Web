@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import useAuthStore from '../../../store/authStore';
+import Swal from 'sweetalert2';
 
 const Container = styled.div`
   display: flex;
@@ -84,8 +85,15 @@ const Fakelogin = () => {
         console.log(data);
         setAuth(accessToken, email, id, nickname, theme); // ✅ Zustand에 토큰 저장
         if (nickname == null) {
-          alert('Replendar에 처음이시군요! 회원가입을 진행해 주세요');
-          navigate('/signup'); // 로그인 후 회원가입으로 이동
+          Swal.fire({
+            icon: 'info',
+            title: 'Replendar에 처음이시군요!',
+            text: '회원가입을 진행해 주세요',
+            showConfirmButton: true,
+            confirmButtonText: '확인',
+          }).then(() => {
+            navigate('/signup'); // SweetAlert 확인 버튼 클릭 후 회원가입 페이지 이동
+          });
         }
       } else {
         setError(data.message || '로그인 실패');

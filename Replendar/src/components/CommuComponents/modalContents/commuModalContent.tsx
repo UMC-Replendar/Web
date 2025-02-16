@@ -15,6 +15,7 @@ import { AddDepartmentAssignment } from '../../../apis/commuApi';
 import { useMutation } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAcademicYearStore } from '../../../store/profileStore';
+import Swal from 'sweetalert2';
 
 const CommuModalContent: React.FC<{ queryKey: string }> = ({ queryKey }) => {
   const [academicYear, setacademicYear] = useState(1);
@@ -44,8 +45,13 @@ const CommuModalContent: React.FC<{ queryKey: string }> = ({ queryKey }) => {
       content: string;
       endDate: string;
     }) => AddDepartmentAssignment({ lectureId, title, content, endDate }),
-    onSuccess: (data) => {
-      alert(data);
+    onSuccess: () => {
+      Swal.fire({
+        icon: 'success',
+        text: '학과 과제가 추가되었습니다',
+        timer: 2000,
+        showConfirmButton: false,
+      });
       setAcademicYear(academicYear);
       closeModal();
       queryClient.invalidateQueries({
@@ -53,7 +59,12 @@ const CommuModalContent: React.FC<{ queryKey: string }> = ({ queryKey }) => {
       });
     },
     onError: (error: Error) => {
-      alert('학과 과제 추가하기에 실패했습니다');
+      Swal.fire({
+        icon: 'error',
+        text: '학과 과제 추가하기에 실패했습니다.',
+        confirmButtonText: '확인',
+        showConfirmButton: true,
+      });
       console.error(error);
     },
   });
@@ -65,15 +76,28 @@ const CommuModalContent: React.FC<{ queryKey: string }> = ({ queryKey }) => {
 
   const handleAddAssignment = () => {
     if (selectedLecture === null) {
-      alert('강좌를 선택해주세요.');
+      Swal.fire({
+        icon: 'warning',
+        text: '강좌를 선택해주세요',
+      });
       return;
     }
     if (!title.trim()) {
-      alert('과제명을 입력해주세요.');
+      Swal.fire({
+        icon: 'warning',
+        text: '과제명을 선택해주세요',
+        timer: 2000,
+        showConfirmButton: false,
+      });
       return;
     }
     if (!deadline) {
-      alert('마감일을 선택해주세요.');
+      Swal.fire({
+        icon: 'warning',
+        text: '마감일을 선택해주세요',
+        timer: 2000,
+        showConfirmButton: false,
+      });
       return;
     }
     const formattedDeadline = `${deadline.format('YYYY/MM/DD')}`;

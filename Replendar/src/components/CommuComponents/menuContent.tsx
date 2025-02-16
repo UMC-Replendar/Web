@@ -24,7 +24,7 @@ const MenuContent: React.FC<MenuContentProps> = ({ menuState, expanded }) => {
       content = <FriendNews />;
       break;
     case '친구관리':
-      content = <FriendManagement />;
+      content = <FriendManagement expanded={expanded} />;
       break;
     case '학과소식':
       content = <DepartmentList />;
@@ -33,7 +33,7 @@ const MenuContent: React.FC<MenuContentProps> = ({ menuState, expanded }) => {
       content = <TaskList expanded={expanded} />;
       break;
     case '강좌목록':
-      content = <LectureList />;
+      content = <LectureList expanded={expanded} />;
       break;
     default:
       content = <FriendRegister />;

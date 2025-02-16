@@ -1,21 +1,43 @@
 import styled from 'styled-components';
 import { AddButton } from '../../../pages/OngoingTasks';
-import PlusIcon from '../../../assets/images/PlusIcon.svg';
+import { PlusIcon } from '../commuIcons';
 import CommuModalContent from '../modalContents/commuModalContent';
 import useGetData from '../../../hooks/useGetData';
 import { ILecture } from '../../../types';
 import { useAcademicYearStore } from '../../../store/profileStore';
 import useModalStore from '../../../store/modalStore';
+import { LectureListSkeleton } from '../../skeleton';
+import { useState } from 'react';
+import React from 'react';
 
-const LectureList = () => {
+const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const { openModal } = useModalStore();
   const { academicYear, setAcademicYear } = useAcademicYearStore();
+  const [lectureId, setLectureId] = useState();
 
   const queryKey = `/api/major/lectures/list/${academicYear}`;
-  const { data } = useGetData(queryKey);
+  const { data, isLoading } = useGetData(queryKey);
+
+  const displayedData = expanded === 'true' ? data : data.slice(0, 3);
 
   const handleOpenModal = () => {
     openModal(<CommuModalContent queryKey={queryKey} />);
+  };
+
+  const [showTasks, setShowTasks] = useState<boolean[]>(
+    new Array(data.length).fill(false)
+  );
+
+  const { data: TaskData } = useGetData(
+    lectureId ? `/api/major/lectures/get/${lectureId}` : ''
+  );
+
+  const toggleGroup = (index: number) => {
+    setShowTasks((prev) => {
+      const newShowTasks = [...prev];
+      newShowTasks[index] = !newShowTasks[index];
+      return newShowTasks;
+    });
   };
 
   return (
@@ -24,7 +46,7 @@ const LectureList = () => {
         <AddButtonDiv>
           <AddButton onClick={handleOpenModal}>
             과제 추가하기
-            <img src={PlusIcon} alt="Plus Icon" />
+            <PlusIcon fill="currentColor" />
           </AddButton>
         </AddButtonDiv>
         <Select
@@ -48,14 +70,36 @@ const LectureList = () => {
         </thead>
 
         <tbody>
-          {data.map((item: ILecture) => (
-            <tr key={item.lectureName}>
-              <td>{item.academicYear}</td>
+          {isLoading ? (
+            <tr>
+              <StyledTd
+                colSpan={7}
+                style={{
+                  backgroundColor: 'transparent',
+                  padding: 0,
 
-              <td>{item.professor}</td>
-              <td>{item.lectureName}</td>
+                  width: '100%',
+                }}
+              >
+                <LectureListSkeleton count={3} />
+              </StyledTd>
             </tr>
-          ))}
+          ) : (
+            displayedData.map((item: ILecture, index: number) => (
+              <React.Fragment key={index}>
+                <tr onClick={() => toggleGroup(index)}>
+                  <td>{item.academicYear.replace('YEAR_', '')}</td>
+                  <td>{item.professor}</td>
+                  <td>{item.lectureName}</td>
+                </tr>
+                {showTasks[index] && (
+                  <tr>
+                    <td colSpan={7}></td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))
+          )}
         </tbody>
       </table>
     </Container>
@@ -63,6 +107,12 @@ const LectureList = () => {
 };
 
 export default LectureList;
+
+const StyledTd = styled.td`
+  background-color: transparent;
+  padding: 0;
+  width: 100%;
+`;
 
 const Select = styled.select`
   margin-left: 130px;
@@ -108,6 +158,11 @@ const Container = styled.div`
     overflow: hidden;
     border-radius: 20px;
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  tr:hover td {
+    background-color: rgba(102, 102, 102, 1);
+    color: white;
   }
 
   tr th:first-child,

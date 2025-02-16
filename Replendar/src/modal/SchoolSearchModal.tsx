@@ -4,6 +4,7 @@ import useModalStore from '../store/modalStore';
 import { axiosInstance } from '../apis/axios-instance';
 import useSchoolStore from '../store/schoolStore';
 import SchoolRegisterModal from './SchoolRegisterModal';
+import Swal from 'sweetalert2';
 
 const ModalWrapper = styled.div`
   padding: 20px;
@@ -129,7 +130,13 @@ const SchoolSearchModal: React.FC<{ onSelect: (school: string) => void }> = ({
   };
 
   const handleSelectSchool = (school: { id: number; name: string }) => {
-    alert(`${school.name} 를 선택하였습니다.`);
+    Swal.fire({
+      icon: 'info',
+      text: `${school.name} 를 선택하였습니다.`,
+      timer: 2000,
+      showConfirmButton: false,
+    });
+
     setSelectedSchool(school);
     onSelect(school.name);
     closeModal();

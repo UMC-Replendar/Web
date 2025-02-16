@@ -23,6 +23,7 @@ import { TextField } from '@mui/material';
 import { styled as muiStyled } from '@mui/material/styles';
 import dayjs, { Dayjs } from 'dayjs';
 import UseNotificationPermission from '../hooks/useNotification';
+import { useAcademicYearStore } from '../store/profileStore';
 dayjs.locale('ko');
 
 const ModalOverlay = styled.div`
@@ -354,7 +355,22 @@ function AddTaskModal({
     return;
   }
 
-  const { data } = useGetData(`/api/assignment/share?userId=${userId}`);
+  const {
+    isFriendModalOpen,
+    openFriendModal,
+    nicknames,
+    updateFriendsData,
+    setFriendData,
+    friendData,
+    resetFriends,
+    toggleAllFriends,
+  } = useFriendsStore();
+
+  const { sortKey, academicYear } = useAcademicYearStore();
+
+  const { data } = useGetData(
+    isFriendModalOpen ? `/api/assignment/share?userId=${userId}` : ''
+  );
 
   const { data: lectureAssignmentData } = useGetData(
     lectureAssignmentId ? `/api/major/lectures/get/${lectureAssignmentId}` : ''
@@ -412,7 +428,17 @@ function AddTaskModal({
     },
     onSuccess: (newTask) => {
       console.log('과제 추가 완료:', newTask);
-      queryClient.invalidateQueries({ queryKey: ['tasks', userId] });
+      queryClient.invalidateQueries({
+        queryKey: ['tasks', userId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['/api/activity/friend'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          `/api/major/lectures/sort/${sortKey}?sort=asc&academicYear=${academicYear}&majorId=`,
+        ],
+      });
       onTaskAdded();
       closeModal();
     },
@@ -445,22 +471,12 @@ function AddTaskModal({
       shareIds: friendData ? friendData.map((friend) => friend.friendId) : [],
       memo: memo.trim() === '' ? '' : memo,
       favorite: isBookmarked ? 'ACTIVE' : 'INACTIVE',
-      originAssId: null,
+      originAssId: assId ? assId : null,
       lectureAssignmentId: lectureAssignmentId ? lectureAssignmentId : null,
     };
 
     addTaskMutation.mutate(taskData);
   };
-  const {
-    isFriendModalOpen,
-    openFriendModal,
-    nicknames,
-    updateFriendsData,
-    setFriendData,
-    friendData,
-    resetFriends,
-    toggleAllFriends,
-  } = useFriendsStore();
 
   useEffect(() => {
     updateFriendsData();

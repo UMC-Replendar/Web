@@ -14,7 +14,7 @@ export default function AskPage() {
 
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState(
-    `닉네임: ${profile?.nickname || '리플레넝'} \n문의내용: `
+    `닉네임: ${profile?.nickname || '리플레닝'} \n문의내용: `
   );
   const { selectedTheme } = useThemeStore();
   const themeColors = themeBackground[selectedTheme];
@@ -26,7 +26,12 @@ export default function AskPage() {
     e.preventDefault();
 
     if (!email || !debouncedMessage) {
-      alert('이메일과 문의 내용을 입력해주세요.');
+      Swal.fire({
+        icon: 'info',
+        text: '이메일과 문의 내용을 입력해주세요',
+        showConfirmButton: false,
+        timer: 2000,
+      });
       return;
     }
 
@@ -52,7 +57,6 @@ export default function AskPage() {
       }
     } catch (error) {
       console.error('이메일 전송 실패:', error);
-      alert('이메일 전송 중 오류가 발생했습니다.');
       Swal.fire({
         icon: 'error',
         title: '이메일 전송에 실패했습니다',
