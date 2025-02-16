@@ -58,6 +58,9 @@ const FriendsNickname = styled.div`
   font-size: 16px;
   font-weight: 500;
   line-height: 140%;
+  width: 50px; /* 원하는 고정 너비 */
+  word-break: break-word; /* 긴 단어를 줄바꿈 */
+  white-space: normal; /* 줄바꿈 허용 */
 `;
 
 const FriendsNameAndMemo = styled.div`
