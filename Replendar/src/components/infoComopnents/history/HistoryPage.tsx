@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
-import { axiosInstance } from '../../apis/axios-instance';
-import BlueButton from '../blueButton';
-import { useThemeStore, themeBackground } from '../../store/useThemeStore';
-import FriendNewsRender from '../friendNewsRender';
+import { axiosInstance } from '../../../apis/axios-instance';
+import BlueButton from '../../blueButton';
+import { useThemeStore, themeBackground } from '../../../store/useThemeStore';
+import FriendNewsRender from '../../friendNewsRender';
 
 const Container = styled.div`
   width: 100%;

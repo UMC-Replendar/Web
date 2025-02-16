@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { axiosInstance } from '../../apis/axios-instance';
-import BlueButton from '../blueButton';
-import Plus from '../../assets/images/PlusIcon.svg';
-import { useThemeStore, themeBackground } from '../../store/useThemeStore';
+import { axiosInstance } from '../../../apis/axios-instance';
+import BlueButton from '../../blueButton';
+import Plus from '../../../assets/images/PlusIcon.svg';
+import { useThemeStore, themeBackground } from '../../../store/useThemeStore';
 
 const Title = styled.p`
   color: black;

@@ -133,9 +133,8 @@ const ImportantTaskPage: React.FC = () => {
           page.content.map((item: Task, index) => {
             console.log('과제 데이터:', item);
 
-            const now = new Date(); // 현재 시간
-            const dueDate = new Date(item.due_date); // 마감일 변환
-            const isValid = now < dueDate; // 현재 시간보다 이후면 유효
+            // completion_time에 따라 상태 설정
+            const completionStatus = item.completion_time ? '완료' : '미완료';
 
             return (
               <WhiteBox key={item.dueDate || index}>
@@ -145,10 +144,8 @@ const ImportantTaskPage: React.FC = () => {
                     <TaskText>{item.due_time || '시간 미정'}</TaskText>
                     <TaskText>{item.title || '과제 없음'}</TaskText>
                   </TaskDetails>
-                  <BlueButton status={isValid ? '유효' : '만료됨'}>
-                    {/*이거 완료 미완료인지 , -> StoredTask에 TaskStaus사용하기
-                    만약 완료 미완료라면 판단 여부는?*/}
-                    {isValid ? '유효' : '만료됨'}
+                  <BlueButton status={completionStatus}>
+                    {completionStatus}
                   </BlueButton>
                 </TaskItem>
               </WhiteBox>

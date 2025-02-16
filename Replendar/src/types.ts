@@ -12,6 +12,7 @@ export interface Task {
   completionTime: string;
   due_datetime: string;
   dueDate: string;
+  completion_time: string;
 }
 
 // 기존 StoredTask 정의 (마감일과 유효성만 포함)

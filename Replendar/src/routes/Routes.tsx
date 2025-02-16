@@ -143,7 +143,7 @@ const StoredTasksPage = lazy(
   () => import('../components/infoComopnents/taskPage/StoredTasksPage')
 );
 const HistoryPage = lazy(
-  () => import('../components/infoComopnents/HistoryPage')
+  () => import('../components/infoComopnents/history/HistoryPage')
 );
 const SignUp = lazy(() => import('../pages/SignUp'));
 const DetailPage = lazy(
