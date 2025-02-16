@@ -7,10 +7,13 @@ import { ILecture } from '../../../types';
 import { useAcademicYearStore } from '../../../store/profileStore';
 import useModalStore from '../../../store/modalStore';
 import { LectureListSkeleton } from '../../skeleton';
+import { useState } from 'react';
+import React from 'react';
 
 const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const { openModal } = useModalStore();
   const { academicYear, setAcademicYear } = useAcademicYearStore();
+  const [lectureId, setLectureId] = useState();
 
   const queryKey = `/api/major/lectures/list/${academicYear}`;
   const { data, isLoading } = useGetData(queryKey);
@@ -19,6 +22,22 @@ const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
 
   const handleOpenModal = () => {
     openModal(<CommuModalContent queryKey={queryKey} />);
+  };
+
+  const [showTasks, setShowTasks] = useState<boolean[]>(
+    new Array(data.length).fill(false)
+  );
+
+  const { data: TaskData } = useGetData(
+    lectureId ? `/api/major/lectures/get/${lectureId}` : ''
+  );
+
+  const toggleGroup = (index: number) => {
+    setShowTasks((prev) => {
+      const newShowTasks = [...prev];
+      newShowTasks[index] = !newShowTasks[index];
+      return newShowTasks;
+    });
   };
 
   return (
@@ -67,12 +86,18 @@ const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
             </tr>
           ) : (
             displayedData.map((item: ILecture, index: number) => (
-              <tr key={index}>
-                <td>{item.academicYear.replace('YEAR_', '')}</td>
-
-                <td>{item.professor}</td>
-                <td>{item.lectureName}</td>
-              </tr>
+              <React.Fragment key={index}>
+                <tr onClick={() => toggleGroup(index)}>
+                  <td>{item.academicYear.replace('YEAR_', '')}</td>
+                  <td>{item.professor}</td>
+                  <td>{item.lectureName}</td>
+                </tr>
+                {showTasks[index] && (
+                  <tr>
+                    <td colSpan={7}></td>
+                  </tr>
+                )}
+              </React.Fragment>
             ))
           )}
         </tbody>
@@ -133,6 +158,11 @@ const Container = styled.div`
     overflow: hidden;
     border-radius: 20px;
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  tr:hover td {
+    background-color: rgba(102, 102, 102, 1);
+    color: white;
   }
 
   tr th:first-child,
