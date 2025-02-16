@@ -341,7 +341,7 @@ function AddTaskModal({
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [taskName, setTaskName] = useState('');
   const [deadline, setDeadline] = useState<Dayjs | null>(dayjs());
-  const [time, setTime] = useState('');
+  const [time, setTime] = useState('23:59');
   const [isPublic, setIsPublic] = useState(false); // 과제 공개 여부
   const [isOn, setIsOn] = useState(false); // 알림 설정
   const [alarmCycles, setAlarmCycles] = useState<string[]>([]);
@@ -457,6 +457,7 @@ function AddTaskModal({
       alert('마감일을 선택해주세요.');
       return;
     }
+
     console.log(notifiypermission);
 
     const formattedDeadline =
