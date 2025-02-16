@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import LockIcon from '../assets/images/LockIcon.svg';
 import UnLockIcon from '../assets/images/UnLockIcon.svg';
@@ -250,18 +250,6 @@ const CompleteButton = styled(Button)`
   color: #666666;
 `;
 
-interface TaskData {
-  assId: number;
-  title: string;
-  due_date: string;
-  memo: string;
-  notification: 'ON' | 'OFF';
-  visibility: 'ON' | 'OFF';
-  notifyCycle: string[];
-  shareFriend: string[];
-  favorite: 'ACTIVE' | 'INACTIVE';
-}
-
 interface EditTaskModalProps {
   assId: number;
   onClose: () => void;
@@ -282,52 +270,59 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     data: task,
     isLoading,
     isError,
-  } = useQuery<TaskData>({
+  } = useQuery({
     queryKey: ['task', assId],
     queryFn: async () => {
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment/${assId}`,
-        { headers: { Authorization: token } }
+        {
+          headers: { Authorization: token },
+        }
       );
       if (!response.data.isSuccess) {
-        throw new Error(
-          response.data.message || '과제 정보를 불러오지 못했습니다.'
-        );
+        throw new Error('과제 정보를 불러오지 못했습니다.');
       }
-
       return response.data.result;
     },
     enabled: !!assId,
   });
 
-  if (isLoading) return <div>로딩 중...</div>;
-  if (isError || !task) return <div>과제 정보를 불러올 수 없습니다.</div>;
+  const [title, setTitle] = useState('');
+  const [dueDate, setDueDate] = useState<Dayjs | null>(null);
+  const [time, setTime] = useState('');
+  const [notifyCycle, setNotifyCycle] = useState<string[]>([]);
+  const [notification, setNotification] = useState<'ON' | 'OFF'>('OFF');
+  const [visibility, setVisibility] = useState<'ON' | 'OFF'>('OFF');
+  const [memo, setMemo] = useState('');
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
-  const [title] = useState(task.title);
-  const [dueDate, setDueDate] = useState<Dayjs | null>(
-    dayjs(task.due_date.split(' ')[0])
-  );
-  const [time, setTime] = useState(task.due_date.split(' ')[1] ?? '');
-  const [notifyCycle, setNotifyCycle] = useState<string[]>(
-    task.notifyCycle ?? []
-  );
-  const [notification, setNotification] = useState<'ON' | 'OFF'>(
-    task.notification
-  );
-  const [visibility, setVisibility] = useState<'ON' | 'OFF'>(task.visibility);
-  const [memo, setMemo] = useState(task.memo);
-  const [isBookmarked, setIsBookmarked] = useState(task.favorite === 'ACTIVE');
+  useEffect(() => {
+    if (task) {
+      setTitle(task.title ?? '');
+      setDueDate(task.endDate ? dayjs(task.endDate.split(' ')[0]) : null);
+      setTime(task.endDate?.split(' ')[1] ?? '');
+      setNotifyCycle(Array.isArray(task.notifyCycle) ? task.notifyCycle : []);
+      setNotification(task.notification ?? 'OFF');
+      setVisibility(task.visibility ?? 'OFF');
+      setMemo(task.memo ?? '');
+      setIsBookmarked(task.favorite === 'ACTIVE');
+    }
+  }, [task]);
 
   // 과제 수정 API
   const editTaskMutation = useMutation({
     mutationFn: async () => {
+      const formattedDueDate = dayjs(
+        `${dueDate?.format('YYYY-MM-DD')}T${time}:00.000Z`
+      ).toISOString();
+
       const requestBody = {
         assId,
         title,
-        due_date: `${dueDate?.format('YYYY/MM/DD')} ${time}`,
+        endDate: formattedDueDate,
         notification,
         visibility,
-        memo,
+        memo: memo.trim(),
         shareIds: [],
         notifyCycle: [],
         favorite: isBookmarked ? 'ACTIVE' : 'INACTIVE',
@@ -400,6 +395,9 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
       prev.includes(cycle) ? prev.filter((c) => c !== cycle) : [...prev, cycle]
     );
   };
+
+  if (isLoading) return <div>로딩 중...</div>;
+  if (isError || !task) return <div>과제 정보를 불러올 수 없습니다.</div>;
 
   return (
     <ModalWrapper>
@@ -475,7 +473,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
       <Label>공유 중인 친구</Label>
       <FriendsList>
         {task?.shareFriend?.length
-          ? task.shareFriend.map((friend, index) => (
+          ? task.shareFriend.map((friend: number, index: number) => (
               <FriendTag key={index}>{friend}</FriendTag>
             ))
           : null}
