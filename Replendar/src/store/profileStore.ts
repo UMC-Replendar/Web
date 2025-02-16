@@ -18,6 +18,7 @@ interface ProfileData {
 
 // 프로필 관련 상태 관리
 interface ProfileStore {
+  refreshProfile(): Promise<void>;
   profile: ProfileData | null;
   loading: boolean;
   fetchProfile: (navigate: NavigateFunction) => Promise<void>;
@@ -56,6 +57,18 @@ export const useProfileStore = create<ProfileStore>((set) => ({
       }).then(() => {
         navigate('/login');
       });
+    }
+  },
+
+  // 로그인 체크 없이 프로필 정보만 갱신
+  refreshProfile: async () => {
+    try {
+      const response = await axiosInstance.get('/api/user/mypage');
+      if (response.data && response.data.result) {
+        set({ profile: response.data.result });
+      }
+    } catch (error) {
+      console.error('프로필 갱신 실패:', error);
     }
   },
 

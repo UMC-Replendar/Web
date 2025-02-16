@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import AddTaskModal from '../modal/AddTaskModal';
 import CustomCalendar from '../components/OngoingComponents/CustomCalendar';
@@ -8,10 +8,10 @@ import UpArrowIcon from '../assets/images/UpArrowIcon.svg';
 import EditTaskModal from '../modal/EditTaskModal';
 import useModalStore from '../store/modalStore';
 import useAuthStore from '../store/authStore';
-import useGetData from '../hooks/useGetData';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useThemeStore, themeBackground } from '../store/useThemeStore';
+import useDebounce from '../hooks/useDebounce';
 import Swal from 'sweetalert2';
 
 const PageWrapper = styled.div`
@@ -32,17 +32,15 @@ const LeftTitles = styled.div`
   display: flex;
 `;
 
-const MainPageTitleBox = styled.div<{
-  isSelected: boolean;
-  background: string;
-}>`
+
+const MainPageTitleBox = styled.div<{ isSelected: boolean;  background: string }>`
   display: flex;
   padding: 17px 20px;
   justify-content: center;
   align-items: center;
   border-radius: 20px 20px 0px 0px;
-  background: ${(props) => (props.isSelected ? props.background : '#e8e8e8')};
-  color: ${({ isSelected }) => (isSelected ? 'black' : '#7e7f7f')};
+  background: ${(props) => (props.$isSelected ? props.$background : '#e8e8e8')};
+  color: ${({ $isSelected }) => ($isSelected ? 'black' : '#7e7f7f')};
   width: 200px;
   height: fit-content;
   cursor: pointer;
@@ -100,9 +98,9 @@ const More = styled.div`
   }
 `;
 
-const TaskBox = styled.div<{ $isScrollable: boolean; background: string }>`
+const TaskBox = styled.div<{ $isScrollable: boolean; $background: string }>`
   border-radius: 0px 20px 20px 20px;
-  background: ${({ background }) => background};
+  background: ${({ $background }) => $background};
   padding: 52px 64px;
   ${({ $isScrollable }) =>
     $isScrollable
@@ -136,6 +134,7 @@ const TaskBlock = styled.div<{ color: string }>`
   border-radius: 50px;
   background-color: ${({ color }) => color};
   width: 100%;
+  cursor: pointer;
 `;
 
 const TaskInfo = styled.div`
@@ -176,17 +175,47 @@ interface TaskProps {
     due_date: string;
     due_time: string;
     memo: string;
+    notification: string;
   };
   onComplete: (assignmentId: number) => void;
   onEdit: (task: TaskProps['task']) => void;
 }
 
+//과제 시간이 마이너스가 되면 조회 목록에서 삭제해야하는데...
 function TaskItem({ task, onComplete, onEdit }: TaskProps) {
+  const [dueTime, setDueTime] = useState(task.due_time);
+  const [dueTimeNumbers, setDueTimeNumbers] = useState<number[]>([]);
+
+  const sendNotification = (message: string) => {
+    if (Notification.permission === 'granted') {
+      new Notification('과제 마감 알림', { body: message });
+    }
+  };
+
+  useEffect(() => {
+    setDueTime(task.due_time);
+    const timeNumbers = task.due_time.match(/-?\d+/g)?.map(Number) || [];
+    if (timeNumbers) {
+      setDueTimeNumbers(timeNumbers.map(Number));
+      if (
+        task.notification == 'ON' &&
+        dueTimeNumbers[0] == 0 &&
+        dueTimeNumbers[1] == 1 &&
+        dueTimeNumbers[2] == 0 &&
+        dueTimeNumbers[3] == 0
+      ) {
+        sendNotification(`'${task.title}' 과제 마감 알림!`);
+      }
+    } else {
+      setDueTimeNumbers([0, 0, 0, 0]); // 기본값
+    }
+  }, [task.due_time]);
+
   return (
     <TaskBlockContainer onClick={() => onEdit(task)}>
       <TaskBlock color={task.color}>
         <TaskInfo>{task.title}</TaskInfo>
-        <TaskInfo>{task.due_time}</TaskInfo>
+        <TaskInfo>{dueTime}</TaskInfo>
       </TaskBlock>
       <TaskCompleteButton
         onClick={(e) => {
@@ -211,12 +240,13 @@ function OngoingTasks() {
   const backgroundColor = themeColors[1]; // 진행 중인 과제 바탕색 (index 1)
 
   // 진행 중인 과제 데이터 가져오기
-  const { data: tasks = [], isLoading } = useGetData(
-    `/api/assignment?userId=${userId}`,
-    {
-      headers: { Authorization: `${token}` },
-    }
-  );
+  const {
+    data: tasks = [],
+    isLoading,
+    isError,
+  } = useGetData(`/api/assignment?userId=${userId}`, {
+    headers: { Authorization: `${token}` },
+  });
 
   const [selectedTab, setSelectedTab] = useState<'ongoing' | 'important'>(
     'ongoing'
@@ -267,36 +297,51 @@ function OngoingTasks() {
     });
   };
 
-  const handleEditTask = (task: any) => {
+  const [selectedAssId, setSelectedAssId] = useState<number | null>(null);
+
+  const handleEditTask = (assId: number) => {
+    console.log('과제 선택됨:', assId);
+    setSelectedAssId(assId);
+  };
+
+  useEffect(() => {
+    if (!selectedAssId) return;
+
     openModal(
       <EditTaskModal
-        task={task}
+        assId={selectedAssId}
         onClose={closeModal}
-        onComplete={() => handleCompleteTask(task)}
+        onComplete={() => handleCompleteTask(selectedAssId)}
       />
     );
   };
 
   if (isLoading) return <div>로딩 중...</div>;
+  if (isError) return <div>데이터를 불러오는 데 실패했습니다.</div>;
 
   // 과제 색상 지정
-  const taskColors = ['#2BAE66', '#2BAE66', '#25C26C', '#25C26C'];
+  const taskColors = [
+    themeColors[5],
+    themeColors[2],
+    themeColors[3],
+    themeColors[4],
+  ];
 
   return (
     <PageWrapper>
       <MainPageTitleWrapper>
         <LeftTitles>
           <MainPageTitleBox
-            isSelected={selectedTab === 'ongoing'}
+            $isSelected={selectedTab === 'ongoing'}
             onClick={() => setSelectedTab('ongoing')}
-            background={backgroundColor}
+            $background={backgroundColor}
           >
             <MainPageTitle>진행 중인 과제</MainPageTitle>
           </MainPageTitleBox>
           <MainPageTitleBox
-            isSelected={selectedTab === 'important'}
+            $isSelected={selectedTab === 'important'}
             onClick={() => setSelectedTab('important')}
-            background={backgroundColor}
+            $background={backgroundColor}
           >
             <MainPageTitle>중요한 과제</MainPageTitle>
           </MainPageTitleBox>
@@ -338,13 +383,13 @@ function OngoingTasks() {
         </div>
       </MainPageTitleWrapper>
 
-      <TaskBox background={backgroundColor} $isScrollable={tasks.length > 10}>
+      <TaskBox $background={backgroundColor} $isScrollable={tasks.length > 10}>
         {tasks.slice(0, visibleTasksCount).map((task: any, index: number) => (
           <TaskItem
             key={task.assignmentId}
             task={{
               ...task,
-              color: index < 4 ? taskColors[index] : '#7AC19A',
+              color: index < 4 ? taskColors[index] : themeColors[4],
             }}
             onComplete={handleCompleteTask}
             onEdit={() => handleEditTask(task)} //여기 왜 아이디를 넘겨주지?? 수정

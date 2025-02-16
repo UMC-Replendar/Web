@@ -23,6 +23,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TextField } from '@mui/material';
 import { styled as muiStyled } from '@mui/material/styles';
 import dayjs, { Dayjs } from 'dayjs';
+import UseNotificationPermission from '../hooks/useNotification';
 dayjs.locale('ko');
 
 const ModalOverlay = styled.div`
@@ -336,7 +337,7 @@ function AddTaskModal({
   const { closeModal } = useModalStore();
   const { addTask } = useTaskStore();
   const queryClient = useQueryClient();
-
+  const notifiypermission = UseNotificationPermission();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [taskName, setTaskName] = useState('');
   const [deadline, setDeadline] = useState<Dayjs | null>(dayjs());
@@ -467,6 +468,7 @@ function AddTaskModal({
       });
       return;
     }
+    console.log(notifiypermission);
 
     const formattedDeadline =
       deadline && time ? `${deadline.format('YYYY/MM/DD')} ${time}` : '';
@@ -533,12 +535,7 @@ function AddTaskModal({
     }
   };
 
-  const alarmOptions = [
-    { label: '3일 전', value: 'DAY3' },
-    { label: '24시간 전', value: 'DAY1' },
-    { label: '10시간 전', value: 'H10' },
-    { label: '1시간 전', value: 'H1' },
-  ];
+  const alarmOptions = [{ label: '1시간 전', value: 'H1' }];
 
   const handleAlarmCycleToggle = (cycle: string) => {
     setAlarmCycles((prev) =>

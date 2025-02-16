@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { axiosInstance } from '../../apis/axios-instance';
 import BlueButton from '../blueButton';
 import { useThemeStore, themeBackground } from '../../store/useThemeStore';
+import FriendNewsRender from '../friendNewsRender';
 
 const Container = styled.div`
   width: 100%;
@@ -64,6 +65,7 @@ const HistoryWhiteBox = styled.div`
   padding: 20px;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 1px;
+  margin-top: 1px;
 `;
 
 const HistoryItem = styled.div`
@@ -107,7 +109,7 @@ const HistoryPage: React.FC = () => {
     queryKey: ['activity', activeMenu], // 메뉴별 캐싱
     queryFn: async () => {
       const response = await axiosInstance.get(apiUrl, {
-        params: { page: 1, size: 10, sort: 'CreatedAt' },
+        params: { page: 1, size: 5, sort: 'CreatedAt' },
       });
 
       console.log(`${activeMenu} API Response:`, response.data);
@@ -140,11 +142,13 @@ const HistoryPage: React.FC = () => {
         ))}
       </Menu>
       <ContentBox background={backgroundColor}>
-        {data.length > 0 ? (
+        {activeMenu === '친구소식' ? (
+          <FriendNewsRender /> // 친구소식 메뉴에서만 표시
+        ) : data.length > 0 ? (
           data.map(
             (
               item: any,
-              index: number //어떻게 배치하지
+              index: number // 다른 메뉴에서는 기존 데이터 렌더링
             ) => (
               <HistoryWhiteBox key={index}>
                 <HistoryItem>
