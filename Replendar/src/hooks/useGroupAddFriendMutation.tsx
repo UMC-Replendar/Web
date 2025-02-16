@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { groupAddFriend } from '../apis/commuApi';
 import useModalStore from '../store/modalStore';
+import Swal from 'sweetalert2';
 
 export const useGroupAddFriendMutation = () => {
   const queryClient = useQueryClient();
@@ -21,7 +22,12 @@ export const useGroupAddFriendMutation = () => {
     },
 
     onError: (error: Error) => {
-      alert('그룹에 친구 추가하기 실패했습니다');
+      Swal.fire({
+        icon: 'error',
+        text: '그룹에 친구 추가하기 실패했습니다.',
+        timer: 2000,
+        showConfirmButton: false,
+      });
       console.error(error);
     },
   });

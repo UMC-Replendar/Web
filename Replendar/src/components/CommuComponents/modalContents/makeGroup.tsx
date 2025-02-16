@@ -9,6 +9,7 @@ import SelectFriendsModal from '../../../modal/SelectFriendsModal';
 import useGetData from '../../../hooks/useGetData';
 import useFriendsStore from '../../../store/useFriendStore';
 import { useGroupAddFriendMutation } from '../../../hooks/useGroupAddFriendMutation';
+import Swal from 'sweetalert2';
 const MakeGroup = () => {
   const { closeModal } = useModalStore();
 
@@ -43,7 +44,12 @@ const MakeGroup = () => {
         groupId: data.groupId,
         friendshipIds: validFriendshipIds,
       });
-      alert('그룹이 성공적으로 생성되었습니다.');
+      Swal.fire({
+        icon: 'success',
+        text: '그룹이 생성되었습니다',
+        timer: 2000,
+        showConfirmButton: false,
+      });
 
       closeModal();
 
@@ -52,13 +58,23 @@ const MakeGroup = () => {
       });
     },
     onError: (error: Error) => {
-      alert('그룹을 생성하는 데 실패했습니다.');
+      Swal.fire({
+        icon: 'error',
+        text: '그룹을 생성하는 데 실패했습니다.',
+        confirmButtonText: '확인',
+        showConfirmButton: true,
+      });
       console.error(error);
     },
   });
   const handleCreateGroup = () => {
     if (!groupName.trim()) {
-      alert('그룹 이름을 입력하세요.');
+      Swal.fire({
+        icon: 'warning',
+        text: '그룹 이름을 입력하세요',
+        timer: 2000,
+        showConfirmButton: false,
+      });
       return;
     }
     AddGroupmutation.mutate(groupName);
@@ -68,7 +84,7 @@ const MakeGroup = () => {
     updateFriendsData();
   }, [isFriendModalOpen]);
 
-  const { data } = useGetData(`/api/friends`);
+  const { data } = useGetData(isFriendModalOpen ? `/api/friends` : '');
 
   useEffect(() => {
     if (JSON.stringify(data) !== JSON.stringify(friendData)) {

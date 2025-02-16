@@ -12,6 +12,7 @@ import useGetData from '../hooks/useGetData';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useThemeStore, themeBackground } from '../store/useThemeStore';
+import Swal from 'sweetalert2';
 
 const PageWrapper = styled.div`
   margin-top: 79px;
@@ -31,8 +32,10 @@ const LeftTitles = styled.div`
   display: flex;
 `;
 
-
-const MainPageTitleBox = styled.div<{ isSelected: boolean;  background: string }>`
+const MainPageTitleBox = styled.div<{
+  isSelected: boolean;
+  background: string;
+}>`
   display: flex;
   padding: 17px 20px;
   justify-content: center;
@@ -202,21 +205,18 @@ function OngoingTasks() {
   const { token, id: userId } = useAuthStore();
   const queryClient = useQueryClient();
 
-
-
   const { selectedTheme } = useThemeStore(); // 현재 선택된 테마 가져오기
 
   const themeColors = themeBackground[selectedTheme]; // 현재 테마 색상 배열
   const backgroundColor = themeColors[1]; // 진행 중인 과제 바탕색 (index 1)
 
   // 진행 중인 과제 데이터 가져오기
-  const {
-    data: tasks = [],
-    isLoading,
-    isError,
-  } = useGetData(`/api/assignment?userId=${userId}`, {
-    headers: { Authorization: `${token}` },
-  });
+  const { data: tasks = [], isLoading } = useGetData(
+    `/api/assignment?userId=${userId}`,
+    {
+      headers: { Authorization: `${token}` },
+    }
+  );
 
   const [selectedTab, setSelectedTab] = useState<'ongoing' | 'important'>(
     'ongoing'
@@ -240,11 +240,18 @@ function OngoingTasks() {
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', userId] }); // 과제 목록 갱신
+      queryClient.invalidateQueries({
+        queryKey: [`/api/assignment?userId=${userId}`], //쿼리키 수정
+      }); // 과제 목록 갱신
     },
     onError: (error) => {
       console.error('과제 완료 처리 중 오류 발생:', error);
-      alert('과제 완료 처리 중 문제가 발생했습니다.');
+      Swal.fire({
+        icon: 'error',
+        text: '과제 완료 처리 중 문제가 발생했습니다',
+        confirmButtonText: '확인',
+        showConfirmButton: true,
+      });
     },
   });
 
@@ -271,7 +278,6 @@ function OngoingTasks() {
   };
 
   if (isLoading) return <div>로딩 중...</div>;
-  if (isError) return <div>데이터를 불러오는 데 실패했습니다.</div>;
 
   // 과제 색상 지정
   const taskColors = ['#2BAE66', '#2BAE66', '#25C26C', '#25C26C'];
@@ -280,7 +286,6 @@ function OngoingTasks() {
     <PageWrapper>
       <MainPageTitleWrapper>
         <LeftTitles>
-
           <MainPageTitleBox
             isSelected={selectedTab === 'ongoing'}
             onClick={() => setSelectedTab('ongoing')}
@@ -342,7 +347,7 @@ function OngoingTasks() {
               color: index < 4 ? taskColors[index] : '#7AC19A',
             }}
             onComplete={handleCompleteTask}
-            onEdit={() => handleEditTask(task.assignmentId)}
+            onEdit={() => handleEditTask(task)} //여기 왜 아이디를 넘겨주지?? 수정
           />
         ))}
       </TaskBox>

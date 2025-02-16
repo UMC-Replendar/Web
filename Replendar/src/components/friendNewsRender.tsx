@@ -75,9 +75,7 @@ const FriendNewsRender = () => {
   if (isPending) {
     return <NewsSkeleton count={5}></NewsSkeleton>;
   }
-  if (isError) {
-    return <h1>{error.message}</h1>;
-  }
+
   return (
     <>
       {data?.pages?.map((page: IPage<IFriendNewsContent>) =>

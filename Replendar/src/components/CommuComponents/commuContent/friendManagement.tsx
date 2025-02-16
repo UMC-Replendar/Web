@@ -14,6 +14,8 @@ import Minus from '../../../assets/images/minus.svg';
 import { useMutation } from '@tanstack/react-query';
 import { deleteGroup } from '../../../apis/commuApi';
 import { useQueryClient } from '@tanstack/react-query';
+import { GroupSkeleton } from '../../skeleton';
+import Swal from 'sweetalert2';
 
 const FriendManagement = () => {
   const { openModal } = useModalStore();
@@ -35,7 +37,7 @@ const FriendManagement = () => {
     });
   };
 
-  const { data, isLoading, isError } = useGetData(`/api/friend-groups`);
+  const { data, isLoading } = useGetData(`/api/friend-groups`);
 
   const DeleteGroupMutation = useMutation({
     mutationFn: (groupId: number) => deleteGroup(groupId),
@@ -45,7 +47,12 @@ const FriendManagement = () => {
       });
     },
     onError: (error: Error) => {
-      alert('친구 요청을 보내는 데 실패했습니다.');
+      Swal.fire({
+        icon: 'error',
+        text: '그룹 삭제하는 데 실패했습니다',
+        timer: 2000,
+        showConfirmButton: false,
+      });
       console.error(error);
     },
   });
@@ -53,14 +60,6 @@ const FriendManagement = () => {
   const [showGroups, setShowGroups] = useState<boolean[]>(
     new Array(data.length).fill(false)
   );
-
-  if (isLoading) {
-    return <h1>로딩</h1>;
-  }
-
-  if (isError) {
-    return <h1>에러</h1>;
-  }
 
   return (
     <Container>
@@ -70,6 +69,7 @@ const FriendManagement = () => {
           <PlusIcon />
         </AddButton>
       </AddButtonDiv>
+      {isLoading && <GroupSkeleton count={4} />}
 
       {data.map((group: IGroupList) => (
         <div key={group.groupId}>

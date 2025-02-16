@@ -5,7 +5,7 @@ import { FriendListSkeleton } from '../../skeleton.tsx';
 
 const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const url = expanded ? `/api/friends` : `/api/friends?limit=5`;
-  const { data, isLoading, isError } = useGetData(url);
+  const { data, isLoading } = useGetData(url);
 
   if (isLoading) {
     return (
@@ -15,15 +15,9 @@ const FriendList: React.FC<{ expanded: string }> = ({ expanded }) => {
     );
   }
 
-  if (isError) {
-    return <h1>에러</h1>;
-  }
-
   return (
     <Container>
-      <FriendListRender data={data} queryKey={url} />
-
-      <FriendListSkeleton count={2} />
+      <FriendListRender data={data} queryKey={url} />{' '}
     </Container>
   );
 };

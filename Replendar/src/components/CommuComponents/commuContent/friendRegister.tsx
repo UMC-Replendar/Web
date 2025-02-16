@@ -7,6 +7,7 @@ import { sendFriendRequest } from '../../../apis/commuApi';
 import { useMutation } from '@tanstack/react-query';
 import { FriendRegisterSkeleton } from '../../skeleton';
 import Swal from 'sweetalert2';
+import { useEffect } from 'react';
 
 const friendRegister = () => {
   const [mq, setMq] = useState('');
@@ -19,6 +20,11 @@ const friendRegister = () => {
 
   const hasData = Array.isArray(data) && data.length > 0;
   const friendData = hasData ? data[0] : null;
+
+  useEffect(() => {
+    console.log(data[0]);
+    console.log(hasData);
+  }, [data]);
 
   //친구요청api호출
   const sendFriendRequestMutation = useMutation({
@@ -33,10 +39,10 @@ const friendRegister = () => {
     },
     onError: (error: Error) => {
       Swal.fire({
-        icon: 'success',
-        title: '친구 요청을 보내는 데 실패했습니다.',
-        timer: 2000,
-        showConfirmButton: false,
+        icon: 'error',
+        text: '친구 요청을 보내는 데 실패했습니다.',
+        confirmButtonText: '확인',
+        showConfirmButton: true,
       });
       console.error(error);
     },
@@ -74,7 +80,11 @@ const friendRegister = () => {
       </InputContainer>
       <EmptyDiv>
         {!hasData && !!mq && !isLoading && (
-          <FlexDiv width="900px">존재하지 않는 사용자입니다.</FlexDiv>
+          <FlexDiv width="900px">
+            <Message>
+              '{mq}' 검색 결과를 찾을 수 없습니다. 다시 시도해주세요.
+            </Message>
+          </FlexDiv>
         )}
         {!!mq && isLoading && <FriendRegisterSkeleton />}
 
@@ -104,8 +114,14 @@ const friendRegister = () => {
     </Container>
   );
 };
-
+// <FlexDiv width="900px">존재하지 않는 사용자입니다.</FlexDiv>
 export default friendRegister;
+
+const Message = styled.span`
+  font-weight: bold;
+  color: #c82333;
+  font-size: 24px;
+`;
 
 const Container = styled.div`
   width: 100%;

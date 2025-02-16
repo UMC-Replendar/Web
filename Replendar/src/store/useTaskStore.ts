@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import useAuthStore from './authStore';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export interface Task {
   assignmentId: number;
@@ -50,7 +51,13 @@ const useTaskStore = create<TaskStore>((set) => ({
       return newTask;
     } catch (error) {
       console.error('과제 추가 중 오류 발생:', error);
-      alert('과제 추가 처리 중 문제가 발생했습니다.');
+      Swal.fire({
+        icon: 'error',
+        text: `과제 추가 처리 중 문제가 발생했습니다`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
       throw error;
     }
   },
@@ -85,7 +92,12 @@ const useTaskStore = create<TaskStore>((set) => ({
       console.log(`과제 완료 처리 성공: ${assId}`);
     } catch (error) {
       console.error('과제 완료 처리 중 오류 발생:', error);
-      alert('과제 완료 처리 중 문제가 발생했습니다.');
+      Swal.fire({
+        icon: 'error',
+        text: `과제 완료 처리 중 문제가 발생했습니다`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
     }
   },
 
@@ -101,7 +113,13 @@ const useTaskStore = create<TaskStore>((set) => ({
 
     if (!userId) {
       console.error('userId가 존재하지 않습니다. 로그인 여부를 확인해주세요.');
-      alert('로그인이 필요합니다.');
+
+      Swal.fire({
+        icon: 'warning',
+        text: `로그인이 필요합니다`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
       return;
     }
 
@@ -117,7 +135,13 @@ const useTaskStore = create<TaskStore>((set) => ({
       console.log('과제 목록 불러오기 성공:', response.data);
     } catch (error) {
       console.error('과제 목록을 불러오는 중 오류 발생:', error);
-      alert(`과제 목록을 불러오는 중 문제가 발생했습니다.`);
+
+      Swal.fire({
+        icon: 'error',
+        text: `과제 목록을 불러오는 중 문제가 발생했습니다`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
     }
   },
 }));

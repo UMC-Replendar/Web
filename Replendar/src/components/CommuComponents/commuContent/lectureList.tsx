@@ -6,13 +6,14 @@ import useGetData from '../../../hooks/useGetData';
 import { ILecture } from '../../../types';
 import { useAcademicYearStore } from '../../../store/profileStore';
 import useModalStore from '../../../store/modalStore';
+import { LectureListSkeleton } from '../../skeleton';
 
 const LectureList = () => {
   const { openModal } = useModalStore();
   const { academicYear, setAcademicYear } = useAcademicYearStore();
 
   const queryKey = `/api/major/lectures/list/${academicYear}`;
-  const { data } = useGetData(queryKey);
+  const { data, isLoading } = useGetData(queryKey);
 
   const handleOpenModal = () => {
     openModal(<CommuModalContent queryKey={queryKey} />);
@@ -48,14 +49,30 @@ const LectureList = () => {
         </thead>
 
         <tbody>
-          {data.map((item: ILecture) => (
-            <tr key={item.lectureName}>
-              <td>{item.academicYear}</td>
+          {isLoading ? (
+            <tr>
+              <StyledTd
+                colSpan={7}
+                style={{
+                  backgroundColor: 'transparent',
+                  padding: 0,
 
-              <td>{item.professor}</td>
-              <td>{item.lectureName}</td>
+                  width: '100%',
+                }}
+              >
+                <LectureListSkeleton count={3} />
+              </StyledTd>
             </tr>
-          ))}
+          ) : (
+            data.map((item: ILecture, index: number) => (
+              <tr key={index}>
+                <td>{item.academicYear}</td>
+
+                <td>{item.professor}</td>
+                <td>{item.lectureName}</td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </Container>
@@ -63,6 +80,12 @@ const LectureList = () => {
 };
 
 export default LectureList;
+
+const StyledTd = styled.td`
+  background-color: transparent;
+  padding: 0;
+  width: 100%;
+`;
 
 const Select = styled.select`
   margin-left: 130px;

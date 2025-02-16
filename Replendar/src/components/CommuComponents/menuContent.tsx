@@ -30,7 +30,7 @@ const MenuContent: React.FC<MenuContentProps> = ({ menuState, expanded }) => {
       content = <DepartmentList />;
       break;
     case '과제목록':
-      content = <TaskList expanded={expanded} />;
+      content = <TaskList />;
       break;
     case '강좌목록':
       content = <LectureList />;

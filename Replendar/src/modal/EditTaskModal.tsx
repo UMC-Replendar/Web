@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import LockIcon from '../assets/images/LockIcon.svg';
 import BookmarkIcon from '../assets/images/BookmarkIcon.svg';
 import ToggleSwitch from '../components/OngoingComponents/ToggleSwitch';
+import { TaskListSkeleton } from '../components/skeleton';
 
 export const SmallToggleSwitch = styled(ToggleSwitch)`
   transform: scale(0.8);
@@ -164,11 +165,13 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
   onClose,
   onComplete,
 }) => {
-  const [deadline, setDeadline] = useState(task.deadline.split('T')[0]);
-  const [time, setTime] = useState(task.deadline.split('T')[1]);
+  const [deadline, setDeadline] = useState(task?.deadline?.split('T')[0]); //여기 split 오류나요
+  const [time, setTime] = useState(task?.deadline?.split('T')[1]);
   const [isAlarmEnabled, setIsAlarmEnabled] = useState(task.isToggled);
   const [memo, setMemo] = useState('');
-
+  useEffect(() => {
+    console.log('task:', task);
+  }, [TaskListSkeleton]);
   return (
     <ModalWrapper>
       {/* 헤더 */}
