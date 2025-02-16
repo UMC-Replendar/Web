@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import LockIcon from '../assets/images/LockIcon.svg';
 import UnLockIcon from '../assets/images/UnLockIcon.svg';
@@ -29,6 +29,7 @@ const ModalWrapper = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   width: 500px;
+  padding: 24px;
   background: white;
   border-radius: 10px;
   box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
@@ -36,9 +37,9 @@ const ModalWrapper = styled.div`
 
 const Header = styled.div`
   display: flex;
-  padding: 8px 8px 8px 20px;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 30px;
 `;
 
 const TitleSection = styled.div`
@@ -64,9 +65,7 @@ const Label = styled.label`
 
 const TaskDeadlineSection = styled.div`
   display: flex;
-  align-items: center;
   gap: 28px;
-  margin-bottom: 10px;
 `;
 
 const InputContainer = styled.div`
@@ -127,33 +126,23 @@ const StyledTimeInput = styled.input`
   width: 86px;
 `;
 
-// const InputGroup = styled.div`
-//   display: flex;
-//   flex-direction: row;
-//   gap: 10px;
-//   flex-grow: 1;
-// `;
-
-// const Input = styled.input`
-//   flex: 1;
-//   padding: 8px;
-//   border: 1px solid #cacaca;
-//   border-radius: 5px;
-//   font-size: 16px;
-//   font-family: Pretendard;
-//   color: #666666;
-// `;
+const AlarmContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
 
 const AlertCycleSettingSection = styled.div`
   display: flex;
   align-items: center;
-  gap: 62px;
+  gap: 8px;
+  margin-bottom: 20px;
 `;
 
 const AlertCycleSettingButtonGroup = styled.div`
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 4px;
 `;
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -170,52 +159,49 @@ const AlarmCycleSettingButton = styled.button.withConfig({
   border-radius: 5px;
   border: 1px solid ${({ isActive }) => (isActive ? '#666666' : '#e8e8e8')};
   background: none;
-  color: #9a9a9a;
+  color: #666666;
   font-size: 16px;
   font-weight: 500;
   line-height: 140%;
   cursor: pointer;
 `;
 
-const AlarmContainer = styled.div`
+const FriendsList = styled.div`
   display: flex;
   align-items: flex-start;
-  gap: 43px;
+  align-content: flex-start;
+  gap: 6px 5px;
+  align-self: stretch;
+  flex-wrap: wrap;
+  margin-top: 5px;
+  margin-bottom: 20px;
 `;
 
-// const AlarmSettings = styled.div`
-//   display: flex;
-//   flex-direction: row;
-//   justify-content: center;
-//   align-items: center;
-//   gap: 8px;
-// `;
-
-// const AlarmButton = styled.button`
-//   color: #666666;
-//   border-radius: 5px;
-//   border: 1px #e8e8e8 solid;
-//   font-size: 16px;
-//   font-weight: 500;
-//   line-height: 22.4px;
-//   cursor: pointer;
-// `;
-
-// const GapBox = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   gap: 18px;
-// `;
-
-const MemoTextarea = styled.textarea`
+const FriendTag = styled.span`
   display: flex;
   padding: 8px;
   justify-content: center;
   align-items: center;
-  align-self: stretch;
+  border-radius: 10px;
+  border: 1px solid #bababa;
+  color: #666666;
+  font-family: Pretendard;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 140%;
+
+  // width: auto;
+  // height: 31px;
+  // min-width: 64px;
+`;
+
+const MemoTextarea = styled.textarea`
+  display: flex;
+  padding: 8px;
   width: 100%;
   height: 40px;
-  border-radius: 2px;
+  border-radius: 5px;
   border: 1px solid #cacaca;
   color: #666666;
   font-family: Pretendard;
@@ -267,11 +253,12 @@ const CompleteButton = styled(Button)`
 interface TaskData {
   assId: number;
   title: string;
-  endDate: string;
+  due_date: string;
   memo: string;
   notification: 'ON' | 'OFF';
   visibility: 'ON' | 'OFF';
   notifyCycle: string[];
+  shareFriend: string[];
   favorite: 'ACTIVE' | 'INACTIVE';
 }
 
@@ -291,39 +278,49 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
   const { editTask, fetchTasks } = useTaskStore();
 
   // 과제 상세 조회 API
-  const { data: task } = useQuery<TaskData>({
+  const {
+    data: task,
+    isLoading,
+    isError,
+  } = useQuery<TaskData>({
     queryKey: ['task', assId],
     queryFn: async () => {
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment/${assId}`,
         { headers: { Authorization: token } }
       );
-      return response.data;
+      if (!response.data.isSuccess) {
+        throw new Error(
+          response.data.message || '과제 정보를 불러오지 못했습니다.'
+        );
+      }
+
+      return response.data.result;
     },
     enabled: !!assId,
   });
 
-  const [title, setTitle] = useState('');
-  const [dueDate, setDueDate] = useState<Dayjs | null>(null);
-  const [time, setTime] = useState('');
-  const [notifyCycle, setNotifyCycle] = useState<string[]>([]);
-  const [notification, setNotification] = useState<'ON' | 'OFF'>('OFF');
-  const [visibility, setVisibility] = useState<'ON' | 'OFF'>('OFF');
-  const [memo, setMemo] = useState('');
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  if (isLoading) return <div>로딩 중...</div>;
+  if (isError || !task) return <div>과제 정보를 불러올 수 없습니다.</div>;
 
-  useEffect(() => {
-    if (task) {
-      setTitle(task.title);
-      setDueDate(dayjs(task.endDate.split(' ')[0]));
-      setTime(task.endDate.split(' ')[1]);
-      setNotifyCycle(task.notifyCycle);
-      setNotification(task.notification);
-      setVisibility(task.visibility);
-      setMemo(task.memo);
-      setIsBookmarked(task.favorite === 'ACTIVE');
-    }
-  }, [task]);
+  const [title] = useState(task?.title ?? '');
+  const [dueDate, setDueDate] = useState<Dayjs | null>(
+    task?.due_date ? dayjs(task.due_date.split(' ')[0]) : null
+  );
+  const [time, setTime] = useState(
+    task?.due_date ? task.due_date.split(' ')[1] : ''
+  );
+  const [notifyCycle, setNotifyCycle] = useState<string[]>(
+    task?.notifyCycle ?? []
+  );
+  const [notification, setNotification] = useState<'ON' | 'OFF'>(
+    task?.notification ?? 'OFF'
+  );
+  const [visibility, setVisibility] = useState<'ON' | 'OFF'>(
+    task?.visibility ?? 'OFF'
+  );
+  const [memo, setMemo] = useState(task?.memo ?? '');
+  const [isBookmarked, setIsBookmarked] = useState(task?.favorite === 'ACTIVE');
 
   // 과제 수정 API
   const editTaskMutation = useMutation({
@@ -331,12 +328,12 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
       const requestBody = {
         assId,
         title,
-        endDate: `${dueDate?.format('YYYY/MM/DD')} ${time}`,
+        due_date: `${dueDate?.format('YYYY/MM/DD')} ${time}`,
         notification,
         visibility,
         memo,
         shareIds: [],
-        notifyCycle,
+        notifyCycle: [],
         favorite: isBookmarked ? 'ACTIVE' : 'INACTIVE',
       };
       return await axios.patch(
@@ -364,6 +361,24 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
 
   const handleEditTask = () => {
     editTaskMutation.mutate();
+  };
+
+  // 과제 삭제 API
+  const deleteTaskMutation = useMutation({
+    mutationFn: async () => {
+      return await axios.delete(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment?assId=${assId}`,
+        { headers: { Authorization: token } }
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      onClose();
+    },
+  });
+
+  const handleDeleteTask = () => {
+    deleteTaskMutation.mutate();
   };
 
   // 공개/비공개
@@ -399,7 +414,6 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
           <img
             src={visibility === 'ON' ? UnLockIcon : LockIcon}
             alt="Visibility Icon"
-            width={18}
             onClick={Visibility}
             style={{ cursor: 'pointer' }}
           />
@@ -407,7 +421,6 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         <img
           src={isBookmarked ? BookmarkFilledIcon : BookmarkIcon}
           alt="Bookmark Icon"
-          width={18}
           onClick={Bookmark}
           style={{ cursor: 'pointer' }}
         />
@@ -419,14 +432,14 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <InputContainer>
             <DesktopDatePicker
-              value={dueDate}
-              onChange={setDueDate}
+              value={dueDate || dayjs()}
+              onChange={(newValue) => setDueDate(newValue)}
               format="YYYY/MM/DD"
               slots={{ textField: StyledTextField }}
             />
             <StyledTimeInput
               type="text"
-              value={time}
+              value={time || ''}
               onChange={(e) => setTime(e.target.value)}
             />
           </InputContainer>
@@ -462,6 +475,16 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         </AlertCycleSettingButtonGroup>
       </AlertCycleSettingSection>
 
+      {/* 공유 중인 친구 */}
+      <Label>공유 중인 친구</Label>
+      <FriendsList>
+        {task?.shareFriend?.length
+          ? task.shareFriend.map((friend, index) => (
+              <FriendTag key={index}>{friend}</FriendTag>
+            ))
+          : null}
+      </FriendsList>
+
       {/* 메모 입력 */}
       <Label>메모</Label>
       <MemoTextarea
@@ -472,7 +495,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
 
       {/* 버튼 그룹 */}
       <ButtonGroup>
-        <DeleteButton>과제 삭제</DeleteButton>
+        <DeleteButton onClick={handleDeleteTask}>과제 삭제</DeleteButton>
         <EditButton onClick={handleEditTask}>정보 수정</EditButton>
         <CompleteButton
           onClick={(e) => {

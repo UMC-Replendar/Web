@@ -20,9 +20,9 @@ interface TaskStore {
   tasks: Task[];
   setTasks: (tasks: Task[]) => void; // 전체 과제 목록 업데이트
   addTask: (taskData: Omit<Task, 'assignmentId'>) => Promise<Task>; // 새로운 과제 추가
-  editTask: (assignmentId: number, updatedTask: Partial<Task>) => void; // 특정 과제 수정
-  deleteTask: (assignmentId: number) => void; // 특정 과제 삭제
-  completeTask: (assignmentId: number) => Promise<void>; // 특정 과제 완료 처리
+  editTask: (assId: number, updatedTask: Partial<Task>) => void; // 특정 과제 수정
+  deleteTask: (assId: number) => void; // 특정 과제 삭제
+  completeTask: (assId: number) => Promise<void>; // 특정 과제 완료 처리
   fetchTasks: (userId: number) => Promise<void>; // 로그인, 강제 새로고침 할 때 실행
 }
 
@@ -62,10 +62,24 @@ const useTaskStore = create<TaskStore>((set) => ({
       ),
     })),
 
-  deleteTask: (assignmentId) =>
-    set((state) => ({
-      tasks: state.tasks.filter((task) => task.assignmentId !== assignmentId),
-    })),
+  deleteTask: async (assId) => {
+    const { token } = useAuthStore.getState();
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment?assId=${assId}`,
+        {
+          headers: { Authorization: `${token}` },
+        }
+      );
+
+      set((state) => ({
+        tasks: state.tasks.filter((task) => task.assignmentId !== assId),
+      }));
+    } catch (error) {
+      console.error('과제 삭제 중 오류 발생:', error);
+      alert('과제 삭제 처리 중 문제가 발생했습니다.');
+    }
+  },
 
   completeTask: async (assId) => {
     const { token } = useAuthStore.getState();
