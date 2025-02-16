@@ -1,3 +1,4 @@
+import { useProfileStore } from '../store/profileStore';
 import { axiosInstance } from './axios-instance';
 
 // 친구 요청 보내기
@@ -20,6 +21,7 @@ export const respondToFriendRequest = async ({
     requestId,
     isAccepted,
   });
+  useProfileStore.getState().refreshProfile(); // 자동 프로필 갱신 추가 -> 내정보 업데이트용
   return response.data.result;
 };
 
@@ -43,6 +45,7 @@ export const deleteFriend = async (friendId: number) => {
   const response = await axiosInstance.delete(
     `/api/friends?friendId=${friendId}`
   );
+  useProfileStore.getState().refreshProfile(); // 자동 프로필 갱신 추가 -> 내정보 업데이트용
   return response.data.result;
 };
 
