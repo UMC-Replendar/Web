@@ -13,7 +13,6 @@ const FlexDiv = styled.div`
   display: flex;
   gap: 100px;
   width: 100%;
-
   font-size: 19px;
   margin-bottom: 1px;
   border-radius: 20px;
@@ -79,10 +78,10 @@ const FriendNewsRender = () => {
     return <h1>{error.message}</h1>;
   }
   return (
-    <>
+    <div>
       {data?.pages?.map((page: IPage<IFriendNewsContent>) =>
         page.content.map((item: IFriendNewsContent) => (
-          <FlexDiv key={item.createdAt}>
+          <FlexDiv key={`${item.assId}-${item.createdAt}`}>
             <CenterDiv>{item.time}</CenterDiv>
             <CenterDiv>{item.content}</CenterDiv>
             <RightAlignedItem>
@@ -112,7 +111,7 @@ const FriendNewsRender = () => {
       <Scroll ref={ref} className="scroll">
         {isFetching && <ClipLoader color={'black'} />}
       </Scroll>
-    </>
+    </div>
   );
 };
 
