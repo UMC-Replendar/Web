@@ -300,9 +300,6 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     enabled: !!assId,
   });
 
-  if (isLoading) return <div>로딩 중...</div>;
-  if (isError || !task) return <div>과제 정보를 불러올 수 없습니다.</div>;
-
   const [title] = useState(task.title);
   const [dueDate, setDueDate] = useState<Dayjs | null>(
     dayjs(task.due_date.split(' ')[0])
@@ -400,6 +397,9 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
       prev.includes(cycle) ? prev.filter((c) => c !== cycle) : [...prev, cycle]
     );
   };
+
+  if (isLoading) return <div>로딩 중...</div>;
+  if (isError || !task) return <div>과제 정보를 불러올 수 없습니다.</div>;
 
   return (
     <ModalWrapper>
