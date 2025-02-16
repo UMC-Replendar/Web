@@ -14,6 +14,7 @@ import {
 import BlueButton from '../blueButton';
 import { groupDeleteFriend } from '../../apis/commuApi';
 import CustomCalendar from '../OngoingComponents/CustomCalendar';
+import Swal from 'sweetalert2';
 
 const FriendListRender: React.FC<{
   data: IFriendList[]; // 데이터는 props로 전달
@@ -46,13 +47,17 @@ const FriendListRender: React.FC<{
       buddyStatus: string;
     }) => setBestFriendStatus({ friendId, buddyStatus }),
     onSuccess: (data) => {
-      alert(data);
       queryClient.invalidateQueries({
         queryKey: [queryKey],
       });
     },
     onError: (error: Error) => {
-      alert('친한 친구 설정하는 데 실패했습니다');
+      Swal.fire({
+        icon: 'error',
+        text: '친한 친구 설정하는 데 실패했습니다.',
+        timer: 2000,
+        showConfirmButton: false,
+      });
       console.error(error);
     },
   });
@@ -60,13 +65,17 @@ const FriendListRender: React.FC<{
   const deleteFriendmutation = useMutation({
     mutationFn: ({ friendId }: { friendId: number }) => deleteFriend(friendId),
     onSuccess: (data) => {
-      alert(data);
       queryClient.invalidateQueries({
         queryKey: [queryKey],
       });
     },
     onError: (error: Error) => {
-      alert('친구 삭제하는 데 실패했습니다.');
+      Swal.fire({
+        icon: 'error',
+        text: '친구 삭제하는 데 실패했습니다.',
+        timer: 2000,
+        showConfirmButton: false,
+      });
       console.error(error);
     },
   });
@@ -75,14 +84,18 @@ const FriendListRender: React.FC<{
     mutationFn: ({ friendId, note }: { friendId: number; note: string }) =>
       patchNote({ friendId, note }), // 메모 업데이트를 위한 API 호출
     onSuccess: (data) => {
-      alert(data); // 메모 업데이트 성공 메시지
       queryClient.invalidateQueries({
         queryKey: [`/api/friends/note?friendId=${modalState.selectedId}`], // 쿼리 캐시를 무효화하여 데이터를 최신 상태로 유지
       });
       setIsEditing(false); // 편집 종료
     },
     onError: (error: Error) => {
-      alert('메모 업데이트에 실패했습니다.'); // 메모 업데이트 실패 메시지
+      Swal.fire({
+        icon: 'error',
+        text: '메모 업데이트에 실패했습니다.',
+        timer: 2000,
+        showConfirmButton: false,
+      }); // 메모 업데이트 실패 메시지
       console.error(error);
     },
   });
@@ -108,13 +121,23 @@ const FriendListRender: React.FC<{
       friendshipId: number;
     }) => groupDeleteFriend({ groupId, friendshipId }),
 
-    onSuccess: (data) => {
-      alert(data);
+    onSuccess: () => {
+      Swal.fire({
+        icon: 'error',
+        text: '친구가 삭제되었습니다',
+        timer: 2000,
+        showConfirmButton: false,
+      });
       queryClient.invalidateQueries({ queryKey: [`/api/friend-groups`] });
     },
 
     onError: (error: Error) => {
-      alert('그룹에 친구 추가하기 실패했습니다');
+      Swal.fire({
+        icon: 'error',
+        text: '그룹에 친구 삭제하기 실패했습니다.',
+        timer: 2000,
+        showConfirmButton: false,
+      });
       console.error(error);
     },
   });
@@ -143,7 +166,6 @@ const FriendListRender: React.FC<{
   };
   return (
     <>
-      {data.length === 0 && <div>친구 없음</div>}
       {data.map((item: IFriendList, index: number) => (
         <div key={item.friendId}>
           {calendarShow && modalState.selectedId && tasks.length > 0 && (
@@ -311,7 +333,6 @@ const SpaceBtwDiv = styled.div`
   position: relative;
   gap: 100px; /* 갭 조정 */
   width: 100%;
-
   height: 67px;
   background: white;
   border-radius: 20px;
@@ -334,6 +355,7 @@ const RightAlignedItem = styled.div`
 `;
 
 const CenterDiv = styled.div<{ width?: string; bold?: boolean }>`
+  font-size: 19px;
   display: flex;
   justify-content: center;
   align-items: center;

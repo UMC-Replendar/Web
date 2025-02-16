@@ -12,10 +12,10 @@ import styled from 'styled-components';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 68px 0px 68px 0px;
+  margin: 68px 0px 136px 0px;
   width: 100%;
   gap: 59px;
-  padding: 0 50px;
+  padding: 0 100px;
 `;
 const Community = () => {
   return (

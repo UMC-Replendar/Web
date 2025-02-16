@@ -4,6 +4,8 @@ import { axiosInstance } from '../../apis/axios-instance';
 import useAuthStore from '../../store/authStore';
 import { useProfileStore } from '../../store/profileStore';
 import CameraIcon from '../../assets/images/Camera.svg';
+import Swal from 'sweetalert2';
+
 const UploadContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -79,7 +81,12 @@ const ProfileUpload: React.FC<ProfileUploadProps> = ({
 
   const handleUpload = async (file: File) => {
     if (!id) {
-      alert('유저 ID를 가져오지 못했습니다.');
+      Swal.fire({
+        icon: 'error',
+        text: '유저 ID를 가져오지 못했습니다',
+        showConfirmButton: true,
+        confirmButtonText: '확인',
+      });
       return;
     }
     if (isUploading.current) return;

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import useModalStore from '../../store/modalStore';
 import SchoolSearchModal from '../../modal/SchoolSearchModal';
 import DepartmentSearchModal from '../../modal/DepartmentSearchModal';
+import Swal from 'sweetalert2';
 
 const BoxWrapper = styled.div`
   display: flex;
@@ -100,7 +101,12 @@ const SchoolInfoForm: React.FC<SchoolInfoFormProps> = ({
 
   const handleOpenDepartmentModal = () => {
     if (!selectedSchool) {
-      alert('먼저 학교를 선택해주세요.');
+      Swal.fire({
+        icon: 'info',
+        text: '먼저 학교를 선택해주세요',
+        showConfirmButton: false,
+        timer: 2000,
+      });
       return;
     }
     openModal(<DepartmentSearchModal />);

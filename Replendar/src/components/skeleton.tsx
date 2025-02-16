@@ -18,7 +18,7 @@ const SkeletonContainer = styled.div`
   gap: 1px;
 `;
 
-const SkeletonItem = styled.div<{ gap?: string }>`
+const SkeletonItem = styled.div<{ gap?: string; justifyContent?: string }>`
   display: flex;
   gap: ${({ gap }) => gap || '100px'};
   height: 67px;
@@ -30,6 +30,7 @@ const SkeletonItem = styled.div<{ gap?: string }>`
   animation: ${skeletonLoading} 1.5s infinite;
   display: flex;
   align-items: center;
+  justify-content: ${({ justifyContent }) => justifyContent || 'flex-start'};
 
   & > div {
     background-color: #e0e0e0;
@@ -72,18 +73,18 @@ const SkeletonProfileImage = styled.div`
   background-color: #e0e0e0;
 `;
 
-const SkeletonText = styled.div<{ width?: string }>`
+const SkeletonText = styled.div<{ width?: string; height?: string }>`
   width: ${(props) => props.width || '100px'};
-  height: 20px;
+  height: ${(props) => props.height || '20px'};
   border-radius: 5px;
   background-color: #e0e0e0;
 `;
 
-const SkeletonButton = styled.div`
+const SkeletonButton = styled.div<{ marginLeft?: string }>`
   width: 106px;
   height: 26px;
   border-radius: 50px;
-  margin-left: auto;
+  margin-left: ${({ marginLeft }) => marginLeft || 'auto'};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -112,6 +113,46 @@ export const FriendListSkeleton = ({ count = 5 }: { count?: number }) => (
     ))}
   </SkeletonContainer>
 );
+
+export const GroupSkeleton = ({ count = 5 }: { count?: number }) => (
+  <SkeletonContainer>
+    {[...Array(count)].map((_, index) => (
+      <SkeletonItem key={index} gap="60px">
+        <SkeletonText width="150px" height="40px" />
+      </SkeletonItem>
+    ))}
+  </SkeletonContainer>
+);
+
+export const LectureListSkeleton = ({ count = 5 }: { count?: number }) => (
+  <SkeletonContainer>
+    {[...Array(count)].map((_, index) => (
+      <SkeletonItem key={index} justifyContent="space-around">
+        <SkeletonText width="100px" />
+        <SkeletonText width="100px" />
+        <SkeletonText width="250px" />
+      </SkeletonItem>
+    ))}
+  </SkeletonContainer>
+);
+export const TaskListSkeleton = ({ count = 5 }: { count?: number }) => (
+  <SkeletonContainer>
+    {[...Array(count)].map((_, index) => (
+      <SkeletonItem key={index} justifyContent="space-around">
+        <SkeletonText width="100px" />
+        <SkeletonText width="100px" />
+        <SkeletonText width="100px" />
+
+        <SkeletonText width="200px" />
+        <SkeletonText width="200px" />
+
+        <SkeletonText width="150px" />
+        <SkeletonButton marginLeft="0px" />
+      </SkeletonItem>
+    ))}
+  </SkeletonContainer>
+);
+
 const NewsSkeleton = ({ count = 5 }: { count?: number }) => (
   <SkeletonContainer>
     {[...Array(count)].map((_, index) => (
