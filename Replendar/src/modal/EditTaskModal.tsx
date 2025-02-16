@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import LockIcon from '../assets/images/LockIcon.svg';
 import UnLockIcon from '../assets/images/UnLockIcon.svg';
@@ -18,7 +18,6 @@ import { TextField } from '@mui/material';
 import { styled as muiStyled } from '@mui/material/styles';
 import dayjs, { Dayjs } from 'dayjs';
 dayjs.locale('ko');
-import { TaskListSkeleton } from '../components/skeleton';
 
 export const SmallToggleSwitch = styled(ToggleSwitch)`
   transform: scale(0.8);
@@ -274,10 +273,133 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
   onClose,
   onComplete,
 }) => {
-  const [deadline, setDeadline] = useState(task.deadline.split('T')[0]);
-  const [time, setTime] = useState(task.deadline.split('T')[1]);
-  const [isAlarmEnabled, setIsAlarmEnabled] = useState(task.isToggled);
-  const [memo, setMemo] = useState('');
+  const { token, id: userId } = useAuthStore();
+  const queryClient = useQueryClient();
+  const { editTask, fetchTasks } = useTaskStore();
+
+  // 과제 상세 조회 API
+  const {
+    data: task,
+    isLoading,
+    isError,
+  } = useQuery<TaskData>({
+    queryKey: ['task', assId],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment/${assId}`,
+        { headers: { Authorization: token } }
+      );
+      if (!response.data.isSuccess) {
+        throw new Error(
+          response.data.message || '과제 정보를 불러오지 못했습니다.'
+        );
+      }
+
+      return response.data.result;
+    },
+    enabled: !!assId,
+  });
+
+  if (isLoading) return <div>로딩 중...</div>;
+  if (isError || !task) return <div>과제 정보를 불러올 수 없습니다.</div>;
+
+  const [title] = useState(task.title);
+  const [dueDate, setDueDate] = useState<Dayjs | null>(
+    dayjs(task.due_date.split(' ')[0])
+  );
+  const [time, setTime] = useState(task.due_date.split(' ')[1] ?? '');
+  const [notifyCycle, setNotifyCycle] = useState<string[]>(
+    task.notifyCycle ?? []
+  );
+  const [notification, setNotification] = useState<'ON' | 'OFF'>(
+    task.notification
+  );
+  const [visibility, setVisibility] = useState<'ON' | 'OFF'>(task.visibility);
+  const [memo, setMemo] = useState(task.memo);
+  const [isBookmarked, setIsBookmarked] = useState(task.favorite === 'ACTIVE');
+
+  // 과제 수정 API
+  const editTaskMutation = useMutation({
+    mutationFn: async () => {
+      const requestBody = {
+        assId,
+        title,
+        due_date: `${dueDate?.format('YYYY/MM/DD')} ${time}`,
+        notification,
+        visibility,
+        memo,
+        shareIds: [],
+        notifyCycle: [],
+        favorite: isBookmarked ? 'ACTIVE' : 'INACTIVE',
+      };
+      return await axios.patch(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment`,
+        requestBody,
+        { headers: { Authorization: token } }
+      );
+    },
+    onSuccess: () => {
+      editTask(assId, {
+        title,
+        endDate: `${dueDate?.format('YYYY/MM/DD')} ${time}`,
+        notifyCycle,
+        notification,
+        visibility,
+        memo,
+      });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      if (userId) {
+        fetchTasks(userId);
+      }
+      onClose();
+    },
+  });
+
+  const handleEditTask = () => {
+    editTaskMutation.mutate();
+  };
+
+  // 과제 삭제 API
+  const deleteTaskMutation = useMutation({
+    mutationFn: async () => {
+      return await axios.delete(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment?assId=${assId}`,
+        { headers: { Authorization: token } }
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      onClose();
+    },
+  });
+
+  const handleDeleteTask = () => {
+    deleteTaskMutation.mutate();
+  };
+
+  // 공개/비공개
+  const Visibility = () => {
+    setVisibility((prev) => (prev === 'ON' ? 'OFF' : 'ON'));
+  };
+
+  // 북마크
+  const Bookmark = () => {
+    setIsBookmarked((prev) => !prev);
+  };
+
+  // 알림
+  const alarmOptions = [
+    { label: '3일 전', value: 'DAY3' },
+    { label: '24시간 전', value: 'DAY1' },
+    { label: '10시간 전', value: 'H10' },
+    { label: '1시간 전', value: 'H1' },
+  ];
+
+  const handleAlarmCycleToggle = (cycle: string) => {
+    setNotifyCycle((prev) =>
+      prev.includes(cycle) ? prev.filter((c) => c !== cycle) : [...prev, cycle]
+    );
+  };
 
   return (
     <ModalWrapper>

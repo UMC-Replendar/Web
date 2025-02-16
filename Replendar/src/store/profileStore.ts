@@ -86,9 +86,13 @@ export const useProfileStore = create<ProfileStore>((set) => ({
 interface AcademicYearState {
   academicYear: number;
   setAcademicYear: (year: number) => void;
+  sortKey: string;
+  setSortKey: (sortKey: string) => void;
 }
 
 export const useAcademicYearStore = create<AcademicYearState>((set) => ({
-  academicYear: 2, // 기본값 (1학년)
+  academicYear: 1, // 기본값 (1학년)
+  sortKey: 'professor',
   setAcademicYear: (year) => set({ academicYear: year }),
+  setSortKey: (sortKey) => set({ sortKey: sortKey }),
 }));

@@ -12,7 +12,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useThemeStore, themeBackground } from '../store/useThemeStore';
 import useDebounce from '../hooks/useDebounce';
-import Swal from 'sweetalert2';
 
 const PageWrapper = styled.div`
   margin-top: 79px;
@@ -32,8 +31,10 @@ const LeftTitles = styled.div`
   display: flex;
 `;
 
-
-const MainPageTitleBox = styled.div<{ isSelected: boolean;  background: string }>`
+const MainPageTitleBox = styled.div<{
+  $isSelected: boolean;
+  $background: string;
+}>`
   display: flex;
   padding: 17px 20px;
   justify-content: center;
@@ -235,18 +236,79 @@ function OngoingTasks() {
   const queryClient = useQueryClient();
 
   const { selectedTheme } = useThemeStore(); // 현재 선택된 테마 가져오기
+  const themeColors = themeBackground[selectedTheme];
+  const backgroundColor = themeColors[1];
 
-  const themeColors = themeBackground[selectedTheme]; // 현재 테마 색상 배열
-  const backgroundColor = themeColors[1]; // 진행 중인 과제 바탕색 (index 1)
+  const debouncedUserId = useDebounce(userId, 1000);
 
-  // 진행 중인 과제 데이터 가져오기
-  const {
-    data: tasks = [],
-    isLoading,
-    isError,
-  } = useGetData(`/api/assignment?userId=${userId}`, {
-    headers: { Authorization: `${token}` },
-  });
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+
+  const deleteTasks = async (assid: number) => {
+    try {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment?assId=${assid}`,
+        {
+          headers: { Authorization: `${token}` },
+        }
+      );
+      console.log(response.data, assid);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // console.log(tasks);
+  const fetchTasks = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment?userId=${debouncedUserId}`,
+        {
+          headers: { Authorization: `${token}` },
+        }
+      );
+      if (Array.isArray(response.data.result)) {
+        const filteredTasks = response.data.result.filter((task: any) => {
+          // ✅ 정규식을 사용하여 숫자만 추출
+          const timeNumbers = task.due_time.match(/-?\d+/g)?.map(Number) || [];
+          if (timeNumbers[0] < 0) {
+            console.log(task.assignmentId);
+            deleteTasks(task.assignmentId);
+          }
+          // ✅ 모든 시간이 0 이하(음수 포함)라면 과제 제외
+          return !timeNumbers.some((num: number) => num < 0);
+        });
+
+        setTasks(filteredTasks); // ✅ 필터링된 과제만 저장
+      } else {
+        console.warn('⚠️ API 응답이 배열이 아님:', response.data);
+        setTasks([]);
+      }
+    } catch (error) {
+      console.error('❌ 과제 데이터 가져오기 실패:', error);
+      setTasks([]);
+    }
+  };
+
+  useEffect(() => {
+    if (!debouncedUserId) return;
+
+    setIsLoading(true);
+    fetchTasks()
+      .then(() => setIsLoading(false))
+      .catch(() => {
+        setIsError(true);
+        setIsLoading(false);
+      });
+
+    // 1초마다 실행
+    const interval = setInterval(() => {
+      fetchTasks();
+    }, 1000);
+
+    return () => clearInterval(interval); // ✅ 컴포넌트 언마운트 시 정리
+  }, [debouncedUserId]);
 
   const [selectedTab, setSelectedTab] = useState<'ongoing' | 'important'>(
     'ongoing'
@@ -270,18 +332,11 @@ function OngoingTasks() {
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [`/api/assignment?userId=${userId}`], //쿼리키 수정
-      }); // 과제 목록 갱신
+      queryClient.invalidateQueries({ queryKey: ['tasks', userId] }); // 과제 목록 갱신
     },
     onError: (error) => {
       console.error('과제 완료 처리 중 오류 발생:', error);
-      Swal.fire({
-        icon: 'error',
-        text: '과제 완료 처리 중 문제가 발생했습니다',
-        confirmButtonText: '확인',
-        showConfirmButton: true,
-      });
+      alert('과제 완료 처리 중 문제가 발생했습니다.');
     },
   });
 
@@ -314,10 +369,7 @@ function OngoingTasks() {
         onComplete={() => handleCompleteTask(selectedAssId)}
       />
     );
-  };
-
-  if (isLoading) return <div>로딩 중...</div>;
-  if (isError) return <div>데이터를 불러오는 데 실패했습니다.</div>;
+  }, [selectedAssId]);
 
   // 과제 색상 지정
   const taskColors = [
@@ -392,7 +444,7 @@ function OngoingTasks() {
               color: index < 4 ? taskColors[index] : themeColors[4],
             }}
             onComplete={handleCompleteTask}
-            onEdit={() => handleEditTask(task)} //여기 왜 아이디를 넘겨주지?? 수정
+            onEdit={() => handleEditTask(task.assignmentId)}
           />
         ))}
       </TaskBox>

@@ -14,7 +14,6 @@ import useTaskStore from '../store/useTaskStore';
 import useAuthStore from '../store/authStore';
 import { Task } from '../store/useTaskStore';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import Swal from 'sweetalert2';
 
 // MUI DatePicker 관련 Import 추가
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -24,6 +23,7 @@ import { TextField } from '@mui/material';
 import { styled as muiStyled } from '@mui/material/styles';
 import dayjs, { Dayjs } from 'dayjs';
 import UseNotificationPermission from '../hooks/useNotification';
+import { useAcademicYearStore } from '../store/profileStore';
 dayjs.locale('ko');
 
 const ModalOverlay = styled.div`
@@ -351,13 +351,7 @@ function AddTaskModal({
 
   if (!userId) {
     console.error('userId가 존재하지 않습니다. 로그인이 필요한 기능입니다.');
-    Swal.fire({
-      icon: 'error',
-      title: 'userId가 존재하지 않습니다',
-      text: '로그인이 필요한 기능입니다',
-      showConfirmButton: true,
-      confirmButtonText: '확인',
-    });
+    alert('로그인이 필요합니다.');
     return;
   }
 
@@ -371,6 +365,8 @@ function AddTaskModal({
     resetFriends,
     toggleAllFriends,
   } = useFriendsStore();
+
+  const { sortKey, academicYear } = useAcademicYearStore();
 
   const { data } = useGetData(
     isFriendModalOpen ? `/api/assignment/share?userId=${userId}` : ''
@@ -433,39 +429,32 @@ function AddTaskModal({
     onSuccess: (newTask) => {
       console.log('과제 추가 완료:', newTask);
       queryClient.invalidateQueries({
-        queryKey: [`/api/assignment?userId=${userId}`],
-      }); //쿼리키 수정
+        queryKey: ['tasks', userId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['/api/activity/friend'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          `/api/major/lectures/sort/${sortKey}?sort=asc&academicYear=${academicYear}&majorId=`,
+        ],
+      });
       onTaskAdded();
       closeModal();
     },
     onError: (error) => {
       console.error('과제 추가 중 오류 발생:', error);
-      Swal.fire({
-        icon: 'error',
-        text: '과제 추가 중 오류가 발생했습니다',
-        confirmButtonText: '확인',
-        showConfirmButton: true,
-      });
+      alert('과제 추가 중 문제가 발생했습니다.');
     },
   });
 
   const handleComplete = async () => {
     if (!taskName.trim()) {
-      Swal.fire({
-        icon: 'warning',
-        text: '과제명을 입력해주세요',
-        showConfirmButton: false,
-        timer: 2000,
-      });
+      alert('과제명을 입력해주세요.');
       return;
     }
     if (!deadline) {
-      Swal.fire({
-        icon: 'warning',
-        text: '마감일을 선택해주세요',
-        showConfirmButton: false,
-        timer: 2000,
-      });
+      alert('마감일을 선택해주세요.');
       return;
     }
     console.log(notifiypermission);
@@ -482,7 +471,7 @@ function AddTaskModal({
       shareIds: friendData ? friendData.map((friend) => friend.friendId) : [],
       memo: memo.trim() === '' ? '' : memo,
       favorite: isBookmarked ? 'ACTIVE' : 'INACTIVE',
-      originAssId: null,
+      originAssId: assId ? assId : null,
       lectureAssignmentId: lectureAssignmentId ? lectureAssignmentId : null,
     };
 
@@ -526,12 +515,8 @@ function AddTaskModal({
     const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
     if (!timeRegex.test(time)) {
-      Swal.fire({
-        icon: 'warning',
-        text: '24시간 형식 (00:00 ~ 23:59)으로 입력하세요',
-        showConfirmButton: false,
-        timer: 2000,
-      });
+      alert('24시간 형식 (00:00 ~ 23:59)으로 입력하세요.');
+      setTime('');
     }
   };
 

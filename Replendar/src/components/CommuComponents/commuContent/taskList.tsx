@@ -98,8 +98,8 @@ const StyledTd = styled.td`
 const TaskList: React.FC = () => {
   const { openModal } = useModalStore();
 
-  const { academicYear, setAcademicYear } = useAcademicYearStore();
-  const [sortKey, setSortKey] = useState('professor');
+  const { academicYear, setAcademicYear, sortKey, setSortKey } =
+    useAcademicYearStore();
 
   const queryKey = `/api/major/lectures/sort/${sortKey}?sort=asc&academicYear=${academicYear}&majorId=`;
   const { data, isLoading } = useGetData(queryKey);

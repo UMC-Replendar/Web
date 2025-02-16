@@ -84,7 +84,7 @@ const FriendNewsRender = () => {
             <CenterDiv>{item.time}</CenterDiv>
             <CenterDiv>{item.content}</CenterDiv>
             <RightAlignedItem>
-              {item.registered ? (
+              {item.isRegistered ? (
                 <BlueButton status="등록됨">등록됨</BlueButton>
               ) : (
                 <BlueButton
