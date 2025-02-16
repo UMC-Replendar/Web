@@ -5,7 +5,7 @@ import { axiosInstance } from '../../apis/axios-instance';
 import BlueButton from '../blueButton';
 import Plus from '../../assets/images/PlusIcon.svg';
 import { useThemeStore, themeBackground } from '../../store/useThemeStore';
-
+import { useEffect } from 'react';
 const Title = styled.p`
   color: black;
   font-size: 28px;
@@ -95,6 +95,10 @@ const HistoryList = () => {
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
   });
+
+  useEffect(() => {
+    console.log('Data', data);
+  }, [data]);
 
   if (isLoading) return <div>로딩 중...</div>;
   if (isError) return <div>데이터를 불러오는 중 오류 발생!</div>;

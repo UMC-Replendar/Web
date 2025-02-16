@@ -109,7 +109,7 @@ const HistoryPage: React.FC = () => {
     queryKey: ['activity', activeMenu], // 메뉴별 캐싱
     queryFn: async () => {
       const response = await axiosInstance.get(apiUrl, {
-        params: { page: 1, size: 5, sort: 'CreatedAt' },
+        params: { page: 1, size: 15, sort: 'CreatedAt' },
       });
 
       console.log(`${activeMenu} API Response:`, response.data);

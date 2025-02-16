@@ -16,7 +16,6 @@ const FlexDiv = styled.div`
   display: flex;
   gap: 100px;
   width: 100%;
-
   font-size: 19px;
   margin-bottom: 1px;
   border-radius: 20px;
@@ -73,10 +72,13 @@ const FriendNewsRender = () => {
     hasNextPage,
     fetchNextPage,
   } = useGetInfiniteData(`/api/activity/friend`, 5);
+
   useEffect(() => {
-    console.log('Data', data);
+    console.log('Data', data?.pages);
+    console.log('hasNextPage', hasNextPage);
   }, [data]);
-  const { ref, inView } = useInView({ threshold: 0 });
+
+  const { ref, inView } = useInView({ threshold: 0, triggerOnce: false });
 
   const { openModal } = useModalStore();
 
@@ -124,11 +126,11 @@ const FriendNewsRender = () => {
   }
 
   return (
-    <>
+    <div>
       {data?.pages?.map((page: IPage<IFriendNewsContent>) =>
         page.content.map((item: IFriendNewsContent) => (
-          <FlexDiv key={item.createdAt}>
-            <CenterDiv>{item.time}</CenterDiv>
+          <FlexDiv key={`${item.assId}-${item.createdAt}`}>
+            <CenterDiv>{item.timeStamp}</CenterDiv>
             <CenterDiv>{item.content}</CenterDiv>
             <RightAlignedItem>
               {item.type === '과제' ? (
@@ -165,8 +167,7 @@ const FriendNewsRender = () => {
                     수락
                   </BlueButton>
                 )
-              ) : null}{' '}
-              {/* item.type이 'task'나 'friendRequest'가 아닐 경우 아무것도 렌더링하지 않음 */}
+              ) : null}
             </RightAlignedItem>
           </FlexDiv>
         ))
@@ -175,7 +176,7 @@ const FriendNewsRender = () => {
       <Scroll ref={ref} className="scroll">
         {isFetching && <ClipLoader color={'black'} />}
       </Scroll>
-    </>
+    </div>
   );
 };
 

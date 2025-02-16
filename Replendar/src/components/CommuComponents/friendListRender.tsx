@@ -15,6 +15,7 @@ import BlueButton from '../blueButton';
 import { groupDeleteFriend } from '../../apis/commuApi';
 import CustomCalendar from '../OngoingComponents/CustomCalendar';
 import Swal from 'sweetalert2';
+import useTaskStore from '../../store/useTaskStore';
 
 const FriendListRender: React.FC<{
   data: IFriendList[]; // 데이터는 props로 전달
@@ -23,6 +24,9 @@ const FriendListRender: React.FC<{
 }> = ({ data, queryKey, groupId }) => {
   // props로 data를 받음
   const queryClient = useQueryClient();
+
+  const { tasks: renderTasks } = useTaskStore();
+  console.log('taskdssssssssssssss', renderTasks);
 
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -46,7 +50,7 @@ const FriendListRender: React.FC<{
       friendId: number;
       buddyStatus: string;
     }) => setBestFriendStatus({ friendId, buddyStatus }),
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKey],
       });
@@ -168,7 +172,7 @@ const FriendListRender: React.FC<{
     <>
       {data.map((item: IFriendList, index: number) => (
         <div key={item.friendId}>
-          {calendarShow && modalState.selectedId && tasks.length > 0 && (
+          {calendarShow && modalState.selectedId && (
             <>
               <StyledModal>
                 <FlexStartDiv>

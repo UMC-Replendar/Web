@@ -77,6 +77,7 @@ const useTaskStore = create<TaskStore>((set) => ({
       set((state) => ({
         tasks: state.tasks.filter((task) => task.assignmentId !== assId),
       }));
+      useProfileStore.getState().refreshProfile(); // 자동 프로필 갱신 추가 -> 내정보 업데이트용
     } catch (error) {
       console.error('과제 삭제 중 오류 발생:', error);
       alert('과제 삭제 처리 중 문제가 발생했습니다.');

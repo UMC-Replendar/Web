@@ -13,7 +13,7 @@ import React from 'react';
 const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
   const { openModal } = useModalStore();
   const { academicYear, setAcademicYear } = useAcademicYearStore();
-  const [lectureId, setLectureId] = useState();
+  const [lectureId, setLectureId] = useState(); //곧 ㅡㅆ일 예정
 
   const queryKey = `/api/major/lectures/list/${academicYear}`;
   const { data, isLoading } = useGetData(queryKey);
@@ -68,7 +68,7 @@ const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
         <tbody>
           {isLoading ? (
             <tr>
-              <StyledTd
+              <td
                 colSpan={7}
                 style={{
                   backgroundColor: 'transparent',
@@ -78,16 +78,51 @@ const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
                 }}
               >
                 <LectureListSkeleton count={3} />
-              </StyledTd>
+              </td>
             </tr>
           ) : (
             displayedData.map((item: ILecture, index: number) => (
               <React.Fragment key={index}>
-                <tr onClick={() => toggleGroup(index)}>
-                  <td>{item.academicYear.replace('YEAR_', '')}</td>
-                  <td>{item.professor}</td>
-                  <td>{item.lectureName}</td>
-                </tr>
+                <StyledTr
+                  key={index}
+                  // 현재 열린 상태 전달
+                  onClick={() => toggleGroup(index)}
+                >
+                  <td
+                    style={{
+                      backgroundColor: showTasks[index]
+                        ? 'rgba(102, 102, 102, 1)'
+                        : 'white',
+                      color: showTasks[index] ? 'white' : 'black',
+                      transition: 'background-color 0.3s ease, color 0.3s ease',
+                    }}
+                  >
+                    {item.academicYear.replace('YEAR_', '')}
+                  </td>
+                  <td
+                    style={{
+                      backgroundColor: showTasks[index]
+                        ? 'rgba(102, 102, 102, 1)'
+                        : 'white',
+                      color: showTasks[index] ? 'white' : 'black',
+                      transition: 'background-color 0.3s ease, color 0.3s ease',
+                    }}
+                  >
+                    {item.professor}
+                  </td>
+                  <td
+                    style={{
+                      backgroundColor: showTasks[index]
+                        ? 'rgba(102, 102, 102, 1)'
+                        : 'white',
+                      color: showTasks[index] ? 'white' : 'black',
+                      transition: 'background-color 0.3s ease, color 0.3s ease',
+                    }}
+                  >
+                    {item.lectureName}
+                  </td>
+                </StyledTr>
+
                 {showTasks[index] && (
                   <tr>
                     <td colSpan={7}></td>
@@ -104,10 +139,11 @@ const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
 
 export default LectureList;
 
-const StyledTd = styled.td`
-  background-color: transparent;
-  padding: 0;
-  width: 100%;
+const StyledTr = styled.tr`
+  &:hover td {
+    background-color: rgba(102, 102, 102, 0.8);
+    color: white;
+  }
 `;
 
 const Select = styled.select`
@@ -154,11 +190,6 @@ const Container = styled.div`
     overflow: hidden;
     border-radius: 20px;
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-  }
-
-  tr:hover td {
-    background-color: rgba(102, 102, 102, 1);
-    color: white;
   }
 
   tr th:first-child,
