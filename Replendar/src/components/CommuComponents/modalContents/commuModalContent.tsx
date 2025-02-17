@@ -107,7 +107,7 @@ const CommuModalContent: React.FC<{ queryKey: string }> = ({ queryKey }) => {
       content: content.trim() || '',
       endDate: formattedDeadline,
     };
-    console.log(data);
+
     AddDepartmentAssignmentMutation.mutate(data);
   };
 

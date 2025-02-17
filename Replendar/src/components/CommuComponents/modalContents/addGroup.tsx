@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useEffect } from 'react';
 import SelectFriendsModal from '../../../modal/SelectFriendsModal';
 import useGetData from '../../../hooks/useGetData';
-import useFriendsStore from '../../../store/useFriendStore';
+import useFriendStore from '../../../store/useFriendStore';
 import { useGroupAddFriendMutation } from '../../../hooks/useGroupAddFriendMutation';
 import Swal from 'sweetalert2';
 
@@ -21,7 +21,7 @@ const AddGroup: React.FC<{ groupId: number }> = ({ groupId }) => {
     friendData,
     resetFriends,
     friendshipIds,
-  } = useFriendsStore();
+  } = useFriendStore();
 
   const groupAddFriendMutation = useGroupAddFriendMutation();
 

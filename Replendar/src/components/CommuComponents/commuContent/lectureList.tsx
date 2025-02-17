@@ -83,7 +83,7 @@ const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
           ) : (
             displayedData.map((item: ILecture, index: number) => (
               <React.Fragment key={index}>
-                <StyledTr
+                <tr
                   key={index}
                   // 현재 열린 상태 전달
                   onClick={() => toggleGroup(index)}
@@ -121,7 +121,7 @@ const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
                   >
                     {item.lectureName}
                   </td>
-                </StyledTr>
+                </tr>
 
                 {showTasks[index] && (
                   <tr>
@@ -138,13 +138,6 @@ const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
 };
 
 export default LectureList;
-
-const StyledTr = styled.tr`
-  &:hover td {
-    background-color: rgba(102, 102, 102, 0.8);
-    color: white;
-  }
-`;
 
 const Select = styled.select`
   margin-left: 130px;

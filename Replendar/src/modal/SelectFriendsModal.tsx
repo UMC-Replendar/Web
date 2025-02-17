@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import UnCheckBoxIcon from '../assets/images/UnCheckBoxIcon.svg';
 import CheckBoxIcon from '../assets/images/CheckBoxIcon.svg';
 import { IFriendList, ITaskFriendList } from '../types';
-import useFriendsStore from '../store/useFriendStore';
+import useFriendStore from '../store/useFriendStore';
 
 const SelectFriendsModalOverlay = styled.div`
   position: fixed;
@@ -63,11 +63,12 @@ const FriendsNickname = styled.div`
   white-space: normal; /* 줄바꿈 허용 */
 `;
 
-const FriendsNameAndMemo = styled.div`
+const FriendsNameAndMemo = styled.div<{ width?: string }>`
   color: #666666;
   font-size: 16px;
   font-weight: 500;
   line-height: 140%;
+  width: ${(props) => (props.width ? props.width : 'auto')};
 `;
 
 const FriendsMemoSection = styled.div`
@@ -81,7 +82,7 @@ const FriendsMemoSection = styled.div`
 
 const FriendsMemoInput = styled.input`
   display: flex;
-  width: 226px;
+  width: 200px;
   height: 38px;
   padding: 8px;
   justify-content: center;
@@ -116,7 +117,7 @@ function SelectFriendsModal() {
     toggleAllFriends,
     closeFriendModal,
     friendData,
-  } = useFriendsStore();
+  } = useFriendStore();
 
   //일단
   //all true인지
@@ -152,7 +153,7 @@ function SelectFriendsModal() {
         <FriendsItem key={friend.friendId}>
           <FriendsNameSection>
             <FriendsNickname>{friend.nickname}</FriendsNickname>
-            <FriendsNameAndMemo>{friend.name}</FriendsNameAndMemo>
+            <FriendsNameAndMemo width="50px">{friend.name}</FriendsNameAndMemo>
           </FriendsNameSection>
           <FriendsMemoSection>
             <FriendsNameAndMemo>메모</FriendsNameAndMemo>
@@ -174,7 +175,7 @@ function SelectFriendsModal() {
         </FriendsItem>
       ))}
 
-      <ConfirmButton onClick={closeFriendModal}>선택 완료</ConfirmButton>
+      <ConfirmButton onClick={closeFriendModal}>공유하기</ConfirmButton>
     </SelectFriendsModalOverlay>
   );
 }

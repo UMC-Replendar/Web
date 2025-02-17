@@ -15,7 +15,8 @@ import BlueButton from '../blueButton';
 import { groupDeleteFriend } from '../../apis/commuApi';
 import CustomCalendar from '../OngoingComponents/CustomCalendar';
 import Swal from 'sweetalert2';
-import useTaskStore from '../../store/useTaskStore';
+import useFriendStore from '../../store/useFriendStore';
+import SelectShareAss from '../../modal/SelectShareAss';
 
 const FriendListRender: React.FC<{
   data: IFriendList[]; // 데이터는 props로 전달
@@ -24,9 +25,6 @@ const FriendListRender: React.FC<{
 }> = ({ data, queryKey, groupId }) => {
   // props로 data를 받음
   const queryClient = useQueryClient();
-
-  const { tasks: renderTasks } = useTaskStore();
-  console.log('taskdssssssssssssss', renderTasks);
 
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -37,6 +35,8 @@ const FriendListRender: React.FC<{
     selectedId: null,
     note: '',
   });
+
+  const { isFriendModalOpen, openFriendModal } = useFriendStore();
 
   const [isEditing, setIsEditing] = useState(false);
   const [updatedNote, setUpdatedNote] = useState<string>('');
@@ -196,6 +196,7 @@ const FriendListRender: React.FC<{
               </StyledModal>
             </>
           )}
+          {isFriendModalOpen && <SelectShareAss friendId={item.friendId} />}
           <SpaceBtwDiv>
             <FlexDiv>
               <ProfileImg src={item.profileImageUrl || DefaultProfileImg} />
@@ -237,7 +238,7 @@ const FriendListRender: React.FC<{
                 <div onClick={() => setCalendarShow(true)}>일정확인</div>
               </ModalContent>
 
-              <P>과제공유</P>
+              <P onClick={openFriendModal}>과제공유</P>
 
               <ModalContent>
                 <div

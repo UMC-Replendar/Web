@@ -70,7 +70,8 @@ function useGetInfiniteData(url: string, size: number = 10) {
     queryKey: [url, size],
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      return lastPage.last ? undefined : lastPage.pageable.pageNumber + 2;
+      if (!lastPage || lastPage.last) return undefined; // ✅ lastPage가 없거나 마지막 페이지면 undefined 반환
+      return (lastPage.pageable?.pageNumber ?? 0) + 2; // ✅ lastPage.pageable이 undefined일 경우 기본값 0 설정
     },
   });
 }

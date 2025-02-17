@@ -15,6 +15,7 @@ export interface Task {
   favorite: 'ACTIVE' | 'INACTIVE';
   originAssId: number | null;
   lectureAssignmentId: number | null;
+  due_date?: string; //수정
 }
 
 interface TaskStore {
@@ -30,11 +31,13 @@ interface TaskStore {
 const useTaskStore = create<TaskStore>((set) => ({
   tasks: [],
 
-  setTasks: (tasks) => set({ tasks }),
+  setTasks: (tasks) => {
+    set({ tasks });
+  },
 
   addTask: async (taskData) => {
     const { token } = useAuthStore.getState();
-
+    console.log('useTaskStore에 taskData', taskData);
     try {
       const { data: newTask } = await axios.post(
         `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment`,

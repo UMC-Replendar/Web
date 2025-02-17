@@ -129,3 +129,18 @@ export const AddDepartmentAssignment = async ({
   });
   return response.data.result;
 };
+
+//과제공유
+export const ShareAss = async ({
+  friendId,
+  assignmentIds,
+}: {
+  friendId: number;
+  assignmentIds: number[];
+}) => {
+  const response = await axiosInstance.post(`/api/friends/share/assignment`, {
+    friendId,
+    assignmentIds,
+  });
+  return response.data.result;
+};

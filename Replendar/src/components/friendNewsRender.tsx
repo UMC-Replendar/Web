@@ -63,20 +63,8 @@ const Scroll = styled.div`
 `;
 
 const FriendNewsRender = () => {
-  const {
-    data,
-    isPending,
-    isError,
-    error,
-    isFetching,
-    hasNextPage,
-    fetchNextPage,
-  } = useGetInfiniteData(`/api/activity/friend`, 5);
-
-  useEffect(() => {
-    console.log('Data', data?.pages);
-    console.log('hasNextPage', hasNextPage);
-  }, [data]);
+  const { data, isPending, isFetching, hasNextPage, fetchNextPage } =
+    useGetInfiniteData(`/api/activity/friend`, 5);
 
   const { ref, inView } = useInView({ threshold: 0, triggerOnce: false });
 
