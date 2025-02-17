@@ -17,15 +17,12 @@ const FlexDiv = styled.div`
   gap: 100px;
   width: 100%;
   font-size: 19px;
-  margin-bottom: 1px;
+
   border-radius: 20px;
   padding: 0px 30px;
   background: white;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-
-  &:nth-child(5),
-  &:nth-child(8) {
-  }
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
 /* &:first-child {

@@ -152,12 +152,7 @@ const SpaceBtwDiv = styled.div<{ status: string }>`
   border-radius: 20px;
   padding: 0px 30px;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1px;
-
-  &:nth-child(10),
-  &:nth-child(11) {
-    margin-bottom: 1.5px; /* 얼탱없네 얘네 */
-  }
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
 const FlexDiv = styled.div<{ gap?: string }>`

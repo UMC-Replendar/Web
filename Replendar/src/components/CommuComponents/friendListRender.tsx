@@ -342,13 +342,8 @@ const SpaceBtwDiv = styled.div`
   background: white;
   border-radius: 20px;
   padding: 0px 30px;
-  margin-bottom: 1px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-
-  &:nth-child(7),
-  &:nth-child(8) {
-    margin-bottom: 1.5px;
-  }
 `;
 
 const RightAlignedItem = styled.div`
