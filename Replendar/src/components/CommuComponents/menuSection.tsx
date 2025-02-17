@@ -96,6 +96,10 @@ const StyledDiv = styled.div<{ expanded: string; background: string }>`
   height: ${(props) => (props.expanded === 'true' ? '855px' : '380px')};
 
   transition: height 0.3s ease-out;
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
 `;
 
 const CustomBtn = styled.button<{ isSelected: boolean }>`
