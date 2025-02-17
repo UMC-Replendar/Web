@@ -253,6 +253,7 @@ function OngoingTasks() {
   const debouncedUserId = useDebounce(userId, 1000);
 
   const [tasks, setTasks] = useState<any[]>([]);
+  //const { tasks, setTasks } = useTaskStore();
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
@@ -296,6 +297,7 @@ function OngoingTasks() {
         });
 
         setTasks(updatedTasks);
+
         useProfileStore.getState().refreshProfile(); // 자동 프로필 갱신 추가 -> 내정보 업데이트용
       } else {
         console.warn('⚠️ API 응답이 배열이 아님:', response.data);

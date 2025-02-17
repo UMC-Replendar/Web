@@ -8,7 +8,7 @@ import ToggleSwitch from '../components/OngoingComponents/ToggleSwitch';
 import GrayPlusIcon from '../assets/images/GrayPlusIcon.svg';
 import SelectFriendsModal from './SelectFriendsModal';
 import useModalStore from '../store/modalStore';
-import useFriendsStore from '../store/useFriendStore';
+import useFriendStore from '../store/useFriendStore';
 import useGetData from '../hooks/useGetData';
 import useTaskStore from '../store/useTaskStore';
 import useAuthStore from '../store/authStore';
@@ -364,7 +364,7 @@ function AddTaskModal({
     friendData,
     resetFriends,
     toggleAllFriends,
-  } = useFriendsStore();
+  } = useFriendStore();
 
   const { sortKey, academicYear } = useAcademicYearStore();
 
@@ -417,9 +417,6 @@ function AddTaskModal({
       setIsBookmarked(favorite === 'ACTIVE' ? true : false);
     }
   }, [assignmentData]);
-  useEffect(() => {
-    console.log('taskNaem:', taskName);
-  }, [taskName]);
 
   // Mutation을 사용하여 addTask 실행
   const addTaskMutation = useMutation({
@@ -475,7 +472,7 @@ function AddTaskModal({
       originAssId: assId ? assId : null,
       lectureAssignmentId: lectureAssignmentId ? lectureAssignmentId : null,
     };
-
+    console.log('보내는 형식', taskData);
     addTaskMutation.mutate(taskData);
   };
 

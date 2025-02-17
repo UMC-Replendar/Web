@@ -7,7 +7,6 @@ import { sendFriendRequest } from '../../../apis/commuApi';
 import { useMutation } from '@tanstack/react-query';
 import { FriendRegisterSkeleton } from '../../skeleton';
 import Swal from 'sweetalert2';
-import { useEffect } from 'react';
 
 const friendRegister = () => {
   const [mq, setMq] = useState('');
@@ -20,11 +19,6 @@ const friendRegister = () => {
 
   const hasData = Array.isArray(data) && data.length > 0;
   const friendData = hasData ? data[0] : null;
-
-  useEffect(() => {
-    console.log(data[0]);
-    console.log(hasData);
-  }, [data]);
 
   //친구요청api호출
   const sendFriendRequestMutation = useMutation({

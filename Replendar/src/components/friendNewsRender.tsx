@@ -63,19 +63,10 @@ const Scroll = styled.div`
 `;
 
 const FriendNewsRender = () => {
-  const {
-    data,
-    isPending,
-    isError,
-    error,
-    isFetching,
-    hasNextPage,
-    fetchNextPage,
-  } = useGetInfiniteData(`/api/activity/friend`, 5);
-  useEffect(() => {
-    console.log('Data', data);
-  }, [data]);
-  const { ref, inView } = useInView({ threshold: 0 });
+  const { data, isPending, isFetching, hasNextPage, fetchNextPage } =
+    useGetInfiniteData(`/api/activity/friend`, 5);
+
+  const { ref, inView } = useInView({ threshold: 0, triggerOnce: false });
 
   const { openModal } = useModalStore();
 
@@ -127,7 +118,7 @@ const FriendNewsRender = () => {
       {data?.pages?.map((page: IPage<IFriendNewsContent>) =>
         page.content.map((item: IFriendNewsContent) => (
           <FlexDiv key={`${item.assId}-${item.createdAt}`}>
-            <CenterDiv>{item.time}</CenterDiv>
+            <CenterDiv>{item.timeStamp}</CenterDiv>
             <CenterDiv>{item.content}</CenterDiv>
             <RightAlignedItem>
               {item.type === '과제' ? (
@@ -164,8 +155,7 @@ const FriendNewsRender = () => {
                     수락
                   </BlueButton>
                 )
-              ) : null}{' '}
-              {/* item.type이 'task'나 'friendRequest'가 아닐 경우 아무것도 렌더링하지 않음 */}
+              ) : null}
             </RightAlignedItem>
           </FlexDiv>
         ))

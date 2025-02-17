@@ -7,7 +7,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import SelectFriendsModal from '../../../modal/SelectFriendsModal';
 import useGetData from '../../../hooks/useGetData';
-import useFriendsStore from '../../../store/useFriendStore';
+import useFriendStore from '../../../store/useFriendStore';
 import { useGroupAddFriendMutation } from '../../../hooks/useGroupAddFriendMutation';
 import Swal from 'sweetalert2';
 const MakeGroup = () => {
@@ -24,7 +24,7 @@ const MakeGroup = () => {
     friendData,
     resetFriends,
     friendshipIds,
-  } = useFriendsStore();
+  } = useFriendStore();
 
   useEffect(() => {
     resetFriends();
