@@ -7,6 +7,7 @@ import InfoIcon from '../assets/images/SideBarIcons/Profile.svg';
 import SettingsIcon from '../assets/images/SideBarIcons/Settings.svg';
 import { Link, useLocation } from 'react-router-dom';
 import { themeBackground, useThemeStore } from '../store/useThemeStore';
+import PaperIcon from '../assets/images/InfoIcons/paper.svg';
 
 function Sidebar() {
   const location = useLocation();
@@ -70,6 +71,16 @@ function Sidebar() {
           >
             <IconImg src={SettingsIcon} />
             <MenuItem>환경설정</MenuItem>
+          </Menu>
+        </Link>
+
+        <Link to="/forguest">
+          <Menu
+            backgroundColor={themeBackground[selectedTheme][5]}
+            isActive={isActive('/forguest')}
+          >
+            <IconImg src={PaperIcon} />
+            <MenuItem>방명록</MenuItem>
           </Menu>
         </Link>
       </MenuContainer>

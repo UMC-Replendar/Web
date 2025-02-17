@@ -1,9 +1,16 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { axiosInstance } from '../../../apis/axios-instance';
+import React, { useEffect } from 'react';
 import BlueButton from '../../blueButton';
 import styled from 'styled-components';
 import { useThemeStore, themeBackground } from '../../../store/useThemeStore';
+import { useInView } from 'react-intersection-observer';
+import { IHistoryAllContent, IPage } from '../../../types';
+import ClipLoader from 'react-spinners/ClipLoader';
+import { useGetInfiniteDataRaw } from '../../../hooks/useGetInfiniteDataRaw';
+import AddTaskModal from '../../../modal/AddTaskModal';
+import useModalStore from '../../../store/modalStore';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import Swal from 'sweetalert2';
+import { respondToFriendRequest } from '../../../apis/commuApi';
 
 const HistoryContainer = styled.div<{ background: string }>`
   padding: 34.5px 109px 67.5px 37px;
@@ -22,7 +29,7 @@ const HistoryEntryContainer = styled.div`
   padding: 20px;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 1px;
-
+  margin-top: 1px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -42,48 +49,124 @@ const HistoryText = styled.div`
   text-align: center;
 `;
 
+const Scroll = styled.div`
+  width: 100vw;
+  height: 50px;
+  margin-top: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+`;
+
 const HistoryAll: React.FC = () => {
   const { selectedTheme } = useThemeStore();
   const themeColors = themeBackground[selectedTheme];
   const backgroundColor = themeColors[1];
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['activity', '전체'],
-    queryFn: async () => {
-      const response = await axiosInstance.get('/api/activity', {
-        params: { page: 1, size: 15, sort: 'CreatedAt' },
+  const { data, isPending, isFetching, hasNextPage, fetchNextPage } =
+    useGetInfiniteDataRaw(`/api/activity`, 5);
+
+  const { ref, inView } = useInView({ threshold: 0 });
+  const { openModal } = useModalStore();
+
+  const queryClient = useQueryClient();
+
+  const RespondToFriendMutation = useMutation({
+    mutationFn: ({
+      requestId,
+      isAccepted,
+    }: {
+      requestId: number;
+      isAccepted: boolean;
+    }) => respondToFriendRequest({ requestId, isAccepted }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [`/api/activity/friend`],
       });
 
-      console.log(`전체 API Response:`, response.data);
-      return response.data.content || [];
+      Swal.fire({
+        icon: 'success',
+        text: '친구 요청을 수락했습니다',
+        timer: 2000,
+        showConfirmButton: false,
+      });
     },
-    staleTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: false,
+    onError: (error: Error) => {
+      Swal.fire({
+        icon: 'error',
+        text: '친구 수락에 실패했습니다.',
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      console.error(error);
+    },
   });
 
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetching) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetching, fetchNextPage]);
+
+  if (isPending) {
+    console.log();
+    return <div>스켈레톤 UI (로딩 중...)</div>;
+  }
+
   return (
-    <HistoryContainer background={backgroundColor}>
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : isError ? (
-        <div>데이터를 불러오는 중 오류 발생!</div>
-      ) : data.length > 0 ? (
-        data.map((entry: any, index: number) => (
-          <HistoryEntryContainer key={index}>
-            <HistoryDetails>
-              <HistoryText>{entry.date}</HistoryText>
-              <HistoryText>{entry.time}</HistoryText>
-              <HistoryText>{entry.content}</HistoryText> {/* 3개만 표시 */}
-            </HistoryDetails>
-            <BlueButton status={entry.check ? '등록됨' : '내 일정에 등록'}>
-              {entry.check ? '등록됨' : '내 일정에 등록'}
-            </BlueButton>
-          </HistoryEntryContainer>
-        ))
-      ) : (
-        <div>기록이 없습니다.</div>
-      )}
-    </HistoryContainer>
+    <>
+      <HistoryContainer background={backgroundColor}>
+        {data?.pages?.flatMap((page: IPage<IHistoryAllContent>) =>
+          page.content.map((item: IHistoryAllContent) => (
+            <HistoryEntryContainer key={item.createdAt}>
+              <HistoryDetails>
+                <HistoryText>{item.date}</HistoryText>
+                <HistoryText>{item.time}</HistoryText>
+                <HistoryText>{item.content}</HistoryText>
+              </HistoryDetails>
+              {item.type === '과제' ? (
+                item.isRegistered ? (
+                  <BlueButton status="등록됨">등록됨</BlueButton>
+                ) : (
+                  <BlueButton
+                    onClick={() =>
+                      openModal(
+                        <AddTaskModal
+                          assId={item.assId}
+                          onTaskAdded={() =>
+                            console.log('과제가 추가되었습니다.')
+                          }
+                        />
+                      )
+                    }
+                  >
+                    내 일정에 등록
+                  </BlueButton>
+                )
+              ) : item.type === '친구요청' ? (
+                item.check === 'CHECK' ? (
+                  <BlueButton status="등록됨">수락됨</BlueButton>
+                ) : (
+                  <BlueButton
+                    onClick={() =>
+                      RespondToFriendMutation.mutate({
+                        requestId: item.friendRequestId,
+                        isAccepted: true,
+                      })
+                    }
+                  >
+                    수락
+                  </BlueButton>
+                )
+              ) : null}{' '}
+              {/*나중에 과제알람 추가 수정*/}
+            </HistoryEntryContainer>
+          ))
+        )}
+        {isFetching && <div>스켈레톤 UI (추가 로딩 중...)</div>}
+      </HistoryContainer>
+      <Scroll ref={ref}>{isFetching && <ClipLoader color={'black'} />}</Scroll>
+    </>
   );
 };
 

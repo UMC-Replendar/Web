@@ -89,6 +89,7 @@ export interface IHistoryAllContent {
   createdAt: string; // ISO 날짜 형식
   type: string;
   isRegistered: boolean;
+  timeStamp: string;
 }
 
 export interface ISort {

@@ -19,7 +19,9 @@ function App() {
     location.pathname === '/login' ||
     location.pathname === '/signup' ||
     location.pathname === '/callback' ||
-    location.pathname === '/fakelogin';
+    location.pathname === '/fakelogin' ||
+    location.pathname === '/forguest' ||
+    location.pathname === '/guestlist';
   return (
     <PageWrapper>
       <Modal />
