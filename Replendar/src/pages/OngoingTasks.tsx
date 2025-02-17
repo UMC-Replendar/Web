@@ -12,6 +12,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useThemeStore, themeBackground } from '../store/useThemeStore';
 import useDebounce from '../hooks/useDebounce';
+import { useProfileStore } from '../store/profileStore';
 
 const PageWrapper = styled.div`
   margin-top: 79px;
@@ -145,8 +146,8 @@ const TaskBlock = styled.div<{ color: string }>`
   cursor: pointer;
 `;
 
-const TaskInfo = styled.div`
-  color: white;
+const TaskInfo = styled.div<{ isOverdue?: string }>`
+  color: ${(props) => (props.isOverdue ? 'red' : 'white')};
   font-family: Pretendard;
   font-size: 16px;
   font-style: normal;
@@ -184,12 +185,13 @@ interface TaskProps {
     due_time: string;
     memo: string;
     notification: string;
+    isOverdue: string;
   };
   onComplete: (assignmentId: number) => void;
   onEdit: (task: TaskProps['task']) => void;
 }
 
-//과제 시간이 마이너스가 되면 조회 목록에서 삭제해야하는데...
+//과제 시간이 마이너스가 되면 조회 목록에서 삭제해야하는데...->응 아니야
 function TaskItem({ task, onComplete, onEdit }: TaskProps) {
   const [dueTime, setDueTime] = useState(task.due_time);
   const [dueTimeNumbers, setDueTimeNumbers] = useState<number[]>([]);
@@ -223,7 +225,9 @@ function TaskItem({ task, onComplete, onEdit }: TaskProps) {
     <TaskBlockContainer onClick={() => onEdit(task)}>
       <TaskBlock color={task.color}>
         <TaskInfo>{task.title}</TaskInfo>
-        <TaskInfo>{dueTime}</TaskInfo>
+        <TaskInfo isOverdue={task.isOverdue}>
+          {task.isOverdue ? '과제가 마감되었습니다' : task.due_time}
+        </TaskInfo>
       </TaskBlock>
       <TaskCompleteButton
         onClick={(e) => {
@@ -275,19 +279,24 @@ function OngoingTasks() {
           headers: { Authorization: `${token}` },
         }
       );
+
       if (Array.isArray(response.data.result)) {
-        const filteredTasks = response.data.result.filter((task: any) => {
-          // ✅ 정규식을 사용하여 숫자만 추출
-          const timeNumbers = task.due_time.match(/-?\d+/g)?.map(Number) || [];
-          if (timeNumbers[0] < 0) {
-            console.log(task.assignmentId);
-            deleteTasks(task.assignmentId);
-          }
-          // ✅ 모든 시간이 0 이하(음수 포함)라면 과제 제외
-          return !timeNumbers.some((num: number) => num < 0);
+        const updatedTasks = response.data.result.map((task: any) => {
+          //정규식을 사용하여 숫자만 추출하고, 명시적으로 `number[]` 타입 지정
+          const timeNumbers: number[] =
+            task.due_time.match(/-?\d+/g)?.map(Number) || [];
+
+          //음수 시간이 포함되어 있는지 여부 확인
+          const isOverdue = timeNumbers.some((num: number) => num < 0);
+
+          return {
+            ...task,
+            isOverdue, // 과제 마감 여부 추가
+          };
         });
 
-        setTasks(filteredTasks); // ✅ 필터링된 과제만 저장
+        setTasks(updatedTasks);
+        useProfileStore.getState().refreshProfile(); // 자동 프로필 갱신 추가 -> 내정보 업데이트용
       } else {
         console.warn('⚠️ API 응답이 배열이 아님:', response.data);
         setTasks([]);
@@ -351,6 +360,7 @@ function OngoingTasks() {
     completeTaskMutation.mutate(assId, {
       onSuccess: () => {
         console.log(`과제 완료: ${assId}`);
+        useProfileStore.getState().refreshProfile(); // 자동 프로필 갱신 추가 -> 내정보 업데이트용
         setTimeout(() => {
           closeModal();
           queryClient.invalidateQueries({ queryKey: ['tasks', userId] });
@@ -449,6 +459,7 @@ function OngoingTasks() {
             task={{
               ...task,
               color: index < 4 ? taskColors[index] : themeColors[4],
+              isOverdue: task.isOverdue, // ✅ 마감 여부 전달
             }}
             onComplete={handleCompleteTask}
             onEdit={() => handleEditTask(task.assignmentId)}

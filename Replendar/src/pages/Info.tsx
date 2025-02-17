@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import HistoryList from '../components/infoComopnents/HistoryList';
+import HistoryList from '../components/infoComopnents/history/HistoryList';
 import ProfileSection from '../components/infoComopnents/ProfileSection';
 import TaskSummary from '../components/infoComopnents/TaskSummary';
 import { useProfileStore } from '../store/profileStore';

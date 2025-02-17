@@ -12,6 +12,7 @@ export interface Task {
   completionTime: string;
   due_datetime: string;
   dueDate: string;
+  completion_time: string;
 }
 
 // 기존 StoredTask 정의 (마감일과 유효성만 포함)
@@ -73,6 +74,19 @@ export interface IFriendNewsContent {
   content: string;
   createdAt: string; // ISO 날짜 형식
   timeStamp: string;
+  type: string;
+  isRegistered: boolean;
+}
+export interface IHistoryAllContent {
+  date: string;
+  time: string;
+  check: 'CHECK'; // "CHECK" 문자열 고정
+  friendRequestId: 0;
+  senderId: 0;
+  friendId: 0;
+  assId: 0;
+  content: string;
+  createdAt: string; // ISO 날짜 형식
   type: string;
   isRegistered: boolean;
 }
