@@ -393,7 +393,6 @@ function AddTaskModal({
   }, [lectureAssignmentData]);
   useEffect(() => {
     if (Array.isArray(assignmentData) && assignmentData.length > 0) {
-      console.log(assignmentData);
       const {
         title,
         due_date,
@@ -424,7 +423,6 @@ function AddTaskModal({
       return await addTask(taskData);
     },
     onSuccess: (newTask) => {
-      console.log('과제 추가 완료:', newTask);
       queryClient.invalidateQueries({
         queryKey: ['tasks', userId],
       });
@@ -472,7 +470,7 @@ function AddTaskModal({
       originAssId: assId ? assId : null,
       lectureAssignmentId: lectureAssignmentId ? lectureAssignmentId : null,
     };
-    console.log('보내는 형식', taskData);
+
     addTaskMutation.mutate(taskData);
   };
 

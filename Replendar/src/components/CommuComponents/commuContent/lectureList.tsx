@@ -7,7 +7,7 @@ import { ILecture } from '../../../types';
 import { useAcademicYearStore } from '../../../store/profileStore';
 import useModalStore from '../../../store/modalStore';
 import { LectureListSkeleton } from '../../skeleton';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import React from 'react';
 import { ITaskList } from '../../../types';
 import BlueButton from '../../blueButton';
@@ -55,9 +55,6 @@ const LectureList: React.FC<{ expanded: string }> = ({ expanded }) => {
     lectureId ? `/api/lecture-assignments/${lectureId}` : ''
   );
 
-  useEffect(() => {
-    console.log('showTasks', showTasks);
-  }, [showTasks]);
   return (
     <Container>
       <SpaceBtwDiv>

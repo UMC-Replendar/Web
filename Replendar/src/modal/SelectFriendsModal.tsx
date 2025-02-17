@@ -175,7 +175,7 @@ function SelectFriendsModal() {
         </FriendsItem>
       ))}
 
-      <ConfirmButton onClick={closeFriendModal}>공유하기</ConfirmButton>
+      <ConfirmButton onClick={closeFriendModal}>선택하기</ConfirmButton>
     </SelectFriendsModalOverlay>
   );
 }

@@ -37,7 +37,7 @@ const useTaskStore = create<TaskStore>((set) => ({
 
   addTask: async (taskData) => {
     const { token } = useAuthStore.getState();
-    console.log('useTaskStore에 taskData', taskData);
+
     try {
       const { data: newTask } = await axios.post(
         `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment`,
