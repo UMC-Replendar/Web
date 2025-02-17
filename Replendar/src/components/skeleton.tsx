@@ -18,9 +18,9 @@ const SkeletonContainer = styled.div`
   gap: 1px;
 `;
 
-const SkeletonItem = styled.div<{ gap?: string; justifyContent?: string }>`
+const SkeletonItem = styled.div<{ $gap?: string; $justifyContent?: string }>`
   display: flex;
-  gap: ${({ gap }) => gap || '100px'};
+  gap: ${({ $gap }) => $gap || '100px'};
   height: 67px;
   background-color: #f0f0f0;
   border-radius: 20px;
@@ -30,7 +30,7 @@ const SkeletonItem = styled.div<{ gap?: string; justifyContent?: string }>`
   animation: ${skeletonLoading} 1.5s infinite;
   display: flex;
   align-items: center;
-  justify-content: ${({ justifyContent }) => justifyContent || 'flex-start'};
+  justify-content: ${({ $justifyContent }) => $justifyContent || 'flex-start'};
 
   & > div {
     background-color: #e0e0e0;
@@ -80,11 +80,11 @@ const SkeletonText = styled.div<{ width?: string; height?: string }>`
   background-color: #e0e0e0;
 `;
 
-const SkeletonButton = styled.div<{ marginLeft?: string }>`
+const SkeletonButton = styled.div<{ $marginLeft?: string }>`
   width: 106px;
   height: 26px;
   border-radius: 50px;
-  margin-left: ${({ marginLeft }) => marginLeft || 'auto'};
+  margin-left: ${({ $marginLeft }) => $marginLeft || 'auto'};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -105,7 +105,7 @@ export const FriendRegisterSkeleton = () => (
 export const FriendListSkeleton = ({ count = 5 }: { count?: number }) => (
   <SkeletonContainer>
     {[...Array(count)].map((_, index) => (
-      <SkeletonItem key={index} gap="60px">
+      <SkeletonItem key={index} $gap="60px">
         <SkeletonProfileImage />
         <SkeletonText width="100px" />
         <SkeletonText width="150px" />
@@ -117,7 +117,7 @@ export const FriendListSkeleton = ({ count = 5 }: { count?: number }) => (
 export const GroupSkeleton = ({ count = 5 }: { count?: number }) => (
   <SkeletonContainer>
     {[...Array(count)].map((_, index) => (
-      <SkeletonItem key={index} gap="60px">
+      <SkeletonItem key={index} $gap="60px">
         <SkeletonText width="150px" height="40px" />
       </SkeletonItem>
     ))}
@@ -127,7 +127,7 @@ export const GroupSkeleton = ({ count = 5 }: { count?: number }) => (
 export const LectureListSkeleton = ({ count = 5 }: { count?: number }) => (
   <SkeletonContainer>
     {[...Array(count)].map((_, index) => (
-      <SkeletonItem key={index} justifyContent="space-around">
+      <SkeletonItem key={index} $justifyContent="space-around">
         <SkeletonText width="100px" />
         <SkeletonText width="100px" />
         <SkeletonText width="250px" />
@@ -138,7 +138,7 @@ export const LectureListSkeleton = ({ count = 5 }: { count?: number }) => (
 export const TaskListSkeleton = ({ count = 5 }: { count?: number }) => (
   <SkeletonContainer>
     {[...Array(count)].map((_, index) => (
-      <SkeletonItem key={index} justifyContent="space-around">
+      <SkeletonItem key={index} $justifyContent="space-around">
         <SkeletonText width="100px" />
         <SkeletonText width="100px" />
         <SkeletonText width="100px" />
@@ -147,7 +147,7 @@ export const TaskListSkeleton = ({ count = 5 }: { count?: number }) => (
         <SkeletonText width="200px" />
 
         <SkeletonText width="150px" />
-        <SkeletonButton marginLeft="0px" />
+        <SkeletonButton $marginLeft="0px" />
       </SkeletonItem>
     ))}
   </SkeletonContainer>

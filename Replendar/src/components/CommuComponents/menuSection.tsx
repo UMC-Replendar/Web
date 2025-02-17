@@ -44,7 +44,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, menuItems }) => {
           {menuItems.map((menu) => (
             <CustomBtn
               key={menu}
-              isSelected={menuState.activeMenu === menu}
+              $isSelected={menuState.activeMenu === menu}
               onClick={() => handleMenuClick(menu)}
             >
               {menu}
@@ -102,15 +102,15 @@ const StyledDiv = styled.div<{ expanded: string; background: string }>`
   }
 `;
 
-const CustomBtn = styled.button<{ isSelected: boolean }>`
+const CustomBtn = styled.button<{ $isSelected: boolean }>`
   background: ${(props) =>
-    props.isSelected ? 'rgba(102, 102, 102, 1)' : 'rgba(243, 243, 243, 1)'};
+    props.$isSelected ? 'rgba(102, 102, 102, 1)' : 'rgba(243, 243, 243, 1)'};
   width: 135px;
   height: 38px;
   border-radius: 50px;
   border: none;
   font-size: 16px;
-  color: ${(props) => (props.isSelected ? 'white' : 'rgba(102, 102, 102, 1)')};
+  color: ${(props) => (props.$isSelected ? 'white' : 'rgba(102, 102, 102, 1)')};
   padding: 0px;
   box-shadow: 0px 5px 15.7px 0px rgba(177, 198, 187, 0.4);
   margin-bottom: 15px;
