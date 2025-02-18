@@ -124,7 +124,7 @@ const HistoryAll: React.FC = () => {
                 <HistoryText>{item.time}</HistoryText>
                 <HistoryText>{item.content}</HistoryText>
               </HistoryDetails>
-              {item.type === '과제' ? (
+              {item.type === '과제 추가' || item.type === '과제 공유' ? (
                 item.isRegistered ? (
                   <BlueButton status="등록됨">등록됨</BlueButton>
                 ) : (
@@ -143,7 +143,7 @@ const HistoryAll: React.FC = () => {
                     내 일정에 등록
                   </BlueButton>
                 )
-              ) : item.type === '친구요청' ? (
+              ) : item.type === '친구 요청' ? (
                 item.check === 'CHECK' ? (
                   <BlueButton status="등록됨">수락됨</BlueButton>
                 ) : (
