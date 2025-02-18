@@ -129,6 +129,8 @@
 import { lazy, Suspense } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
+import GuestBook from '../pages/guest/GuestBook';
+import GetGuestBook from '../pages/guest/GetGuestBook';
 
 // 📌 Lazy Loading 적용
 const Info = lazy(() => import('../pages/Info'));
@@ -196,6 +198,7 @@ function Router() {
             token ? <ThemeSettingPage /> : <Navigate to="/login" replace />
           }
         />
+
         <Route
           path="/settings/ask"
           element={token ? <AskPage /> : <Navigate to="/login" replace />}
@@ -223,6 +226,15 @@ function Router() {
         <Route
           path="/info/history"
           element={token ? <HistoryPage /> : <Navigate to="/login" replace />}
+        />
+
+        <Route
+          path="/guestlist"
+          element={token ? <GetGuestBook /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/forguest"
+          element={token ? <GuestBook /> : <Navigate to="/login" replace />}
         />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/callback" element={<Redirect />} />
