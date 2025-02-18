@@ -23,6 +23,7 @@ const FlexDiv = styled.div`
   border-radius: 20px;
 `;
 const TimeDiv = styled.div`
+  margin-left: 20px;
   display: flex;
   justify-content: flex-start;
   align-items: center;
