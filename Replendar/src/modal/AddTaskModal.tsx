@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import useFriendsStore from '../store/useFriendStore';
 import useModalStore from '../store/modalStore';
-import { addTask, storeTask, fetchLectureAssignment } from '../apis/taskApi';
+import { addTask, storeTask } from '../apis/taskApi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
-
+import useGetData from '../hooks/useGetData';
 import SelectFriendsModal from './SelectFriendsModal';
 import ToggleSwitch from '../components/OngoingComponents/ToggleSwitch';
-
+import useAuthStore from '../store/authStore';
 import BookmarkIcon from '../assets/images/BookmarkIcon.svg';
 import BookmarkFilledIcon from '../assets/images/BookmarkFilledIcon.svg';
 import LockIcon from '../assets/images/LockIcon.svg';
@@ -25,13 +25,14 @@ import dayjs from 'dayjs';
 import Swal from 'sweetalert2';
 
 // import UseNotificationPermission from '../hooks/useNotification';
-// import { useAcademicYearStore } from '../store/profileStore';
+import { useAcademicYearStore } from '../store/profileStore';
 
 dayjs.locale('ko');
 
 interface AddTaskModalProps {
   onTaskAdded: () => void;
   lectureAssignmentId?: number;
+  assId?: number;
 }
 
 const ModalOverlay = styled.div`
@@ -343,164 +344,13 @@ const ActionButtons = styled.div`
   width: 100%;
 `;
 
-// interface AddTaskModalProps {
-//   onTaskAdded: () => void;
-//   assId?: number;
-//   lectureAssignmentId?: number;
-// }
-
-// function AddTaskModal({
-//   onTaskAdded,
-//   assId,
-//   lectureAssignmentId,
-// }: AddTaskModalProps) {
-//   const { closeModal } = useModalStore();
-//   const { addTask } = useTaskStore();
-//   const queryClient = useQueryClient();
-//   const notifiypermission = UseNotificationPermission();
-//   const [isBookmarked, setIsBookmarked] = useState(false);
-//   const [taskName, setTaskName] = useState('');
-//   const [deadline, setDeadline] = useState<Dayjs | null>(dayjs());
-//   const [time, setTime] = useState('23:59');
-//   const [isPublic, setIsPublic] = useState(false); // 과제 공개 여부
-//   const [isOn, setIsOn] = useState(false); // 알림 설정
-//   const [alarmCycles, setAlarmCycles] = useState<string[]>([]);
-//   const [memo, setMemo] = useState('');
-
-//   const {
-//     isFriendModalOpen,
-//     openFriendModal,
-//     nicknames,
-//     updateFriendsData,
-//     setFriendData,
-//     friendData,
-//     resetFriends,
-//     toggleAllFriends,
-//   } = useFriendsStore();
-
-//   const { sortKey, academicYear } = useAcademicYearStore();
-
-//   const { data } = useGetData(
-//     isFriendModalOpen ? `/api/assignment/share?userId=${userId}` : ''
-//   );
-
-//   const { data: lectureAssignmentData } = useGetData(
-//     lectureAssignmentId ? `/api/major/lectures/get/${lectureAssignmentId}` : ''
-//   );
-//   const { data: assignmentData } = useGetData(
-//     assId ? `/api/assignment/${assId}` : ''
-//   );
-
-//   useEffect(() => {
-//     if (
-//       Array.isArray(lectureAssignmentData) &&
-//       lectureAssignmentData.length > 0
-//     ) {
-//       const { title, due_date, due_time, content } = lectureAssignmentData[0];
-//       setTaskName(title);
-//       setDeadline(dayjs(due_date));
-//       setTime(due_time);
-//       setMemo(content);
-//     }
-//   }, [lectureAssignmentData]);
-//   useEffect(() => {
-//     if (Array.isArray(assignmentData) && assignmentData.length > 0) {
-//       console.log(assignmentData);
-//       const {
-//         title,
-//         due_date,
-//         memo,
-//         notification,
-//         visibility,
-//         notifyCycle,
-//         shareFriend,
-//         favorite,
-//       } = assignmentData[0];
-//       const [date, time] = due_date.split(' ');
-
-//       setTaskName(title);
-//       setDeadline(dayjs(date));
-//       setTime(time);
-//       setMemo(memo);
-//       setIsOn(notification === 'ON' ? true : false);
-//       setIsPublic(visibility === 'ON' ? true : false);
-//       setAlarmCycles(notifyCycle);
-//       toggleAllFriends(shareFriend);
-//       setIsBookmarked(favorite === 'ACTIVE' ? true : false);
-//     }
-//   }, [assignmentData]);
-//   useEffect(() => {
-//     console.log('taskNaem:', taskName);
-//   }, [taskName]);
-
-//   // Mutation을 사용하여 addTask 실행
-//   const addTaskMutation = useMutation({
-//     mutationFn: async (taskData: Omit<Task, 'assignmentId'>) => {
-//       return await addTask(taskData);
-//     },
-//     onSuccess: (newTask) => {
-//       console.log('과제 추가 완료:', newTask);
-//       queryClient.invalidateQueries({
-//         queryKey: ['tasks', userId],
-//       });
-//       queryClient.invalidateQueries({
-//         queryKey: ['/api/activity/friend'],
-//       });
-//       queryClient.invalidateQueries({
-//         queryKey: [
-//           `/api/major/lectures/sort/${sortKey}?sort=asc&academicYear=${academicYear}&majorId=`,
-//         ],
-//       });
-//       onTaskAdded();
-//       closeModal();
-//     },
-//     onError: (error) => {
-//       console.error('과제 추가 중 오류 발생:', error);
-//       alert('과제 추가 중 문제가 발생했습니다.');
-//     },
-//   });
-
-//   const handleComplete = async () => {
-
-//     console.log(notifiypermission);
-
-//     const taskData: Omit<Task, 'assignmentId'> = {
-//       title: taskName,
-//       endDate: formattedDeadline,
-//       notification: isOn ? 'ON' : 'OFF',
-//       visibility: isPublic ? 'ON' : 'OFF',
-//       notifyCycle: alarmCycles.length > 0 ? alarmCycles : [],
-//       shareIds: friendData ? friendData.map((friend) => friend.friendId) : [],
-//       memo: memo.trim() === '' ? '' : memo,
-//       favorite: isBookmarked ? 'ACTIVE' : 'INACTIVE',
-//       originAssId: assId ? assId : null,
-//       lectureAssignmentId: lectureAssignmentId ? lectureAssignmentId : null,
-//     };
-
-//     addTaskMutation.mutate(taskData);
-//   };
-
-//   useEffect(() => {
-//     updateFriendsData();
-//   }, [isFriendModalOpen]);
-
-//   useEffect(() => {
-//     if (JSON.stringify(data) !== JSON.stringify(friendData)) {
-//       setFriendData(data);
-//     }
-//   }, [data, openFriendModal]);
-
-//   useEffect(() => {
-//     resetFriends();
-//   }, [closeModal]);
-
 const AddTaskModal: React.FC<AddTaskModalProps> = ({
   onTaskAdded,
   lectureAssignmentId,
+  assId,
 }) => {
   const { closeModal } = useModalStore();
   const queryClient = useQueryClient();
-  const { checkedFriends, friendData } = useFriendsStore();
 
   const [taskData, setTaskData] = useState({
     isBookmarked: false,
@@ -513,24 +363,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
     shareIds: [] as number[],
     memo: '',
   });
-  /*
-  const notifiypermission = useNotificationPermission();
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const [taskName, setTaskName] = useState('');
-  const [deadline, setDeadline] = useState<Dayjs | null>(dayjs());
-  const [time, setTime] = useState('23:59');
-  const [isPublic, setIsPublic] = useState(false); // 과제 공개 여부
-  const [isOn, setIsOn] = useState(false); // 알림 설정
-  const [alarmCycles, setAlarmCycles] = useState<string[]>([]);
-  const [memo, setMemo] = useState('');
-
-  const { id: userId, token } = useAuthStore();
-
-  if (!userId) {
-    console.error('userId가 존재하지 않습니다. 로그인이 필요한 기능입니다.');
-    alert('로그인이 필요합니다.');
-    return;
-  }
+  const { id: userId } = useAuthStore();
 
   const {
     isFriendModalOpen,
@@ -540,14 +373,116 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
     setFriendData,
     friendData,
     resetFriends,
-    toggleAllFriends,
-  } = useFriendStore();
+
+    checkedFriends,
+  } = useFriendsStore();
 
   const { sortKey, academicYear } = useAcademicYearStore();
 
+  const { data: lectureAssignmentData } = useGetData(
+    lectureAssignmentId ? `/api/major/lectures/get/${lectureAssignmentId}` : '' //여기 값 채워서 addMutation에 넣어주기, useEfect3인방
+  );
+  const { data: assignmentData } = useGetData(
+    assId ? `/api/assignment/${assId}` : ''
+  );
+
+  // useEffect(() => {
+  //   if (
+  //     Array.isArray(lectureAssignmentData) &&
+  //     lectureAssignmentData.length > 0
+  //   ) {
+  //     const { title, due_date, due_time, content } = lectureAssignmentData[0];
+  //     setTaskName(title);
+  //     setDeadline(dayjs(due_date));
+  //     setTime(due_time);
+  //     setMemo(content);
+  //   }
+  // }, [lectureAssignmentData]);
+
+  useEffect(() => {
+    if (
+      Array.isArray(lectureAssignmentData) &&
+      lectureAssignmentData.length > 0
+    ) {
+      const { title, due_date, due_time, content } = lectureAssignmentData[0];
+
+      setTaskData((prev) => ({
+        ...prev,
+        title,
+        dueDate: dayjs(due_date),
+        dueTime: due_time,
+        memo: content,
+      }));
+    }
+  }, [lectureAssignmentData]);
+  // useEffect(() => {
+  //   if (Array.isArray(assignmentData) && assignmentData.length > 0) {
+  //     console.log(assignmentData);
+  //     const {
+  //       title,
+  //       due_date,
+  //       memo,
+  //       notification,
+  //       visibility,
+  //       notifyCycle,
+  //       shareFriend,
+  //       favorite,
+  //     } = assignmentData[0];
+  //     const [date, time] = due_date.split(' ');
+
+  //     setTaskName(title);
+  //     setDeadline(dayjs(date));
+  //     setTime(time);
+  //     setMemo(memo);
+  //     setIsOn(notification === 'ON' ? true : false);
+  //     setIsPublic(visibility === 'ON' ? true : false);
+  //     setAlarmCycles(notifyCycle);
+  //     toggleAllFriends(shareFriend);
+  //     setIsBookmarked(favorite === 'ACTIVE' ? true : false);
+  //   }
+  // }, [assignmentData]);
+
+  useEffect(() => {
+    if (Array.isArray(assignmentData) && assignmentData.length > 0) {
+      console.log(assignmentData);
+      const {
+        title,
+        due_date,
+        memo,
+        notification,
+        visibility,
+        notifyCycle,
+
+        favorite,
+      } = assignmentData[0];
+
+      const [date, time] = due_date.split(' ');
+
+      setTaskData((prev) => ({
+        ...prev,
+        title,
+        dueDate: dayjs(date),
+        dueTime: time,
+        memo,
+        isOn: notification === 'ON',
+        isPublic: visibility === 'ON',
+        notifyCycle,
+        isBookmarked: favorite === 'ACTIVE',
+      }));
+    }
+  }, [assignmentData]);
+
+  useEffect(() => {
+    updateFriendsData();
+  }, [isFriendModalOpen]);
+
+  useEffect(() => {
+    resetFriends();
+  }, [closeModal]);
+
   const { data } = useGetData(
     isFriendModalOpen ? `/api/assignment/share?userId=${userId}` : ''
-  );*/
+  );
 
   const handleChange = (field: keyof typeof taskData, value: any) => {
     setTaskData((prev) => ({
@@ -555,6 +490,12 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
       [field]: value,
     }));
   };
+
+  useEffect(() => {
+    if (JSON.stringify(data) !== JSON.stringify(friendData)) {
+      setFriendData(data);
+    }
+  }, [data, openFriendModal]);
 
   const formattedTaskData = {
     title: taskData.title,
@@ -577,53 +518,6 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
       alert('과제가 추가되었습니다!');
       queryClient.invalidateQueries({ queryKey: ['tasks'] }); // 과제 목록 갱신
 
-      /* useEffect(() => {
-    if (
-      Array.isArray(lectureAssignmentData) &&
-      lectureAssignmentData.length > 0
-    ) {
-      const { title, due_date, due_time, content } = lectureAssignmentData[0];
-      setTaskName(title);
-      setDeadline(dayjs(due_date));
-      setTime(due_time);
-      setMemo(content);
-    }
-  }, [lectureAssignmentData]);
-  useEffect(() => {
-    if (Array.isArray(assignmentData) && assignmentData.length > 0) {
-      const {
-        title,
-        due_date,
-        memo,
-        notification,
-        visibility,
-        notifyCycle,
-        shareFriend,
-        favorite,
-      } = assignmentData[0];
-      const [date, time] = due_date.split(' ');
-
-      setTaskName(title);
-      setDeadline(dayjs(date));
-      setTime(time);
-      setMemo(memo);
-      setIsOn(notification === 'ON' ? true : false);
-      setIsPublic(visibility === 'ON' ? true : false);
-      setAlarmCycles(notifyCycle);
-      toggleAllFriends(shareFriend);
-      setIsBookmarked(favorite === 'ACTIVE' ? true : false);
-    }
-  }, [assignmentData]);
-
-  // Mutation을 사용하여 addTask 실행
-  const addTaskMutation = useMutation({
-    mutationFn: async (taskData: Omit<Task, 'assignmentId'>) => {
-      return await addTask(taskData);
-    },
-    onSuccess: (newTask) => {
-      queryClient.invalidateQueries({
-        queryKey: ['tasks', userId],
-      });
       queryClient.invalidateQueries({
         queryKey: ['/api/activity/friend'],
       });
@@ -631,7 +525,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
         queryKey: [
           `/api/major/lectures/sort/${sortKey}?sort=asc&academicYear=${academicYear}&majorId=`,
         ],
-      });*/
+      });
       onTaskAdded();
       closeModal();
     },

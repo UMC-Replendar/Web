@@ -5,7 +5,7 @@ import { IFriendList, ITaskFriendList } from '../types';
 import useFriendStore from '../store/useFriendStore';
 
 interface SelectFriendsModalProps {
-  onConfirm: () => void; // 추가했습니다.
+  onConfirm?: () => void; // 추가했습니다.
 }
 
 const SelectFriendsModalOverlay = styled.div`
@@ -178,10 +178,11 @@ function SelectFriendsModal({ onConfirm }: SelectFriendsModalProps) {
           </FriendsMemoSection>
         </FriendsItem>
       ))}
-
       <ConfirmButton
         onClick={() => {
-          onConfirm(); // 친구 선택 결과 반영
+          if (onConfirm) {
+            onConfirm(); // onConfirm이 있을 경우만 호출
+          }
           closeFriendModal();
         }}
       >

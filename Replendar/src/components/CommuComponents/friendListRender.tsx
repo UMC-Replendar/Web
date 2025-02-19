@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { NineDots } from '../CommuComponents/commuIcons';
 import useGetData from '../../hooks/useGetData';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SmallToggleSwitch } from '../../modal/EditTaskModal';
 import DefaultProfileImg from '../../assets/images/SideBarIcons/DefaultProfileImg.svg';
 import { IFriendList } from '../../types';
@@ -36,7 +36,7 @@ const FriendListRender: React.FC<{
     note: '',
   });
 
-  const { isFriendModalOpen, openFriendModal } = useFriendStore();
+  const { isFriendModalOpen, openFriendModal, resetFriends } = useFriendStore();
 
   const [isEditing, setIsEditing] = useState(false);
   const [updatedNote, setUpdatedNote] = useState<string>('');
@@ -145,6 +145,10 @@ const FriendListRender: React.FC<{
       console.error(error);
     },
   });
+
+  useEffect(() => {
+    resetFriends();
+  }, [modalState.selectedId, modalState.isOpen]);
 
   const hasData = Array.isArray(noteData) && noteData.length > 0;
   const memo = hasData ? noteData[0].note : null;
