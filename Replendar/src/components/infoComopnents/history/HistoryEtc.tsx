@@ -12,15 +12,18 @@ const HistoryContainer = styled.div<{ background: string }>`
   flex-direction: column;
   height: 100%;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  position: relative;
 `;
 
 const Message = styled.div`
-  font-size: 20px;
+  align-self: center;
+  text-align: center;
+  font-size: 18px;
   font-family: Pretendard, sans-serif;
   font-weight: 500;
-  color: #666;
-  text-align: center;
+  color: gray;
+  margin-top: 20px;
 `;
 
 const HistoryEtc: React.FC = () => {

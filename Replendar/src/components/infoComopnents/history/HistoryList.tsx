@@ -9,6 +9,7 @@ import useModalStore from '../../../store/modalStore';
 import AddTaskModal from '../../../modal/AddTaskModal';
 import Swal from 'sweetalert2';
 import { respondToFriendRequest } from '../../../apis/commuApi';
+import { HistoryAssignmentSkeleton } from '../../skeleton';
 
 const Title = styled.p`
   color: black;
@@ -45,15 +46,27 @@ const HistoryEntryContainer = styled.div`
 
 const HistoryDetails = styled.div`
   display: flex;
-  gap: 30px;
   align-items: center;
+  width: 100%;
+  justify-content: space-between;
 `;
 
-const HistoryText = styled.div`
+const HistoryText = styled.div<{ $flex?: string }>`
+  flex: ${({ $flex }) => $flex || '1'};
+  text-align: left;
   font-size: 19px;
   font-family: Pretendard, sans-serif;
   font-weight: 500;
   color: black;
+`;
+
+const HistoryButtonWrapper = styled.div`
+  flex: 0.5;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  flex-shrink: 0;
+  min-width: 100px;
 `;
 
 const More = styled.img`
@@ -80,6 +93,16 @@ const MoreContainer = styled.div`
   width: auto;
   justify-content: flex-end;
   cursor: pointer;
+`;
+
+const Message = styled.div`
+  align-self: center;
+  text-align: center;
+  font-size: 18px;
+  font-family: Pretendard, sans-serif;
+  font-weight: 500;
+  color: gray;
+  margin-top: 20px;
 `;
 
 const HistoryList = () => {
@@ -133,8 +156,9 @@ const HistoryList = () => {
     },
   });
 
-  if (isLoading) return <div>로딩 중...</div>;
-  if (isError) return <div>데이터를 불러오는 중 오류 발생!</div>;
+  if (isLoading) return <HistoryAssignmentSkeleton count={3} />;
+  if (isError)
+    return <Message>데이터를 불러오는 중 오류가 발생하였습니다.</Message>;
 
   return (
     <div>
@@ -152,49 +176,51 @@ const HistoryList = () => {
           data.map((entry: any, index: number) => (
             <HistoryEntryContainer key={index}>
               <HistoryDetails>
-                <HistoryText>{entry.date}</HistoryText>
-                <HistoryText>{entry.time}</HistoryText>
-                <HistoryText>{entry.content}</HistoryText> {/* 3개만 표시 */}
+                <HistoryText $flex="0.5">{entry.date}</HistoryText>
+                <HistoryText $flex="0.5">{entry.time}</HistoryText>
+                <HistoryText $flex="2">{entry.content}</HistoryText>
+                <HistoryButtonWrapper>
+                  {entry.type === '과제 추가' || entry.type === '과제 공유' ? (
+                    entry.isRegistered ? (
+                      <BlueButton status="등록됨">등록됨</BlueButton>
+                    ) : (
+                      <BlueButton
+                        onClick={() =>
+                          openModal(
+                            <AddTaskModal
+                              assId={entry.assId}
+                              onTaskAdded={() =>
+                                console.log('과제가 추가되었습니다.')
+                              }
+                            />
+                          )
+                        }
+                      >
+                        내 일정에 등록
+                      </BlueButton>
+                    )
+                  ) : entry.type === '친구 요청' ? (
+                    entry.check === 'CHECK' ? (
+                      <BlueButton status="등록됨">수락됨</BlueButton>
+                    ) : (
+                      <BlueButton
+                        onClick={() =>
+                          RespondToFriendMutation.mutate({
+                            requestId: entry.friendRequestId,
+                            isAccepted: true,
+                          })
+                        }
+                      >
+                        수락
+                      </BlueButton>
+                    )
+                  ) : null}
+                </HistoryButtonWrapper>
               </HistoryDetails>
-              {entry.type === '과제 추가' || entry.type === '과제 공유' ? (
-                entry.isRegistered ? (
-                  <BlueButton status="등록됨">등록됨</BlueButton>
-                ) : (
-                  <BlueButton
-                    onClick={() =>
-                      openModal(
-                        <AddTaskModal
-                          assId={entry.assId}
-                          onTaskAdded={() =>
-                            console.log('과제가 추가되었습니다.')
-                          }
-                        />
-                      )
-                    }
-                  >
-                    내 일정에 등록
-                  </BlueButton>
-                )
-              ) : entry.type === '친구 요청' ? (
-                entry.check === 'CHECK' ? (
-                  <BlueButton status="등록됨">수락됨</BlueButton>
-                ) : (
-                  <BlueButton
-                    onClick={() =>
-                      RespondToFriendMutation.mutate({
-                        requestId: entry.friendRequestId,
-                        isAccepted: true,
-                      })
-                    }
-                  >
-                    수락
-                  </BlueButton>
-                )
-              ) : null}{' '}
             </HistoryEntryContainer>
           ))
         ) : (
-          <div>기록이 없습니다.</div>
+          <Message>기록이 없습니다.</Message>
         )}
       </HistoryContainer>
     </div>

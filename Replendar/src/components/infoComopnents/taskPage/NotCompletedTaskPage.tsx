@@ -7,6 +7,7 @@ import { useGetInfiniteData } from '../../../hooks/useGetInfiniteData';
 import { useInView } from 'react-intersection-observer';
 import ClipLoader from 'react-spinners/ClipLoader';
 import { useThemeStore, themeBackground } from '../../../store/useThemeStore';
+import { NotCompletedTaskSkeleton } from '../../skeleton';
 
 const Container = styled.div`
   display: flex;
@@ -114,7 +115,7 @@ const NotCompletedTaskPage: React.FC = () => {
   }, [inView, hasNextPage, isFetching, fetchNextPage]);
 
   if (isPending) {
-    return <div>스켈레톤 UI (로딩 중...)</div>;
+    return <NotCompletedTaskSkeleton count={5} />;
   }
 
   return (
@@ -141,9 +142,11 @@ const NotCompletedTaskPage: React.FC = () => {
             );
           })
         )}
+        {isFetching && <NotCompletedTaskSkeleton count={5} />}
+        <Scroll ref={ref}>
+          {isFetching && <ClipLoader color={'black'} />}
+        </Scroll>
       </Box>
-      {isFetching && <div>스켈레톤 UI (추가 로딩 중...)</div>}
-      <Scroll ref={ref}>{isFetching && <ClipLoader color={'black'} />}</Scroll>
     </Container>
   );
 };

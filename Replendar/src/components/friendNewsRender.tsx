@@ -17,6 +17,7 @@ const FlexDiv = styled.div`
   width: 100%;
   font-size: 19px;
   padding: 0px 20px;
+  padding-right: 30px;
   background: white;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -34,7 +35,7 @@ const CenterDiv = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  width: 70%;
+  width: 120%;
   height: 67px;
 `;
 
