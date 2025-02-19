@@ -57,3 +57,20 @@ export const completeTask = async (assignmentId: number) => {
   );
   return response.data.result;
 };
+
+// 과제 등록하지 않고 보관하기
+export const storeTask = async (taskData: {
+  title: string;
+  endDate: string;
+  notification: string;
+  visibility: string;
+  notifyCycle?: string[];
+  shareIds?: number[];
+  memo?: string;
+  favorite?: 'ACTIVE' | 'INACTIVE';
+  originAssId?: number;
+  lectureAssignmentId?: number;
+}) => {
+  const response = await axiosInstance.post(`/api/assignment/store`, taskData);
+  return response.data.result;
+};

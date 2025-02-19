@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import useFriendsStore from '../store/useFriendStore';
 import useModalStore from '../store/modalStore';
-import { addTask, fetchLectureAssignment } from '../apis/taskApi';
+import { addTask, storeTask, fetchLectureAssignment } from '../apis/taskApi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
 
@@ -22,10 +22,10 @@ import { TextField } from '@mui/material';
 import { styled as muiStyled } from '@mui/material/styles';
 import dayjs from 'dayjs';
 
+import Swal from 'sweetalert2';
+
 // import UseNotificationPermission from '../hooks/useNotification';
 // import { useAcademicYearStore } from '../store/profileStore';
-
-// import Swal from 'sweetalert2';
 
 dayjs.locale('ko');
 
@@ -500,7 +500,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
 }) => {
   const { closeModal } = useModalStore();
   const queryClient = useQueryClient();
-    const { checkedFriends, friendData } = useFriendsStore();
+  const { checkedFriends, friendData } = useFriendsStore();
 
   const [taskData, setTaskData] = useState({
     isBookmarked: false,
@@ -513,7 +513,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
     shareIds: [] as number[],
     memo: '',
   });
-/*
+  /*
   const notifiypermission = useNotificationPermission();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [taskName, setTaskName] = useState('');
@@ -577,7 +577,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
       alert('과제가 추가되었습니다!');
       queryClient.invalidateQueries({ queryKey: ['tasks'] }); // 과제 목록 갱신
 
-/* useEffect(() => {
+      /* useEffect(() => {
     if (
       Array.isArray(lectureAssignmentData) &&
       lectureAssignmentData.length > 0
@@ -698,7 +698,83 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
     addTaskMutation();
   };
 
-/*  useEffect(() => {
+  const { mutate: saveDraftMutation } = useMutation({
+    mutationFn: async () => storeTask(formattedTaskData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      Swal.fire({
+        icon: 'success',
+        title: '과제가 임시저장 되었습니다.',
+        confirmButtonColor: '#25C26C',
+      });
+      closeModal();
+    },
+    onError: (error) => {
+      console.error('임시저장 중 오류 발생:', error);
+      alert('과제 임시저장 중 문제가 발생했습니다.');
+    },
+  });
+
+  const handleSaveDraft = () => {
+    if (!taskData.title.trim()) {
+      alert('과제명을 입력해주세요.');
+      return;
+    }
+
+    if (!taskData.dueDate) {
+      alert('마감일을 선택해주세요.');
+      return;
+    }
+
+    saveDraftMutation();
+  };
+
+  // const saveDraftMutation = useMutation({
+  //   mutationFn: async (taskData) => storeTask(taskData),
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['tasks', userId] });
+  //     Swal.fire({
+  //       icon: 'success',
+  //       title: '과제가 임시저장 되었습니다.',
+  //       confirmButtonColor: '#25C26C',
+  //     });
+  //     closeModal();
+  //   },
+  //   onError: (error) => {
+  //     console.error('임시저장 중 오류 발생:', error);
+  //     alert('과제 임시저장 중 문제가 발생했습니다.');
+  //   },
+  // });
+
+  // const handleSaveDraft = () => {
+  //   if (!taskData.title.trim()) {
+  //     alert('과제명을 입력해주세요.');
+  //     return;
+  //   }
+  //   if (!taskData.dueDate) {
+  //     alert('마감일을 선택해주세요.');
+  //     return;
+  //   }
+
+  //   const formattedDeadline = new Date(taskData.dueDate.format('YYYY-MM-DD') + 'T' + taskData.dueTime + ':00.000Z').toISOString();
+
+  //   const draftTaskData = {
+  //     title: taskData.title,
+  //     endDate: formattedDeadline,
+  //     notification: taskData.isOn ? 'ON' : 'OFF',
+  //     visibility: taskData.isPublic ? 'ON' : 'OFF',
+  //     notifyCycle: taskData.notifyCycle.length > 0 ? taskData.notifyCycle : [],
+  //     shareIds: taskData.shareIds,
+  //     memo: taskData.memo.trim() || '',
+  //     favorite: taskData.isBookmarked ? 'ACTIVE' : 'INACTIVE',
+  //     originAssId: undefined,
+  //     lectureAssignmentId: undefined,
+  //   };
+
+  //   saveDraftMutation.mutate(draftTaskData);
+  // };
+
+  /*  useEffect(() => {
     if (lectureAssignmentId) {
       fetchLectureAssignment(lectureAssignmentId)
         .then((data) => {
@@ -745,14 +821,6 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
   });
 
   const handleSaveDraft = async () => {
-    if (!taskName.trim()) {
-      alert('과제명을 입력해주세요.');
-      return;
-    }
-    if (!deadline) {
-      alert('마감일을 선택해주세요.');
-      return;
-    }
 
     const formattedDeadline =
       deadline && time ? `${deadline.format('YYYY/MM/DD')} ${time}` : '';
@@ -769,8 +837,6 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
       originAssId: assId ? assId : null,
       lectureAssignmentId: lectureAssignmentId ? lectureAssignmentId : null,
     };
-
-    saveDraftMutation.mutate(draftTaskData);
   }; */
 
   return (
