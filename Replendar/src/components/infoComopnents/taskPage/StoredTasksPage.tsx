@@ -135,14 +135,17 @@ const StoredTaskPage: React.FC = () => {
           page.content.map((item: Task) => {
             console.log('과제 데이터:', item);
 
+            // 마감일 및 시간 변환
+            const dueDateTime = new Date(`${item.due_date} ${item.due_time}`);
             const now = new Date(); // 현재 시간
-            const dueDate = new Date(item.due_date); // 마감일 변환
-            const isValid = now < dueDate; // 현재 시간보다 이후면 유효
+            const isValid = now < dueDateTime; // 현재 시간보다 이후면 유효
 
             return (
               <WhiteBox key={item.createdAt}>
                 <TaskRow>
-                  <div>{item.due_date}</div>
+                  <div>
+                    {item.due_date} {item.due_time}
+                  </div>
                   <TaskStatus isValid={isValid}>
                     {isValid ? '유효' : '만료됨'}
                   </TaskStatus>
