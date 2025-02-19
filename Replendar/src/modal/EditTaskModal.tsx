@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { Task } from '../store/useTaskStore';
+import useFriendsStore from '../store/useFriendStore';
+import SelectFriendsModal from './SelectFriendsModal';
+import { deleteTask, editTask, completeTask } from '../apis/taskApi';
+import { useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
+
 import LockIcon from '../assets/images/LockIcon.svg';
 import UnLockIcon from '../assets/images/UnLockIcon.svg';
 import BookmarkIcon from '../assets/images/BookmarkIcon.svg';
 import BookmarkFilledIcon from '../assets/images/BookmarkFilledIcon.svg';
+// import GrayPlusIcon from '../assets/images/GrayPlusIcon.svg';
 import ToggleSwitch from '../components/OngoingComponents/ToggleSwitch';
-import useAuthStore from '../store/authStore';
-import useTaskStore from '../store/useTaskStore';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+// import { PlusFriendsButton } from './AddTaskModal';
 
 // MUI DatePicker 관련 Import 추가
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -16,7 +20,7 @@ import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TextField } from '@mui/material';
 import { styled as muiStyled } from '@mui/material/styles';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 dayjs.locale('ko');
 
 export const SmallToggleSwitch = styled(ToggleSwitch)`
@@ -149,9 +153,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isActive?: boolean;
 }
 
-const AlarmCycleSettingButton = styled.button.withConfig({
-  shouldForwardProp: (prop) => prop !== 'isActive',
-})<ButtonProps>`
+const AlarmCycleSettingButton = styled.button<ButtonProps>`
   display: flex;
   padding: 0px 10px;
   justify-content: center;
@@ -251,138 +253,87 @@ const CompleteButton = styled(Button)`
 `;
 
 interface EditTaskModalProps {
-  assId: number;
+  task: Task;
   onClose: () => void;
-  onComplete: () => void;
 }
 
-const EditTaskModal: React.FC<EditTaskModalProps> = ({
-  assId,
-  onClose,
-  onComplete,
-}) => {
-  const { token, id: userId } = useAuthStore();
+const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, onClose }) => {
   const queryClient = useQueryClient();
-  const { editTask, fetchTasks } = useTaskStore();
+  const { checkedFriends, friendData, /*openFriendModal,*/ isFriendModalOpen } =
+    useFriendsStore();
 
-  // 과제 상세 조회 API
-  const {
-    data: task,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ['task', assId],
-    queryFn: async () => {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment/${assId}`,
-        {
-          headers: { Authorization: token },
-        }
-      );
-      if (!response.data.isSuccess) {
-        throw new Error('과제 정보를 불러오지 못했습니다.');
-      }
-      return response.data.result;
-    },
-    enabled: !!assId,
+  const [taskData, setTaskData] = useState({
+    assId: task.assId,
+    title: task.title,
+    dueDate: dayjs(task.endDate),
+    dueTime: dayjs(task.endDate).format('HH:mm'),
+    notification: task.notification,
+    visibility: task.visibility,
+    memo: task.memo || '',
+    shareIds: task.shareIds || [],
+    notifyCycle: task.notifyCycle || [],
+    isBookmarked: task.favorite === 'ACTIVE',
   });
-
-  const [title, setTitle] = useState('');
-  const [dueDate, setDueDate] = useState<Dayjs | null>(null);
-  const [time, setTime] = useState('');
-  const [notifyCycle, setNotifyCycle] = useState<string[]>([]);
-  const [notification, setNotification] = useState<'ON' | 'OFF'>('OFF');
-  const [visibility, setVisibility] = useState<'ON' | 'OFF'>('OFF');
-  const [memo, setMemo] = useState('');
-  const [isBookmarked, setIsBookmarked] = useState(false);
 
   useEffect(() => {
-    if (task) {
-      setTitle(task.title ?? '');
-      setDueDate(task.endDate ? dayjs(task.endDate.split(' ')[0]) : null);
-      setTime(task.endDate?.split(' ')[1] ?? '');
-      setNotifyCycle(Array.isArray(task.notifyCycle) ? task.notifyCycle : []);
-      setNotification(task.notification ?? 'OFF');
-      setVisibility(task.visibility ?? 'OFF');
-      setMemo(task.memo ?? '');
-      setIsBookmarked(task.favorite === 'ACTIVE');
-    }
+    setTaskData({
+      assId: task.assId,
+      title: task.title,
+      dueDate: dayjs(task.endDate),
+      dueTime: dayjs(task.endDate).format('HH:mm'),
+      notification: task.notification,
+      visibility: task.visibility,
+      memo: task.memo || '',
+      shareIds: task.shareIds || [],
+      notifyCycle: task.notifyCycle || [],
+      isBookmarked: task.favorite === 'ACTIVE',
+    });
   }, [task]);
 
-  // 과제 수정 API
-  const editTaskMutation = useMutation({
-    mutationFn: async () => {
-      const formattedDueDate = dayjs(
-        `${dueDate?.format('YYYY-MM-DD')}T${time}:00.000Z`
-      ).toISOString();
-
-      const requestBody = {
-        assId,
-        title,
-        endDate: formattedDueDate,
-        notification,
-        visibility,
-        memo: memo.trim(),
-        shareIds: [],
-        notifyCycle: [],
-        favorite: isBookmarked ? 'ACTIVE' : 'INACTIVE',
-      };
-      return await axios.patch(
-        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment`,
-        requestBody,
-        { headers: { Authorization: token } }
-      );
-    },
-    onSuccess: () => {
-      editTask(assId, {
-        title,
-        endDate: `${dueDate?.format('YYYY/MM/DD')} ${time}`,
-        notifyCycle,
-        notification,
-        visibility,
-        memo,
-      });
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      if (userId) {
-        fetchTasks(userId);
-      }
-      onClose();
-    },
-  });
-
-  const handleEditTask = () => {
-    editTaskMutation.mutate();
+  const handleChange = (field: keyof typeof taskData, value: any) => {
+    setTaskData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
-  // 과제 삭제 API
-  const deleteTaskMutation = useMutation({
-    mutationFn: async () => {
-      return await axios.delete(
-        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment?assId=${assId}`,
-        { headers: { Authorization: token } }
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      onClose();
-    },
-  });
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let inputTime = e.target.value.replace(/[^0-9]/g, '');
+    if (inputTime.length > 4) inputTime = inputTime.slice(0, 4);
 
-  const handleDeleteTask = () => {
-    deleteTaskMutation.mutate();
+    let formattedTime = '';
+    if (inputTime.length >= 2) {
+      let hours = inputTime.slice(0, 2);
+      let minutes = inputTime.slice(2);
+
+      if (parseInt(hours) > 23) hours = '23';
+      if (minutes.length > 0 && parseInt(minutes) > 59) minutes = '59';
+
+      formattedTime = `${hours}:${minutes}`;
+    } else {
+      formattedTime = inputTime;
+    }
+
+    handleChange('dueTime', formattedTime);
   };
 
-  // 공개/비공개
-  const Visibility = () => {
-    setVisibility((prev) => (prev === 'ON' ? 'OFF' : 'ON'));
+  const handleTimeBlur = () => {
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    if (!timeRegex.test(taskData.dueTime)) {
+      alert('24시간 형식 (00:00 ~ 23:59)으로 입력하세요.');
+      handleChange('dueTime', '');
+    }
   };
 
-  // 북마크
-  const Bookmark = () => {
-    setIsBookmarked((prev) => !prev);
+  const handleAlarmCycleToggle = (cycle: string) => {
+    handleChange(
+      'notifyCycle',
+      taskData.notifyCycle.includes(cycle)
+        ? taskData.notifyCycle.filter((c) => c !== cycle)
+        : [...taskData.notifyCycle, cycle]
+    );
   };
 
-  // 알림
   const alarmOptions = [
     { label: '3일 전', value: 'DAY3' },
     { label: '24시간 전', value: 'DAY1' },
@@ -390,32 +341,80 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     { label: '1시간 전', value: 'H1' },
   ];
 
-  const handleAlarmCycleToggle = (cycle: string) => {
-    setNotifyCycle((prev) =>
-      prev.includes(cycle) ? prev.filter((c) => c !== cycle) : [...prev, cycle]
-    );
+  const handleConfirmFriends = () => {
+    const selectedFriends = friendData
+      .filter((friend) => checkedFriends[friend.friendId])
+      .map((friend) => friend.friendId);
+
+    handleChange('shareIds', selectedFriends);
   };
 
-  if (isLoading) return <div>로딩 중...</div>;
-  if (isError || !task) return <div>과제 정보를 불러올 수 없습니다.</div>;
+  const handleSave = async () => {
+    try {
+      const formattedEndDate = `${taskData.dueDate?.format('YYYY-MM-DD')}T${taskData.dueTime}:00.000Z`;
+
+      await editTask({
+        assId: task.assId,
+        title: taskData.title,
+        endDate: formattedEndDate,
+        memo: taskData.memo,
+        notification: taskData.notification,
+        notifyCycle: taskData.notifyCycle,
+        visibility: taskData.visibility,
+        favorite: taskData.isBookmarked ? 'ACTIVE' : 'INACTIVE',
+        shareIds: taskData.shareIds,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      onClose();
+    } catch (error) {
+      console.error('과제 수정 오류:', error);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteTask(task.assId);
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      onClose();
+    } catch (error) {
+      console.error('과제 삭제 오류:', error);
+    }
+  };
+
+  const handleComplete = async () => {
+    try {
+      await completeTask(task.assId);
+
+      queryClient.invalidateQueries({ queryKey: ['tasks'] }); // 과제 목록 갱신
+      onClose();
+    } catch (error) {
+      console.error('과제 완료 오류:', error);
+    }
+  };
 
   return (
     <ModalWrapper>
       {/* 헤더 */}
       <Header>
         <TitleSection>
-          <span>{title}</span>
+          <span>{taskData.title}</span>
           <img
-            src={visibility === 'ON' ? UnLockIcon : LockIcon}
+            src={taskData.visibility === 'ON' ? UnLockIcon : LockIcon}
             alt="Visibility Icon"
-            onClick={Visibility}
+            onClick={() =>
+              handleChange(
+                'visibility',
+                taskData.visibility === 'ON' ? 'OFF' : 'ON'
+              )
+            }
             style={{ cursor: 'pointer' }}
           />
         </TitleSection>
         <img
-          src={isBookmarked ? BookmarkFilledIcon : BookmarkIcon}
+          src={taskData.isBookmarked ? BookmarkFilledIcon : BookmarkIcon}
           alt="Bookmark Icon"
-          onClick={Bookmark}
+          onClick={() => handleChange('isBookmarked', !taskData.isBookmarked)}
           style={{ cursor: 'pointer' }}
         />
       </Header>
@@ -426,15 +425,16 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <InputContainer>
             <DesktopDatePicker
-              value={dueDate || dayjs()}
-              onChange={(newValue) => setDueDate(newValue)}
+              value={taskData.dueDate}
+              onChange={(newValue) => handleChange('dueDate', newValue)}
               format="YYYY/MM/DD"
               slots={{ textField: StyledTextField }}
             />
             <StyledTimeInput
               type="text"
-              value={time || ''}
-              onChange={(e) => setTime(e.target.value)}
+              value={taskData.dueTime}
+              onChange={handleTimeChange}
+              onBlur={handleTimeBlur}
             />
           </InputContainer>
         </LocalizationProvider>
@@ -445,9 +445,12 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         <Label>알림 설정</Label>
         <div style={{ transform: 'scale(0.5)', display: 'inline-block' }}>
           <SmallToggleSwitch
-            isOn={notification === 'ON'}
+            isOn={taskData.notification === 'ON'}
             onToggle={() =>
-              setNotification(notification === 'ON' ? 'OFF' : 'ON')
+              handleChange(
+                'notification',
+                taskData.notification === 'ON' ? 'OFF' : 'ON'
+              )
             }
           />
         </div>
@@ -460,7 +463,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
           {alarmOptions.map(({ label, value }) => (
             <AlarmCycleSettingButton
               key={value}
-              isActive={notifyCycle.includes(value)}
+              isActive={taskData.notifyCycle.includes(value)}
               onClick={() => handleAlarmCycleToggle(value)}
             >
               {label}
@@ -471,31 +474,54 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
 
       {/* 공유 중인 친구 */}
       <Label>공유 중인 친구</Label>
+      {/* <PlusFriendsButton onClick={openFriendModal}>
+        <img src={GrayPlusIcon} alt="Gray Plus Icon" />
+        추가
+      </PlusFriendsButton> */}
       <FriendsList>
-        {task?.shareFriend?.length
-          ? task.shareFriend.map((friend: number, index: number) => (
-              <FriendTag key={index}>{friend}</FriendTag>
-            ))
-          : null}
+        {taskData.shareIds.length > 0 &&
+          taskData.shareIds.map((friendId) => {
+            const friend = friendData.find((f) => f.friendId === friendId);
+            return friend ? (
+              <FriendTag key={friendId}>{friend.nickname}</FriendTag>
+            ) : null;
+          })}
       </FriendsList>
+
+      {isFriendModalOpen && (
+        <SelectFriendsModal onConfirm={handleConfirmFriends} />
+      )}
 
       {/* 메모 입력 */}
       <Label>메모</Label>
       <MemoTextarea
         placeholder="메모를 입력하세요..."
-        value={memo}
-        onChange={(e) => setMemo(e.target.value)}
+        value={taskData.memo}
+        onChange={(e) => handleChange('memo', e.target.value)}
       />
 
       {/* 버튼 그룹 */}
       <ButtonGroup>
-        <DeleteButton onClick={handleDeleteTask}>과제 삭제</DeleteButton>
-        <EditButton onClick={handleEditTask}>정보 수정</EditButton>
+        <DeleteButton
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDelete();
+          }}
+        >
+          과제 삭제
+        </DeleteButton>
+        <EditButton
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSave();
+          }}
+        >
+          정보 수정
+        </EditButton>
         <CompleteButton
           onClick={(e) => {
-            e.stopPropagation(); // 이벤트 버블링 방지
-            onComplete();
-            onClose();
+            e.stopPropagation();
+            handleComplete();
           }}
         >
           과제 완료

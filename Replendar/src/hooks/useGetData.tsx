@@ -2,8 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { axiosInstance } from '../apis/axios-instance';
 import Swal from 'sweetalert2';
 
-//isPending: 데이터를 불러오는 중입니다 데이터가 로딩중일 때 isPending true
-//isLoading: 데이터를 불러오는 중이거나 재시도 중 일 때 ture가 됩니다
+// isPending: 데이터를 불러오는 중입니다 데이터가 로딩중일 때 isPending true
+// isLoading: 데이터를 불러오는 중이거나 재시도 중 일 때 ture가 됩니다
 
 const useGetData = (url: string, options?: object) => {
   const getData = async () => {
@@ -37,7 +37,6 @@ const useGetData = (url: string, options?: object) => {
 
         Swal.fire({
           icon: 'warning',
-
           text: errorMessage,
           showConfirmButton: false,
           timer: 2000,
