@@ -1,4 +1,4 @@
-import{v as L,g as v,r as d,j as e,d as o,b as k,S as y,u as V,i as Y,e as G,M as J}from"./index-DUVwGiPo.js";import{P as U}from"./ProfileUpload-ZseqlbI1.js";const M=L(n=>({schools:[],selectedSchool:null,setSchools:t=>n({schools:t}),addSchool:t=>n(i=>({schools:[...i.schools,t]})),setSelectedSchool:t=>n({selectedSchool:t})})),Z=o.div`
+import{v as L,b as v,r as d,j as e,d as o,e as k,S as y,u as V,i as Y,g as G,M as J}from"./index-CFPyf70Z.js";import{P as U}from"./ProfileUpload-C_An1l09.js";const M=L(n=>({schools:[],selectedSchool:null,setSchools:t=>n({schools:t}),addSchool:t=>n(i=>({schools:[...i.schools,t]})),setSelectedSchool:t=>n({selectedSchool:t})})),Z=o.div`
   padding: 20px;
 `,q=o.h2`
   font-size: 20px;
