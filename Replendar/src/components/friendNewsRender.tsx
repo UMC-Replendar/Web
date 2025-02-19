@@ -14,43 +14,35 @@ import Swal from 'sweetalert2';
 
 const FlexDiv = styled.div`
   display: flex;
-  gap: 100px;
   width: 100%;
   font-size: 19px;
-  margin-bottom: 1px;
-  border-radius: 20px;
-  padding: 0px 30px;
+  padding: 0px 20px;
   background: white;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-
-  &:nth-child(5),
-  &:nth-child(8) {
-  }
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
 `;
-
-/* &:first-child {
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-  }
-
-  &:nth-last-child(2) {
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
-  }
- */
-
-const RightAlignedItem = styled.div`
-  margin-left: auto;
+const TimeDiv = styled.div`
+  margin-left: 20px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
+  width: 20%;
+  height: 67px;
 `;
-
 const CenterDiv = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
+  width: 70%;
   height: 67px;
+`;
+
+const RightAlignedItem = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 20%;
 `;
 
 const Scroll = styled.div`
@@ -63,19 +55,10 @@ const Scroll = styled.div`
 `;
 
 const FriendNewsRender = () => {
-  const {
-    data,
-    isPending,
-    isError,
-    error,
-    isFetching,
-    hasNextPage,
-    fetchNextPage,
-  } = useGetInfiniteData(`/api/activity/friend`, 5);
-  useEffect(() => {
-    console.log('Data', data);
-  }, [data]);
-  const { ref, inView } = useInView({ threshold: 0 });
+  const { data, isPending, isFetching, hasNextPage, fetchNextPage } =
+    useGetInfiniteData(`/api/activity/friend`, 5);
+
+  const { ref, inView } = useInView({ threshold: 0, triggerOnce: false });
 
   const { openModal } = useModalStore();
 
@@ -119,7 +102,7 @@ const FriendNewsRender = () => {
   }, [isFetching, hasNextPage, fetchNextPage, inView]);
 
   if (isPending) {
-    return <NewsSkeleton count={5}></NewsSkeleton>;
+    return <NewsSkeleton count={5} />;
   }
 
   return (
@@ -127,10 +110,10 @@ const FriendNewsRender = () => {
       {data?.pages?.map((page: IPage<IFriendNewsContent>) =>
         page.content.map((item: IFriendNewsContent) => (
           <FlexDiv key={`${item.assId}-${item.createdAt}`}>
-            <CenterDiv>{item.time}</CenterDiv>
+            <TimeDiv>{item.timeStamp}</TimeDiv>
             <CenterDiv>{item.content}</CenterDiv>
             <RightAlignedItem>
-              {item.type === '과제' ? (
+              {item.type === '과제 활동 로그' ? (
                 item.isRegistered ? (
                   <BlueButton status="등록됨">등록됨</BlueButton>
                 ) : (
@@ -149,7 +132,7 @@ const FriendNewsRender = () => {
                     내 일정에 등록
                   </BlueButton>
                 )
-              ) : item.type === '친구요청' ? (
+              ) : item.type === '친구 요청' ? (
                 item.check === 'CHECK' ? (
                   <BlueButton status="등록됨">수락됨</BlueButton>
                 ) : (
@@ -164,13 +147,12 @@ const FriendNewsRender = () => {
                     수락
                   </BlueButton>
                 )
-              ) : null}{' '}
-              {/* item.type이 'task'나 'friendRequest'가 아닐 경우 아무것도 렌더링하지 않음 */}
+              ) : null}
             </RightAlignedItem>
           </FlexDiv>
         ))
       )}
-      {isFetching && <NewsSkeleton count={5}></NewsSkeleton>}
+      {isFetching && <NewsSkeleton count={5} />}
       <Scroll ref={ref} className="scroll">
         {isFetching && <ClipLoader color={'black'} />}
       </Scroll>

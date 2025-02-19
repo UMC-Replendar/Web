@@ -1,10 +1,14 @@
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { axiosInstance } from '../../apis/axios-instance';
-import BlueButton from '../blueButton';
-import Plus from '../../assets/images/PlusIcon.svg';
-import { useThemeStore, themeBackground } from '../../store/useThemeStore';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { axiosInstance } from '../../../apis/axios-instance';
+import BlueButton from '../../blueButton';
+import Plus from '../../../assets/images/PlusIcon.svg';
+import { useThemeStore, themeBackground } from '../../../store/useThemeStore';
+import useModalStore from '../../../store/modalStore';
+import AddTaskModal from '../../../modal/AddTaskModal';
+import Swal from 'sweetalert2';
+import { respondToFriendRequest } from '../../../apis/commuApi';
 
 const Title = styled.p`
   color: black;
@@ -83,6 +87,8 @@ const HistoryList = () => {
   const { selectedTheme } = useThemeStore();
   const themeColors = themeBackground[selectedTheme];
   const backgroundColor = themeColors[1];
+  const { openModal } = useModalStore();
+  const queryClient = useQueryClient();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['history-preview'],
@@ -94,6 +100,37 @@ const HistoryList = () => {
     },
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
+  });
+
+  const RespondToFriendMutation = useMutation({
+    mutationFn: ({
+      requestId,
+      isAccepted,
+    }: {
+      requestId: number;
+      isAccepted: boolean;
+    }) => respondToFriendRequest({ requestId, isAccepted }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [`/api/activity/friend`],
+      });
+
+      Swal.fire({
+        icon: 'success',
+        text: '친구 요청을 수락했습니다',
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    },
+    onError: (error: Error) => {
+      Swal.fire({
+        icon: 'error',
+        text: '친구 수락에 실패했습니다.',
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      console.error(error);
+    },
   });
 
   if (isLoading) return <div>로딩 중...</div>;
@@ -119,9 +156,41 @@ const HistoryList = () => {
                 <HistoryText>{entry.time}</HistoryText>
                 <HistoryText>{entry.content}</HistoryText> {/* 3개만 표시 */}
               </HistoryDetails>
-              <BlueButton status={entry.check ? '등록됨' : '내 일정에 등록'}>
-                {entry.check ? '등록됨' : '내 일정에 등록'}
-              </BlueButton>
+              {entry.type === '과제 추가' || entry.type === '과제 공유' ? (
+                entry.isRegistered ? (
+                  <BlueButton status="등록됨">등록됨</BlueButton>
+                ) : (
+                  <BlueButton
+                    onClick={() =>
+                      openModal(
+                        <AddTaskModal
+                          assId={entry.assId}
+                          onTaskAdded={() =>
+                            console.log('과제가 추가되었습니다.')
+                          }
+                        />
+                      )
+                    }
+                  >
+                    내 일정에 등록
+                  </BlueButton>
+                )
+              ) : entry.type === '친구 요청' ? (
+                entry.check === 'CHECK' ? (
+                  <BlueButton status="등록됨">수락됨</BlueButton>
+                ) : (
+                  <BlueButton
+                    onClick={() =>
+                      RespondToFriendMutation.mutate({
+                        requestId: entry.friendRequestId,
+                        isAccepted: true,
+                      })
+                    }
+                  >
+                    수락
+                  </BlueButton>
+                )
+              ) : null}{' '}
             </HistoryEntryContainer>
           ))
         ) : (

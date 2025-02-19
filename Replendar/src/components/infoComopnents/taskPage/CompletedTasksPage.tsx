@@ -17,6 +17,7 @@ const Container = styled.div`
   margin-top: 70px;
   gap: 20px;
 `;
+
 const Image = styled.img`
   width: 30px;
   height: 30px;
@@ -56,14 +57,17 @@ const TaskItem = styled.div`
 
 const TaskDetails = styled.div`
   display: flex;
-  width: 40%;
+  width: 100%;
   justify-content: space-between;
+  align-items: center;
 `;
+
 const Text = styled.div`
   font-weight: bold;
   font-size: 28px;
   font-family: Pretendard, sans-serif;
 `;
+
 const TaskText = styled.div`
   color: black;
   font-size: 19px;
@@ -72,6 +76,22 @@ const TaskText = styled.div`
   line-height: 26.6px;
   word-wrap: break-word;
   text-align: left;
+
+  &:nth-child(1) {
+    flex-basis: 10%;
+    text-align: center;
+  }
+  &:nth-child(2) {
+    flex-basis: 5%;
+    text-align: center;
+  }
+  &:nth-child(3) {
+    flex-basis: 70%;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 `;
 
 const DelayMessage = styled.div<{ isEarly: boolean }>`
@@ -124,9 +144,23 @@ const CompletedTasksPage: React.FC = () => {
           page.content.map((item: Task) => {
             console.log('과제 데이터:', item);
 
-            const isEarly = !item.due_datetime.includes('-'); // "-"가 없으면 빠른 제출
-            const formattedTime = item.due_datetime.replace('-', '').trim(); // "-" 제거하여 순수 시간만 표시
+            // 마감 기한과 완료 시간을 Date 객체로 변환
+            const dueDateTime = new Date(`${item.due_date} ${item.due_time}`);
+            const completionDateTime = new Date(item.completion_time);
 
+            // 시간 차이 계산
+            const timeDiff =
+              dueDateTime.getTime() - completionDateTime.getTime();
+            const isEarly = timeDiff > 0; // 양수면 빠르게 제출, 음수면 늦게 제출
+
+            // 시간 차이를 보기 쉽게 변환
+            const diffInSeconds = Math.abs(timeDiff) / 1000;
+            const days = Math.floor(diffInSeconds / 86400);
+            const hours = Math.floor((diffInSeconds % 86400) / 3600);
+            const minutes = Math.floor((diffInSeconds % 3600) / 60);
+            const seconds = Math.floor(diffInSeconds % 60);
+
+            const formattedTime = `${days}일 ${hours}시간 ${minutes}분 ${seconds}초`;
             const delayMessage = `과제 제출이 ${
               isEarly
                 ? `${formattedTime} 빨랐습니다`

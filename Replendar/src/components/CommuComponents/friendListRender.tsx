@@ -15,6 +15,8 @@ import BlueButton from '../blueButton';
 import { groupDeleteFriend } from '../../apis/commuApi';
 import CustomCalendar from '../OngoingComponents/CustomCalendar';
 import Swal from 'sweetalert2';
+import useFriendStore from '../../store/useFriendStore';
+import SelectShareAss from '../../modal/SelectShareAss';
 
 const FriendListRender: React.FC<{
   data: IFriendList[]; // 데이터는 props로 전달
@@ -34,6 +36,8 @@ const FriendListRender: React.FC<{
     note: '',
   });
 
+  const { isFriendModalOpen, openFriendModal } = useFriendStore();
+
   const [isEditing, setIsEditing] = useState(false);
   const [updatedNote, setUpdatedNote] = useState<string>('');
   const [calendarShow, setCalendarShow] = useState(false);
@@ -46,7 +50,7 @@ const FriendListRender: React.FC<{
       friendId: number;
       buddyStatus: string;
     }) => setBestFriendStatus({ friendId, buddyStatus }),
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKey],
       });
@@ -168,7 +172,7 @@ const FriendListRender: React.FC<{
     <>
       {data.map((item: IFriendList, index: number) => (
         <div key={item.friendId}>
-          {calendarShow && modalState.selectedId && tasks.length > 0 && (
+          {calendarShow && modalState.selectedId && (
             <>
               <StyledModal>
                 <FlexStartDiv>
@@ -192,6 +196,7 @@ const FriendListRender: React.FC<{
               </StyledModal>
             </>
           )}
+          {isFriendModalOpen && <SelectShareAss friendId={item.friendId} />}
           <SpaceBtwDiv>
             <FlexDiv>
               <ProfileImg src={item.profileImageUrl || DefaultProfileImg} />
@@ -233,7 +238,7 @@ const FriendListRender: React.FC<{
                 <div onClick={() => setCalendarShow(true)}>일정확인</div>
               </ModalContent>
 
-              <P>과제공유</P>
+              <P onClick={openFriendModal}>과제공유</P>
 
               <ModalContent>
                 <div
@@ -337,13 +342,8 @@ const SpaceBtwDiv = styled.div`
   background: white;
   border-radius: 20px;
   padding: 0px 30px;
-  margin-bottom: 1px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-
-  &:nth-child(7),
-  &:nth-child(8) {
-    margin-bottom: 1.5px;
-  }
 `;
 
 const RightAlignedItem = styled.div`

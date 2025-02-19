@@ -22,8 +22,8 @@ const FlexDiv = styled.div`
   background: white;
   border-radius: 20px;
   padding: 0px 30px;
-  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);yarn add react-spinners
-
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   margin-left: auto; /* 오른쪽 끝에 배치 */
   display: flex;
   jsutify-content: center;
@@ -54,15 +54,8 @@ const Scroll = styled.div`
 `;
 
 const DepartmentNews = () => {
-  const {
-    data,
-    isPending,
-    isError,
-    error,
-    isFetching,
-    hasNextPage,
-    fetchNextPage,
-  } = useGetInfiniteData('/api/major/lectures/news', 4);
+  const { data, isPending, isFetching, hasNextPage, fetchNextPage } =
+    useGetInfiniteData('/api/major/lectures/news', 4);
 
   const { ref, inView } = useInView({ threshold: 0 });
 
@@ -80,9 +73,6 @@ const DepartmentNews = () => {
         <NewsSkeleton count={5}></NewsSkeleton>
       </Container>
     );
-  }
-  if (isError) {
-    return <h1>{error.message}</h1>;
   }
 
   return (

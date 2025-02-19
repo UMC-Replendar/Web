@@ -23,7 +23,7 @@ interface FriendsStore {
   closeFriendModal: () => void;
 }
 
-const useFriendsStore = create<FriendsStore>((set, get) => ({
+const useFriendStore = create<FriendsStore>((set, get) => ({
   checkedFriends: {},
 
   //필요하신 배열 쓰시면 돼요
@@ -56,12 +56,6 @@ const useFriendsStore = create<FriendsStore>((set, get) => ({
       return { checkedFriends: newCheckedFriends };
     }),
 
-  //이거 해주셔야 해요
-  /* useEffect(() => {
-    if (JSON.stringify(data) !== JSON.stringify(friendData)) {
-      setFriendData(data);
-    }
-  }, [data]);*/
   updateFriendsData: () => {
     const { checkedFriends, friendData } = get();
 
@@ -97,4 +91,4 @@ const useFriendsStore = create<FriendsStore>((set, get) => ({
   closeFriendModal: () => set({ isFriendModalOpen: false }),
 }));
 
-export default useFriendsStore;
+export default useFriendStore;

@@ -125,6 +125,10 @@ export interface Task {
   shareIds?: number[];
   notifyCycle?: string[];
   favorite?: 'ACTIVE' | 'INACTIVE';
+  
+/*  originAssId: number | null;
+  lectureAssignmentId: number | null;
+  */
 }
 
 interface TaskStore {

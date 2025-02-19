@@ -25,6 +25,8 @@ import dayjs from 'dayjs';
 // import UseNotificationPermission from '../hooks/useNotification';
 // import { useAcademicYearStore } from '../store/profileStore';
 
+// import Swal from 'sweetalert2';
+
 dayjs.locale('ko');
 
 interface AddTaskModalProps {
@@ -498,7 +500,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
 }) => {
   const { closeModal } = useModalStore();
   const queryClient = useQueryClient();
-  const { checkedFriends, friendData } = useFriendsStore();
+    const { checkedFriends, friendData } = useFriendsStore();
 
   const [taskData, setTaskData] = useState({
     isBookmarked: false,
@@ -511,6 +513,41 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
     shareIds: [] as number[],
     memo: '',
   });
+/*
+  const notifiypermission = useNotificationPermission();
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [taskName, setTaskName] = useState('');
+  const [deadline, setDeadline] = useState<Dayjs | null>(dayjs());
+  const [time, setTime] = useState('23:59');
+  const [isPublic, setIsPublic] = useState(false); // 과제 공개 여부
+  const [isOn, setIsOn] = useState(false); // 알림 설정
+  const [alarmCycles, setAlarmCycles] = useState<string[]>([]);
+  const [memo, setMemo] = useState('');
+
+  const { id: userId, token } = useAuthStore();
+
+  if (!userId) {
+    console.error('userId가 존재하지 않습니다. 로그인이 필요한 기능입니다.');
+    alert('로그인이 필요합니다.');
+    return;
+  }
+
+  const {
+    isFriendModalOpen,
+    openFriendModal,
+    nicknames,
+    updateFriendsData,
+    setFriendData,
+    friendData,
+    resetFriends,
+    toggleAllFriends,
+  } = useFriendStore();
+
+  const { sortKey, academicYear } = useAcademicYearStore();
+
+  const { data } = useGetData(
+    isFriendModalOpen ? `/api/assignment/share?userId=${userId}` : ''
+  );*/
 
   const handleChange = (field: keyof typeof taskData, value: any) => {
     setTaskData((prev) => ({
@@ -539,6 +576,62 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
     onSuccess: () => {
       alert('과제가 추가되었습니다!');
       queryClient.invalidateQueries({ queryKey: ['tasks'] }); // 과제 목록 갱신
+
+/* useEffect(() => {
+    if (
+      Array.isArray(lectureAssignmentData) &&
+      lectureAssignmentData.length > 0
+    ) {
+      const { title, due_date, due_time, content } = lectureAssignmentData[0];
+      setTaskName(title);
+      setDeadline(dayjs(due_date));
+      setTime(due_time);
+      setMemo(content);
+    }
+  }, [lectureAssignmentData]);
+  useEffect(() => {
+    if (Array.isArray(assignmentData) && assignmentData.length > 0) {
+      const {
+        title,
+        due_date,
+        memo,
+        notification,
+        visibility,
+        notifyCycle,
+        shareFriend,
+        favorite,
+      } = assignmentData[0];
+      const [date, time] = due_date.split(' ');
+
+      setTaskName(title);
+      setDeadline(dayjs(date));
+      setTime(time);
+      setMemo(memo);
+      setIsOn(notification === 'ON' ? true : false);
+      setIsPublic(visibility === 'ON' ? true : false);
+      setAlarmCycles(notifyCycle);
+      toggleAllFriends(shareFriend);
+      setIsBookmarked(favorite === 'ACTIVE' ? true : false);
+    }
+  }, [assignmentData]);
+
+  // Mutation을 사용하여 addTask 실행
+  const addTaskMutation = useMutation({
+    mutationFn: async (taskData: Omit<Task, 'assignmentId'>) => {
+      return await addTask(taskData);
+    },
+    onSuccess: (newTask) => {
+      queryClient.invalidateQueries({
+        queryKey: ['tasks', userId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['/api/activity/friend'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          `/api/major/lectures/sort/${sortKey}?sort=asc&academicYear=${academicYear}&majorId=`,
+        ],
+      });*/
       onTaskAdded();
       closeModal();
     },
@@ -605,7 +698,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
     addTaskMutation();
   };
 
-  useEffect(() => {
+/*  useEffect(() => {
     if (lectureAssignmentId) {
       fetchLectureAssignment(lectureAssignmentId)
         .then((data) => {
@@ -624,6 +717,61 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
         );
     }
   }, [lectureAssignmentId]);
+
+  const saveDraftMutation = useMutation({
+    mutationFn: async (taskData: Omit<Task, 'assignmentId'>) => {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment/store`,
+        taskData,
+        {
+          headers: { Authorization: `${token}` },
+        }
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', userId] });
+      Swal.fire({
+        icon: 'success',
+        title: '과제가 임시저장 되었습니다.',
+        confirmButtonColor: '#25C26C',
+      });
+      closeModal();
+    },
+    onError: (error) => {
+      console.error('임시저장 중 오류 발생:', error);
+      alert('과제 임시저장 중 문제가 발생했습니다.');
+    },
+  });
+
+  const handleSaveDraft = async () => {
+    if (!taskName.trim()) {
+      alert('과제명을 입력해주세요.');
+      return;
+    }
+    if (!deadline) {
+      alert('마감일을 선택해주세요.');
+      return;
+    }
+
+    const formattedDeadline =
+      deadline && time ? `${deadline.format('YYYY/MM/DD')} ${time}` : '';
+
+    const draftTaskData: Omit<Task, 'assignmentId'> = {
+      title: taskName,
+      endDate: formattedDeadline,
+      notification: isOn ? 'ON' : 'OFF',
+      visibility: isPublic ? 'ON' : 'OFF',
+      notifyCycle: alarmCycles.length > 0 ? alarmCycles : [],
+      shareIds: friendData ? friendData.map((friend) => friend.friendId) : [],
+      memo: memo.trim() === '' ? '' : memo,
+      favorite: isBookmarked ? 'ACTIVE' : 'INACTIVE',
+      originAssId: assId ? assId : null,
+      lectureAssignmentId: lectureAssignmentId ? lectureAssignmentId : null,
+    };
+
+    saveDraftMutation.mutate(draftTaskData);
+  }; */
 
   return (
     <ModalOverlay onClick={closeModal}>
@@ -763,7 +911,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
         </MemoSection>
 
         <ActionButtons>
-          <ActionButton>임시저장</ActionButton>
+          <ActionButton onClick={handleSaveDraft}>임시저장</ActionButton>
           <ActionButton onClick={closeModal}>수정</ActionButton>
           <ActionButton onClick={handleComplete}>완료</ActionButton>
         </ActionButtons>
