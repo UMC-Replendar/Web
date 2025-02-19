@@ -7,6 +7,7 @@ import { ThemeProvider } from 'styled-components';
 import theme from './assets/css/Theme.tsx';
 import { GlobalStyle } from './assets/css/GlobalStyle.ts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { registerServiceWorker } from './serviceWorker.ts';
 
 const queryClient = new QueryClient();
 const basename =
@@ -25,3 +26,5 @@ createRoot(document.getElementById('root')!).render(
   </ThemeProvider>
   // </StrictMode>
 );
+
+registerServiceWorker();
