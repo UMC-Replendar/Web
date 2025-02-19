@@ -7,7 +7,6 @@ import useAuthStore from '../store/authStore';
 import useGetData from '../hooks/useGetData';
 import { useState } from 'react';
 import { Task } from '../store/useTaskStore';
-
 import { ShareAss } from '../apis/commuApi';
 import { useMutation } from '@tanstack/react-query';
 import Swal from 'sweetalert2';
@@ -145,6 +144,7 @@ const SelectShareAss: React.FC<{ friendId: number }> = ({ friendId }) => {
         timer: 2000,
         showConfirmButton: false,
       });
+      closeFriendModal();
     },
 
     onError: (error: Error) => {

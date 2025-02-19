@@ -6,6 +6,8 @@ import { useGetInfiniteData } from '../../../hooks/useGetInfiniteData';
 import { useEffect } from 'react';
 import { IDepartmentNewsContent, IPage } from '../../../types';
 import NewsSkeleton from '../../skeleton';
+import useModalStore from '../../../store/modalStore';
+import AddTaskModal from '../../../modal/AddTaskModal';
 
 const Container = styled.div`
   width: 100%;
@@ -59,6 +61,8 @@ const DepartmentNews = () => {
 
   const { ref, inView } = useInView({ threshold: 0 });
 
+  const { openModal } = useModalStore();
+
   useEffect(() => {
     if (inView) {
       !isFetching && hasNextPage && fetchNextPage();
@@ -78,8 +82,8 @@ const DepartmentNews = () => {
   return (
     <Container>
       {data?.pages?.map((page: IPage<IDepartmentNewsContent>) =>
-        page.content.map((item: IDepartmentNewsContent) => (
-          <FlexDiv key={item.friendId}>
+        page.content.map((item: IDepartmentNewsContent, index: number) => (
+          <FlexDiv key={`${item.lectureAssignmentId}-${index}`}>
             <CenterDiv>{item.time}</CenterDiv>
             <CenterDiv>
               {item.nickname}님이 {item.title}를 등록하였습니다
@@ -88,7 +92,20 @@ const DepartmentNews = () => {
               {item.check === 'CHECK' ? (
                 <BlueButton status="등록됨">등록됨</BlueButton>
               ) : (
-                <BlueButton>내 일정에 등록</BlueButton>
+                <BlueButton
+                  onClick={() =>
+                    openModal(
+                      <AddTaskModal
+                        lectureAssignmentId={item.lectureAssignmentId}
+                        onTaskAdded={() =>
+                          console.log('과제가 추가되었습니다.')
+                        }
+                      />
+                    )
+                  }
+                >
+                  내 일정에 등록
+                </BlueButton>
               )}
             </RightAlignedItem>
           </FlexDiv>
