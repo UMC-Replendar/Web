@@ -4,6 +4,10 @@ import CheckBoxIcon from '../assets/images/CheckBoxIcon.svg';
 import { IFriendList, ITaskFriendList } from '../types';
 import useFriendStore from '../store/useFriendStore';
 
+interface SelectFriendsModalProps {
+  onConfirm: () => void; // 추가했습니다.
+}
+
 const SelectFriendsModalOverlay = styled.div`
   position: fixed;
   top: 50%;
@@ -110,7 +114,7 @@ const ConfirmButton = styled.button`
   }
 `;
 
-function SelectFriendsModal() {
+function SelectFriendsModal({ onConfirm }: SelectFriendsModalProps) {
   const {
     checkedFriends,
     toggleFriend,
@@ -175,7 +179,14 @@ function SelectFriendsModal() {
         </FriendsItem>
       ))}
 
-      <ConfirmButton onClick={closeFriendModal}>선택하기</ConfirmButton>
+      <ConfirmButton
+        onClick={() => {
+          onConfirm(); // 친구 선택 결과 반영
+          closeFriendModal();
+        }}
+      >
+        선택 완료
+      </ConfirmButton>
     </SelectFriendsModalOverlay>
   );
 }

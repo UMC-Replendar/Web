@@ -2,6 +2,8 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import PreviousArrowIcon from '/src/assets/images/PreviousArrowIcon.svg';
 import NextArrowIcon from '/src/assets/images/NextArrowIcon.svg';
+import { AddButton } from '../../pages/OngoingTasks';
+import { PlusIcon } from '../CommuComponents/commuIcons';
 import Calendar from 'react-calendar';
 import { useThemeStore, themeBackground } from '../../store/useThemeStore';
 
@@ -14,7 +16,6 @@ const CalendarHeader = styled.div`
   align-items: center;
   gap: 15px;
   align-self: stretch;
-  margin-bottom: 4px;
   margin-left: 22px;
 `;
 
@@ -39,15 +40,22 @@ const ArrowButton = styled.button`
   cursor: pointer;
 `;
 
+const CalendarSubtitle = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin: 0 0 26px 22px;
+  padding-right: 25px;
+`;
+
 const ScheduleText = styled.p`
-  align-self: stretch;
   color: #666666;
   font-family: Pretendard;
   font-size: 16px;
   font-style: normal;
   font-weight: 500;
   line-height: 140%;
-  margin: 0 0 26px 22px;
 `;
 
 const StyledCalendar = styled(Calendar)`
@@ -217,7 +225,13 @@ function CustomCalendar({ tasks }: CustomCalendarProps) {
         </ArrowButtonContainer>
       </CalendarHeader>
 
-      <ScheduleText>달력에 스케쥴표를 확인하세요</ScheduleText>
+      <CalendarSubtitle>
+        <ScheduleText>달력에 스케쥴표를 확인하세요</ScheduleText>
+        <AddButton>
+          방명록 작성하기
+          <PlusIcon fill="currentColor" />
+        </AddButton>
+      </CalendarSubtitle>
 
       <StyledCalendar
         value={currentDate}
