@@ -22,8 +22,10 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TextField } from '@mui/material';
 import { styled as muiStyled } from '@mui/material/styles';
 import dayjs, { Dayjs } from 'dayjs';
-import UseNotificationPermission from '../hooks/useNotification';
 import { useAcademicYearStore } from '../store/profileStore';
+import { useNotificationPermission } from '../hooks/useNotification';
+import axios from 'axios';
+import Swal from 'sweetalert2';
 dayjs.locale('ko');
 
 const ModalOverlay = styled.div`
@@ -337,7 +339,7 @@ function AddTaskModal({
   const { closeModal } = useModalStore();
   const { addTask } = useTaskStore();
   const queryClient = useQueryClient();
-  const notifiypermission = UseNotificationPermission();
+  const notifiypermission = useNotificationPermission();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [taskName, setTaskName] = useState('');
   const [deadline, setDeadline] = useState<Dayjs | null>(dayjs());
@@ -347,7 +349,7 @@ function AddTaskModal({
   const [alarmCycles, setAlarmCycles] = useState<string[]>([]);
   const [memo, setMemo] = useState('');
 
-  const { id: userId } = useAuthStore();
+  const { id: userId, token } = useAuthStore();
 
   if (!userId) {
     console.error('userId가 존재하지 않습니다. 로그인이 필요한 기능입니다.');
@@ -524,6 +526,61 @@ function AddTaskModal({
     );
   };
 
+  const saveDraftMutation = useMutation({
+    mutationFn: async (taskData: Omit<Task, 'assignmentId'>) => {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment/store`,
+        taskData,
+        {
+          headers: { Authorization: `${token}` },
+        }
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', userId] });
+      Swal.fire({
+        icon: 'success',
+        title: '과제가 임시저장 되었습니다.',
+        confirmButtonColor: '#25C26C',
+      });
+      closeModal();
+    },
+    onError: (error) => {
+      console.error('임시저장 중 오류 발생:', error);
+      alert('과제 임시저장 중 문제가 발생했습니다.');
+    },
+  });
+
+  const handleSaveDraft = async () => {
+    if (!taskName.trim()) {
+      alert('과제명을 입력해주세요.');
+      return;
+    }
+    if (!deadline) {
+      alert('마감일을 선택해주세요.');
+      return;
+    }
+
+    const formattedDeadline =
+      deadline && time ? `${deadline.format('YYYY/MM/DD')} ${time}` : '';
+
+    const draftTaskData: Omit<Task, 'assignmentId'> = {
+      title: taskName,
+      endDate: formattedDeadline,
+      notification: isOn ? 'ON' : 'OFF',
+      visibility: isPublic ? 'ON' : 'OFF',
+      notifyCycle: alarmCycles.length > 0 ? alarmCycles : [],
+      shareIds: friendData ? friendData.map((friend) => friend.friendId) : [],
+      memo: memo.trim() === '' ? '' : memo,
+      favorite: isBookmarked ? 'ACTIVE' : 'INACTIVE',
+      originAssId: assId ? assId : null,
+      lectureAssignmentId: lectureAssignmentId ? lectureAssignmentId : null,
+    };
+
+    saveDraftMutation.mutate(draftTaskData);
+  };
+
   return (
     <ModalOverlay onClick={closeModal}>
       <Modal onClick={(e) => e.stopPropagation()}>
@@ -640,7 +697,7 @@ function AddTaskModal({
         </MemoSection>
 
         <ActionButtons>
-          <ActionButton>임시저장</ActionButton>
+          <ActionButton onClick={handleSaveDraft}>임시저장</ActionButton>
           <ActionButton onClick={closeModal}>수정</ActionButton>
           <ActionButton onClick={handleComplete}>완료</ActionButton>
         </ActionButtons>

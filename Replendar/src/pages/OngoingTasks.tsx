@@ -13,6 +13,7 @@ import axios from 'axios';
 import { useThemeStore, themeBackground } from '../store/useThemeStore';
 import useDebounce from '../hooks/useDebounce';
 import { useProfileStore } from '../store/profileStore';
+import { sendNotification } from '../hooks/useNotification';
 
 const PageWrapper = styled.div`
   margin-top: 79px;
@@ -196,12 +197,6 @@ function TaskItem({ task, onComplete, onEdit }: TaskProps) {
   const [dueTime, setDueTime] = useState(task.due_time);
   const [dueTimeNumbers, setDueTimeNumbers] = useState<number[]>([]);
 
-  const sendNotification = (message: string) => {
-    if (Notification.permission === 'granted') {
-      new Notification('과제 마감 알림', { body: message });
-    }
-  };
-
   useEffect(() => {
     setDueTime(task.due_time);
     const timeNumbers = task.due_time.match(/-?\d+/g)?.map(Number) || [];
@@ -214,7 +209,10 @@ function TaskItem({ task, onComplete, onEdit }: TaskProps) {
         dueTimeNumbers[2] == 0 &&
         dueTimeNumbers[3] == 0
       ) {
-        sendNotification(`'${task.title}' 과제 마감 알림!`);
+        sendNotification(
+          `'${task.title}' 과제 마감 알림!`,
+          '과제를 확인하세요!'
+        );
       }
     } else {
       setDueTimeNumbers([0, 0, 0, 0]); // 기본값

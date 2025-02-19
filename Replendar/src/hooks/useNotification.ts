@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-const UseNotificationPermission = () => {
+const useNotificationPermission = () => {
   const [permission, setPermission] = useState<NotificationPermission>(
     Notification.permission
   );
@@ -16,9 +16,21 @@ const UseNotificationPermission = () => {
         }
       });
     }
-  }, []);
+  }, [permission]);
 
   return permission;
 };
 
-export default UseNotificationPermission;
+const sendNotification = (title: string, body: string) => {
+  if (Notification.permission === 'granted') {
+    new Notification(title, {
+      body,
+      icon: '../assets/images/AppIconSvg.svg',
+      badge: '../assets/images/AppIconSvg.svg',
+    });
+  } else {
+    console.warn('⚠️ 알림이 허용되지 않았습니다. 브라우저 설정을 확인하세요.');
+  }
+};
+
+export { useNotificationPermission, sendNotification };
