@@ -4,7 +4,7 @@ import { Task } from '../store/useTaskStore';
 // 과제 목록 가져오기
 export const fetchTasks = async (userId: number) => {
   const response = await axiosInstance.get(`/api/assignment?userId=${userId}`);
-  // console.log(response.data);
+  console.log('진행중 과제', response.data.result);
   return response.data.result;
 };
 
@@ -12,12 +12,12 @@ export const fetchTasks = async (userId: number) => {
 export const fetchImportantTasks = async () => {
   const response = await axiosInstance.get(`/api/assignment/favorite`, {
     params: {
-      size: 10,
+      size: 15, //임시로 15개
       page: 1,
       sort: 'createdAt,desc',
     },
   });
-  console.log(response.data.result.content);
+  console.log('중요한 과제', response.data.result.content);
   return response.data.result.content;
 };
 
