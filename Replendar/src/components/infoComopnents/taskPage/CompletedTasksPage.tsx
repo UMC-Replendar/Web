@@ -7,7 +7,7 @@ import { useGetInfiniteData } from '../../../hooks/useGetInfiniteData';
 import { IPage, Task } from '../../../types';
 import taskIcon from '../../../assets/images/InfoIcons/Task.svg';
 import { useThemeStore, themeBackground } from '../../../store/useThemeStore';
-
+import { CompletedTaskSkeleton } from '../../skeleton';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -129,7 +129,7 @@ const CompletedTasksPage: React.FC = () => {
   }, [inView, hasNextPage, isFetching, fetchNextPage]);
 
   if (isPending) {
-    return <div>스켈레톤 UI (로딩 중...)</div>;
+    return <CompletedTaskSkeleton count={5} />;
   }
 
   return (
@@ -182,10 +182,11 @@ const CompletedTasksPage: React.FC = () => {
             );
           })
         )}
+        {isFetching && <CompletedTaskSkeleton count={5} />}
+        <Scroll ref={ref}>
+          {isFetching && <ClipLoader color={'black'} />}
+        </Scroll>
       </Box>
-
-      {isFetching && <div>스켈레톤 UI (추가 로딩 중...)</div>}
-      <Scroll ref={ref}>{isFetching && <ClipLoader color={'black'} />}</Scroll>
     </Container>
   );
 };

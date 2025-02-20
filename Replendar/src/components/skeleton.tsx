@@ -89,6 +89,7 @@ const SkeletonButton = styled.div<{ $marginLeft?: string }>`
   justify-content: center;
   align-items: center;
 `;
+
 export const FriendRegisterSkeleton = () => (
   <SkeletonContainer>
     <RegisterSkeletonItem>
@@ -165,4 +166,132 @@ const NewsSkeleton = ({ count = 5 }: { count?: number }) => (
   </SkeletonContainer>
 );
 
+export const HistoryAssignmentSkeleton = ({
+  count = 3,
+}: {
+  count?: number;
+}) => (
+  <SkeletonContainer>
+    {[...Array(count)].map((_, index) => (
+      <SkeletonItem key={index}>
+        <SkeletonText width="100px" />
+        <SkeletonText width="100px" />
+        <SkeletonText width="300px" />
+      </SkeletonItem>
+    ))}
+  </SkeletonContainer>
+);
+
+export const HistoryAllSkeleton = ({ count = 3 }: { count?: number }) => (
+  <SkeletonContainer>
+    {[...Array(count)].map((_, index) => (
+      <SkeletonItem key={index}>
+        <SkeletonText width="100px" />
+        <SkeletonText width="100px" />
+        <SkeletonText width="300px" />
+        <SkeletonButton />
+      </SkeletonItem>
+    ))}
+  </SkeletonContainer>
+);
+
+export const StoredTaskSkeleton = ({ count = 5 }: { count?: number }) => (
+  <SkeletonTaskContainer>
+    {[...Array(count)].map((_, index) => (
+      <SkeletonItem key={index}>
+        <SkeletonText width="20%" />
+        <SkeletonText width="10%" />
+        <SkeletonText width="60%" />
+      </SkeletonItem>
+    ))}
+  </SkeletonTaskContainer>
+);
+export const CompletedTaskSkeleton = ({ count = 5 }: { count?: number }) => (
+  <SkeletonTaskContainer>
+    {[...Array(count)].map((_, index) => (
+      <TaskSkeletonBox key={index}>
+        <TaskSkeletonItem>
+          <TaskSkeletonText width="150px" />
+          <TaskSkeletonText width="80px" />
+          <TaskSkeletonText width="300px" />
+          <TaskSkeletonButtonWrapper>
+            <TaskSkeletonButton />
+          </TaskSkeletonButtonWrapper>
+        </TaskSkeletonItem>
+      </TaskSkeletonBox>
+    ))}
+  </SkeletonTaskContainer>
+);
+
+export const NotCompletedTaskSkeleton = ({ count = 5 }: { count?: number }) => (
+  <SkeletonTaskContainer>
+    {[...Array(count)].map((_, index) => (
+      <TaskSkeletonBox key={index}>
+        <TaskSkeletonItem>
+          <TaskSkeletonText width="20%" />
+          <TaskSkeletonText width="60%" />
+          <TaskSkeletonButtonWrapper>
+            <TaskSkeletonButton />
+          </TaskSkeletonButtonWrapper>
+        </TaskSkeletonItem>
+      </TaskSkeletonBox>
+    ))}
+  </SkeletonTaskContainer>
+);
+
 export default NewsSkeleton;
+
+//여기서 부터 아래는 task용 스켈레톤 추가 작성
+const SkeletonTaskContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
+const TaskSkeletonBox = styled.div`
+  background: #f0f0f0;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  animation: shimmer 1.5s infinite;
+
+  @keyframes shimmer {
+    0% {
+      background-color: #f0f0f0;
+    }
+    50% {
+      background-color: #e0e0e0;
+    }
+    100% {
+      background-color: #f0f0f0;
+    }
+  }
+`;
+
+const TaskSkeletonItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 125px;
+`;
+
+const TaskSkeletonText = styled.div<{ width: string }>`
+  width: ${({ width }) => width};
+  height: 20px;
+  background: #e0e0e0;
+  border-radius: 5px;
+`;
+
+const TaskSkeletonButtonWrapper = styled.div`
+  flex-grow: 1; /* 버튼이 자동으로 오른쪽으로 밀리도록 설정 */
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const TaskSkeletonButton = styled.div`
+  width: 100px;
+  height: 30px;
+  background: #e0e0e0;
+  border-radius: 20px;
+`;

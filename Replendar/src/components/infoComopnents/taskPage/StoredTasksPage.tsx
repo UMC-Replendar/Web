@@ -8,7 +8,7 @@ import taskIcon from '../../../assets/images/InfoIcons/Task.svg';
 import { useGetInfiniteData } from '../../../hooks/useGetInfiniteData';
 import { useInView } from 'react-intersection-observer';
 import ClipLoader from 'react-spinners/ClipLoader';
-
+import { StoredTaskSkeleton } from '../../skeleton';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -99,7 +99,7 @@ const Scroll = styled.div`
 
 const StoredTaskPage: React.FC = () => {
   const { data, isPending, isFetching, hasNextPage, fetchNextPage } =
-    useGetInfiniteData(`/api/assignment/store`, 5);
+    useGetInfiniteData(`/api/assignment/store`, 1);
 
   const { ref, inView } = useInView({ threshold: 0 });
 
@@ -114,7 +114,7 @@ const StoredTaskPage: React.FC = () => {
   }, [inView, hasNextPage, isFetching, fetchNextPage]);
 
   if (isPending) {
-    return <div>스켈레톤 UI (로딩 중...)</div>;
+    return <StoredTaskSkeleton count={5} />;
   }
 
   return (
@@ -155,9 +155,11 @@ const StoredTaskPage: React.FC = () => {
             );
           })
         )}
+        {isFetching && <StoredTaskSkeleton count={5} />}
+        <Scroll ref={ref}>
+          {isFetching && <ClipLoader color={'black'} />}
+        </Scroll>
       </Box>
-      {isFetching && <div>스켈레톤 UI (추가 로딩 중...)</div>}
-      <Scroll ref={ref}>{isFetching && <ClipLoader color={'black'} />}</Scroll>
     </Container>
   );
 };

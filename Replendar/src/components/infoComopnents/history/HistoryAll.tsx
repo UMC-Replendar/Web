@@ -11,7 +11,7 @@ import useModalStore from '../../../store/modalStore';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Swal from 'sweetalert2';
 import { respondToFriendRequest } from '../../../apis/commuApi';
-
+import { HistoryAllSkeleton } from '../../skeleton';
 const HistoryContainer = styled.div<{ background: string }>`
   padding: 34.5px 109px 67.5px 37px;
   background: ${({ background }) => background};
@@ -27,6 +27,8 @@ const HistoryEntryContainer = styled.div`
   background-color: white;
   border-radius: 20px;
   padding: 20px;
+  padding-left: 30px;
+  padding-right: 30px;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 1px;
   margin-top: 1px;
@@ -37,7 +39,7 @@ const HistoryEntryContainer = styled.div`
 
 const HistoryDetails = styled.div`
   display: flex;
-  gap: 50px;
+  gap: 100px;
   font-size: 18px;
   font-family: Pretendard, sans-serif;
   font-weight: 500;
@@ -109,8 +111,7 @@ const HistoryAll: React.FC = () => {
   }, [inView, hasNextPage, isFetching, fetchNextPage]);
 
   if (isPending) {
-    console.log();
-    return <div>스켈레톤 UI (로딩 중...)</div>;
+    return <HistoryAllSkeleton count={5} />;
   }
 
   return (
@@ -159,11 +160,11 @@ const HistoryAll: React.FC = () => {
                   </BlueButton>
                 )
               ) : null}{' '}
-              {/*나중에 과제알람 추가 수정*/}
+              {/*나머지는 버튼이 없음*/}
             </HistoryEntryContainer>
           ))
         )}
-        {isFetching && <div>스켈레톤 UI (추가 로딩 중...)</div>}
+        {isFetching && <HistoryAllSkeleton count={5} />}
       </HistoryContainer>
       <Scroll ref={ref}>{isFetching && <ClipLoader color={'black'} />}</Scroll>
     </>
