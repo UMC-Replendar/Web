@@ -25,6 +25,8 @@ import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
 
 interface TaskItem {
+  id: number;
+  assId: number;
   assignmentId: number;
   title: string;
   due_date: string;
@@ -385,9 +387,9 @@ function OngoingTasks() {
   const visibleCount =
     selectedTab === 'ongoing' ? ongoingTasksCount : importantTasksCount;
 
-  const handleEditTask = async (assId: number) => {
+  const handleEditTask = async (id: number) => {
     try {
-      const taskDetail = await fetchTaskDetail(assId);
+      const taskDetail = await fetchTaskDetail(id);
       openModal(<EditTaskModal task={taskDetail} onClose={closeModal} />);
     } catch (error) {
       console.error('과제 상세 조회 오류:', error);
@@ -428,10 +430,11 @@ function OngoingTasks() {
     */
   };
 
-  const handleCompleteTask = async (assignmentId: number) => {
+  const handleCompleteTask = async (id: number) => {
     try {
-      await completeTask(assignmentId);
+      await completeTask(id);
       await fetchTasks(); // 과제 완료 후 목록 갱신
+      await fetchImportantTasks();
     } catch (error) {
       console.error('과제 완료 처리 중 오류 발생:', error);
     }
@@ -564,14 +567,17 @@ function OngoingTasks() {
       >
         {displayTask.slice(0, visibleCount).map((task: any, index: number) => (
           <TaskItem
-            key={task.assignmentId}
+            key={task.assignmentId || task.assId}
             task={{
               ...task,
+              id: task.assId ?? task.assignmentId, // 동일한 값을 id로 통합
               color: index < 4 ? taskColors[index] : themeColors[4],
               isOverdue: task.isOverdue, // ✅ 마감 여부 전달
             }}
-            onComplete={handleCompleteTask}
-            onEdit={handleEditTask}
+            onComplete={() =>
+              handleCompleteTask(task.assId ?? task.assignmentId)
+            }
+            onEdit={() => handleEditTask(task.assId ?? task.assignmentId)}
           />
         ))}
       </TaskBox>
@@ -680,7 +686,7 @@ const TaskItem: React.FC<TaskProps> = ({ task, onComplete, onEdit }) => {
   }, [task, notified]);
 
   return (
-    <TaskBlockContainer onClick={() => onEdit(task.assignmentId)}>
+    <TaskBlockContainer onClick={() => onEdit(task.id)}>
       <TaskBlock color={task.color}>
         <TaskInfo>{task.title}</TaskInfo>
         <TaskInfo isOverdue={isOverdue}>
@@ -690,7 +696,7 @@ const TaskItem: React.FC<TaskProps> = ({ task, onComplete, onEdit }) => {
       <TaskCompleteButton
         onClick={(e) => {
           e.stopPropagation(); // 이벤트 버블링 방지
-          onComplete(task.assignmentId);
+          onComplete(task.id);
         }}
       >
         완료

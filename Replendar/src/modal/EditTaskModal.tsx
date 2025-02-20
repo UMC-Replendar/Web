@@ -265,7 +265,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, onClose }) => {
   const [taskData, setTaskData] = useState({
     assId: task.assId,
     title: task.title,
-    dueDate: dayjs(task.endDate),
+    endDate: dayjs(task.endDate),
     dueTime: dayjs(task.endDate).format('HH:mm'),
     notification: task.notification,
     visibility: task.visibility,
@@ -281,7 +281,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, onClose }) => {
         ...prev,
         assId: task.assId,
         title: task.title,
-        dueDate: task.endDate ? dayjs(task.endDate) : dayjs(),
+        endDate: task.endDate ? dayjs(task.endDate) : dayjs(),
         dueTime: task.endDate ? dayjs(task.endDate).format('HH:mm') : '',
         notification: task.notification ?? 'OFF',
         visibility: task.visibility ?? 'OFF',
@@ -359,7 +359,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, onClose }) => {
 
   const handleSave = async () => {
     try {
-      const formattedEndDate = `${dayjs(taskData.dueDate).format('YYYY-MM-DD')}T${taskData.dueTime}:00.000Z`;
+      const formattedEndDate = `${dayjs(taskData.endDate).format('YYYY-MM-DD')}T${taskData.dueTime}:00.000Z`;
 
       await editTask({
         assId: task.assId,
@@ -433,9 +433,9 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, onClose }) => {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <InputContainer>
             <DesktopDatePicker
-              value={dayjs(taskData.dueDate)}
+              value={dayjs(taskData.endDate)}
               onChange={(newValue) =>
-                handleChange('dueDate', newValue?.format('YYYY-MM-DD'))
+                handleChange('endDate', newValue?.format('YYYY-MM-DD'))
               }
               format="YYYY/MM/DD"
               slots={{ textField: StyledTextField }}
