@@ -19,6 +19,34 @@ import duration from 'dayjs/plugin/duration';
 
 dayjs.extend(duration);
 
+/*
+interface TaskItem {
+  id: number;
+  assId: number;
+  assignmentId: number;
+  title: string;
+  due_date: string;
+  due_time: string;
+  memo?: string;
+  notification: 'ON' | 'OFF';
+  visibility: 'ON' | 'OFF';
+  notifyCycle?: string[];
+  favorite?: 'ACTIVE' | 'INACTIVE';
+  isOverdue: boolean;
+
+  color: string;
+}
+
+interface TaskProps {
+  task: TaskItem;
+  onComplete: (assId: number) => void;
+  onEdit: (assId: number) => void;
+}
+*/
+
+// import { useProfileStore } from '../store/profileStore';
+// import { sendNotification } from '../hooks/useNotification';
+
 const PageWrapper = styled.div`
   margin-top: 79px;
   margin-left: 66px;
@@ -157,19 +185,20 @@ function OngoingTasks() {
   const visibleCount =
     selectedTab === 'ongoing' ? ongoingTasksCount : importantTasksCount;
 
-  const handleEditTask = async (assId: number) => {
+  const handleEditTask = async (id: number) => {
     try {
-      const taskDetail = await fetchTaskDetail(assId);
+      const taskDetail = await fetchTaskDetail(id);
       openModal(<EditTaskModal task={taskDetail} onClose={closeModal} />);
     } catch (error) {
       console.error('과제 상세 조회 오류:', error);
     }
   };
 
-  const handleCompleteTask = async (assignmentId: number) => {
+  const handleCompleteTask = async (id: number) => {
     try {
-      await completeTask(assignmentId);
+      await completeTask(id);
       await fetchTasks(); // 과제 완료 후 목록 갱신
+      await fetchImportantTasks();
     } catch (error) {
       console.error('과제 완료 처리 중 오류 발생:', error);
     }
@@ -237,14 +266,21 @@ function OngoingTasks() {
       >
         {displayTask.slice(0, visibleCount).map((task: any, index: number) => (
           <TaskItem
-            key={task.assignmentId}
+            key={task.assignmentId || task.assId}
             task={{
               ...task,
+              id: task.assId ?? task.assignmentId, // 동일한 값을 id로 통합
               color: index < 4 ? taskColors[index] : themeColors[4],
               isOverdue: task.isOverdue, // ✅ 마감 여부 전달
             }}
+
+            onComplete={() =>
+              handleCompleteTask(task.assId ?? task.assignmentId)
+            }
+            onEdit={() => handleEditTask(task.assId ?? task.assignmentId)}
+/*
             onComplete={handleCompleteTask}
-            onEdit={handleEditTask}
+            onEdit={handleEditTask} */
             selectedTab={selectedTab}
           />
         ))}
@@ -263,3 +299,112 @@ function OngoingTasks() {
 }
 
 export default OngoingTasks;
+
+const TaskItem: React.FC<TaskProps> = ({ task, onComplete, onEdit }) => {
+  const [remainingTime, setRemainingTime] = useState<string>('');
+  const [isOverdue, setIsOverdue] = useState<boolean>(false);
+  const [notified, setNotified] = useState<boolean>(false);
+
+  useEffect(() => {
+    const updateRemainingTime = () => {
+      if (!task?.due_date || !task?.due_time) {
+        setRemainingTime('잘못된 과제 정보');
+        setIsOverdue(true);
+        return;
+      }
+
+      // 기존 과제 데이터의 날짜 형식 변환
+      let formattedDueDate = task.due_date.replace(/\//g, '-'); // YYYY-MM-DD 변환
+      let formattedDueTime = task.due_time.slice(0, 5); // HH:mm 변환
+
+      formattedDueTime = convertRelativeTimeToClockTime(task.due_time);
+
+      const dueDateTime = dayjs(
+        `${formattedDueDate} ${formattedDueTime}`,
+        'YYYY-MM-DD HH:mm'
+      );
+      const now = dayjs();
+
+      if (!dueDateTime.isValid()) {
+        console.log(
+          '변환된 날짜가 유효하지 않음:',
+          formattedDueDate,
+          formattedDueTime
+        );
+        setRemainingTime('잘못된 날짜 형식');
+        setIsOverdue(true);
+        return;
+      }
+
+      const diff = dueDateTime.diff(now);
+
+      // 과제 마감 여부 확인
+      if (diff <= 0) {
+        setRemainingTime('과제 마감됨');
+        setIsOverdue(true);
+        return;
+      }
+
+      // 남은 시간 계산
+      const durationObj = dayjs.duration(diff);
+      const days = Math.floor(durationObj.asDays());
+      const hours = durationObj.hours();
+      const minutes = durationObj.minutes();
+      const seconds = durationObj.seconds();
+
+      setRemainingTime(`${days}d ${hours}h ${minutes}m ${seconds}s`);
+      setIsOverdue(false);
+
+      // 1시간 전 알림
+      if (
+        task.notification === 'ON' &&
+        durationObj.asMinutes() <= 60 &&
+        !notified &&
+        Notification.permission === 'granted'
+      ) {
+        new Notification('과제 마감 알림', {
+          body: `🔔 '${task.title}' 과제가 1시간 후 마감됩니다!`,
+        });
+        setNotified(true); // 한 번만 실행되도록
+      }
+    };
+
+    // "dd hh mm ss" -> "hh:mm" 변환
+    const convertRelativeTimeToClockTime = (relativeTime: string) => {
+      const timeMatch = relativeTime.match(/(\d{1,2})h (\d{1,2})m/);
+      if (timeMatch) {
+        const hours = timeMatch[1].padStart(2, '0');
+        const minutes = timeMatch[2].padStart(2, '0');
+        return `${hours}:${minutes}`;
+      }
+      return '00:00';
+    };
+
+    // 처음 한 번 실행
+    updateRemainingTime();
+
+    // 매초마다 실행
+    const interval = setInterval(updateRemainingTime, 1000);
+
+    return () => clearInterval(interval);
+  }, [task, notified]);
+
+  return (
+    <TaskBlockContainer onClick={() => onEdit(task.id)}>
+      <TaskBlock color={task.color}>
+        <TaskInfo>{task.title}</TaskInfo>
+        <TaskInfo isOverdue={isOverdue}>
+          {isOverdue ? '과제 마감됨' : remainingTime}
+        </TaskInfo>
+      </TaskBlock>
+      <TaskCompleteButton
+        onClick={(e) => {
+          e.stopPropagation(); // 이벤트 버블링 방지
+          onComplete(task.id);
+        }}
+      >
+        완료
+      </TaskCompleteButton>
+    </TaskBlockContainer>
+  );
+};

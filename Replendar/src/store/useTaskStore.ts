@@ -3,6 +3,7 @@ import { fetchTasks, fetchImportantTasks } from '../apis/taskApi';
 import useAuthStore from './authStore';
 
 export interface Task {
+  id: number;
   assId: number;
   assignmentId: number;
   title: string;
