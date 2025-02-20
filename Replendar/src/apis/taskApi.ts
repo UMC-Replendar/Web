@@ -4,6 +4,14 @@ import { Task } from '../store/useTaskStore';
 // 과제 목록 가져오기
 export const fetchTasks = async (userId: number) => {
   const response = await axiosInstance.get(`/api/assignment?userId=${userId}`);
+  // console.log(response.data);
+  return response.data.result;
+};
+
+// 중요한 과제 목록 가져오기
+export const fetchImportantTasks = async () => {
+  const response = await axiosInstance.get(`/api/assignment/favorite`);
+  // console.log(response.data);
   return response.data.result;
 };
 
