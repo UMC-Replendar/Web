@@ -10,9 +10,15 @@ export const fetchTasks = async (userId: number) => {
 
 // 중요한 과제 목록 가져오기
 export const fetchImportantTasks = async () => {
-  const response = await axiosInstance.get(`/api/assignment/favorite`);
-  // console.log(response.data);
-  return response.data.result;
+  const response = await axiosInstance.get(`/api/assignment/favorite`, {
+    params: {
+      size: 10,
+      page: 1,
+      sort: 'createdAt,desc',
+    },
+  });
+  console.log(response.data.result.content);
+  return response.data.result.content;
 };
 
 // 과제 상세 조회

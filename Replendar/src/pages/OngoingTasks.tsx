@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import useTaskStore from '../store/useTaskStore';
 import useModalStore from '../store/modalStore';
-import { fetchTaskDetail, completeTask } from '../apis/taskApi';
+import {
+  fetchTaskDetail,
+  completeTask,
+  fetchImportantTasks,
+} from '../apis/taskApi';
 import styled from 'styled-components';
 
 import CustomCalendar from '../components/OngoingComponents/CustomCalendar';
@@ -345,21 +349,40 @@ function OngoingTasks() {
   }, [debouncedUserId]);
   */
 
-  const { tasks, fetchTasks } = useTaskStore();
+  const { tasks, fetchTasks, importantTasks, fetchImportantTasks } =
+    useTaskStore();
   const { isOpen, openModal, closeModal, modalContent } = useModalStore();
   const [selectedTab, setSelectedTab] = useState<'ongoing' | 'important'>(
     'ongoing'
   );
-  const [visibleTasksCount, setVisibleTasksCount] = useState(3);
+  const [ongoingTasksCount, setOngoingTasksCount] = useState(3); // 진행 중 과제 개수
+  const [importantTasksCount, setImportantTasksCount] = useState(3); // 중요한 과제 개수
 
+  const displayTask = selectedTab === 'ongoing' ? tasks : importantTasks;
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    if (selectedTab === 'ongoing') {
+      fetchTasks(); // 진행 중인 과제 가져오기
+    } else if (selectedTab === 'important') {
+      fetchImportantTasks();
+    }
+  }, [selectedTab]);
 
   const handleShowMore = () => {
-    setVisibleTasksCount((prev) => (prev < tasks.length ? tasks.length : 3));
+    if (selectedTab === 'ongoing') {
+      setOngoingTasksCount(
+        ongoingTasksCount === tasks.length ? 3 : tasks.length
+      );
+    } else if (selectedTab === 'important') {
+      setImportantTasksCount(
+        importantTasksCount === importantTasks.length
+          ? 3
+          : importantTasks.length
+      );
+    }
   };
 
+  const visibleCount =
+    selectedTab === 'ongoing' ? ongoingTasksCount : importantTasksCount;
   const handleEditTask = async (assId: number) => {
     try {
       const taskDetail = await fetchTaskDetail(assId);
@@ -368,7 +391,7 @@ function OngoingTasks() {
       console.error('과제 상세 조회 오류:', error);
     }
 
-/*
+    /*
   // 과제 완료 처리
   const completeTaskMutation = useMutation({
     mutationFn: async (assId: number) => {
@@ -513,17 +536,19 @@ function OngoingTasks() {
             <PlusIcon fill="currentColor" />
           </AddButton>
 
-          {tasks.length > 3 && (
+          {displayTask.length > 3 && (
             <More onClick={handleShowMore}>
-              {visibleTasksCount === tasks.length ? '닫기' : '더보기'}
+              {visibleCount === displayTask.length ? '닫기' : '더보기'}
               <img
                 src={
-                  visibleTasksCount === tasks.length
+                  visibleCount === displayTask.length
                     ? UpArrowIcon
                     : DownArrowIcon
                 }
                 alt={
-                  visibleTasksCount === tasks.length ? 'Up Arrow' : 'Down Arrow'
+                  visibleCount === displayTask.length
+                    ? 'Up Arrow'
+                    : 'Down Arrow'
                 }
               />
             </More>
@@ -531,8 +556,11 @@ function OngoingTasks() {
         </div>
       </MainPageTitleWrapper>
 
-      <TaskBox isScrollable={tasks.length > 10} background={themeColors[1]}>
-        {tasks.slice(0, visibleTasksCount).map((task: any, index: number) => (
+      <TaskBox
+        isScrollable={displayTask.length > 10}
+        background={themeColors[1]}
+      >
+        {displayTask.slice(0, visibleCount).map((task: any, index: number) => (
           <TaskItem
             key={task.assId}
             task={{
