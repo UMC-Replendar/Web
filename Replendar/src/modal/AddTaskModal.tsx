@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import useFriendsStore from '../store/useFriendStore';
 import useModalStore from '../store/modalStore';
-import { useAcademicYearStore } from '../store/profileStore';
-import { addTask, storeTask } from '../apis/taskApi';
+import { useAcademicYearStore, useProfileStore } from '../store/profileStore';
+import { addTask, fetchImportantTasks, storeTask } from '../apis/taskApi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
 import useGetData from '../hooks/useGetData';
@@ -495,7 +495,9 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
     mutationFn: async () => addTask(formattedTaskData),
     onSuccess: () => {
       alert('과제가 추가되었습니다!');
+      useProfileStore.getState().refreshProfile(); // 자동 프로필 갱신 추가 -> 내정보 업데이트용
       queryClient.invalidateQueries({ queryKey: ['tasks'] }); // 과제 목록 갱신
+      fetchImportantTasks(); // 중요한 과제 목록 갱신
 
       queryClient.invalidateQueries({
         queryKey: ['/api/activity/friend'],

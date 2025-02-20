@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import useModalStore from '../store/modalStore';
 import { axiosInstance } from '../apis/axios-instance';
 import useDepartmentStore from '../store/useDepartmentStore';
-import useSchoolStore from '../store/schoolStore'; // ✅ 학교 정보 가져오기
+import useSchoolStore from '../store/schoolStore';
 
 const ModalWrapper = styled.div`
   padding: 20px;
@@ -54,7 +54,7 @@ const DepartmentRegisterModal: React.FC = () => {
   const [majorName, setMajorName] = useState('');
   const [error, setError] = useState('');
   const { addDepartment } = useDepartmentStore();
-  const { selectedSchool } = useSchoolStore(); // ✅ 선택된 학교 가져오기
+  const { selectedSchool } = useSchoolStore();
 
   const handleRegisterDepartment = async () => {
     if (!majorName.trim()) {
@@ -68,8 +68,8 @@ const DepartmentRegisterModal: React.FC = () => {
     }
 
     try {
-      const response = await axiosInstance.post('api/majors', {
-        schoolId: selectedSchool.id, // ✅ 선택된 학교 ID 추가
+      const response = await axiosInstance.post('api/major', {
+        schoolId: selectedSchool.id,
         majorName,
       });
 
