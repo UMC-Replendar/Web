@@ -2,10 +2,9 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import PreviousArrowIcon from '/src/assets/images/PreviousArrowIcon.svg';
 import NextArrowIcon from '/src/assets/images/NextArrowIcon.svg';
-import { AddButton } from '../../pages/OngoingTasks';
-import { PlusIcon } from '../CommuComponents/commuIcons';
 import Calendar from 'react-calendar';
 import { useThemeStore, themeBackground } from '../../store/useThemeStore';
+import DemodayTaskModal from '../../modal/DemodayTaskModal';
 
 const CalendarWrapper = styled.div`
   margin-top: 66px;
@@ -177,6 +176,7 @@ const TaskMarker = styled.div<{ background: string }>`
   font-style: normal;
   font-weight: 400;
   line-height: 140%;
+  cursor: pointer;
 `;
 
 interface CustomCalendarProps {
@@ -186,6 +186,8 @@ interface CustomCalendarProps {
 function CustomCalendar({ tasks }: CustomCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date()); // 선택한 날짜
   const [viewDate, setViewDate] = useState(new Date()); // 캘린더에 표시되는 월
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [taskMemo, setTaskMemo] = useState(''); // 과제 메모 저장
 
   const { selectedTheme } = useThemeStore();
   const themeColors = themeBackground[selectedTheme];
@@ -211,83 +213,98 @@ function CustomCalendar({ tasks }: CustomCalendarProps) {
 
   const isSunday = (date: Date) => date.getDay() === 0;
 
+  const handleTaskClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleSaveMemo = (memo: string) => {
+    setTaskMemo(memo);
+    setIsModalOpen(false);
+  };
+
   return (
-    <CalendarWrapper>
-      <CalendarHeader>
-        <MonthText>{getMonthYearText(viewDate)}</MonthText>
-        <ArrowButtonContainer>
-          <ArrowButton onClick={goToPreviousMonth}>
-            <img src={PreviousArrowIcon} alt="이전 달" />
-          </ArrowButton>
-          <ArrowButton onClick={goToNextMonth}>
-            <img src={NextArrowIcon} alt="다음 달" />
-          </ArrowButton>
-        </ArrowButtonContainer>
-      </CalendarHeader>
+    <>
+      <CalendarWrapper>
+        <CalendarHeader>
+          <MonthText>{getMonthYearText(viewDate)}</MonthText>
+          <ArrowButtonContainer>
+            <ArrowButton onClick={goToPreviousMonth}>
+              <img src={PreviousArrowIcon} alt="이전 달" />
+            </ArrowButton>
+            <ArrowButton onClick={goToNextMonth}>
+              <img src={NextArrowIcon} alt="다음 달" />
+            </ArrowButton>
+          </ArrowButtonContainer>
+        </CalendarHeader>
 
-      <CalendarSubtitle>
-        <ScheduleText>달력에 스케쥴표를 확인하세요</ScheduleText>
-        <AddButton>
-          방명록 작성하기
-          <PlusIcon fill="currentColor" />
-        </AddButton>
-      </CalendarSubtitle>
+        <CalendarSubtitle>
+          <ScheduleText>달력에 스케쥴표를 확인하세요</ScheduleText>
+        </CalendarSubtitle>
 
-      <StyledCalendar
-        value={currentDate}
-        locale="ko-KR"
-        calendarType="gregory"
-        activeStartDate={viewDate}
-        formatDay={(_locale, date) => date.getDate().toString()}
-        tileClassName={({ date }) => {
-          if (!isSameMonth(date, viewDate)) return 'neighboringMonth';
-          if (isSameMonth(date, viewDate) && isSunday(date))
-            return 'currentMonthSunday';
-          return null;
-        }}
-        tileContent={({ date }) => {
-          const formattedDate = date
-            .toLocaleDateString('ko-KR', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-            })
-            .replace(/\\./g, '-');
-
-          const tasksForDate = tasks.filter((task) => {
-            const taskDate = new Date(task.deadline);
-            const localDate = taskDate
+        <StyledCalendar
+          value={currentDate}
+          locale="ko-KR"
+          calendarType="gregory"
+          activeStartDate={viewDate}
+          formatDay={(_locale, date) => date.getDate().toString()}
+          tileClassName={({ date }) => {
+            if (!isSameMonth(date, viewDate)) return 'neighboringMonth';
+            if (isSameMonth(date, viewDate) && isSunday(date))
+              return 'currentMonthSunday';
+            return null;
+          }}
+          tileContent={({ date }) => {
+            const formattedDate = date
               .toLocaleDateString('ko-KR', {
                 year: 'numeric',
                 month: '2-digit',
                 day: '2-digit',
               })
               .replace(/\\./g, '-');
-            return localDate === formattedDate;
-          });
 
-          if (tasksForDate.length > 0) {
-            return (
-              <TaskMarkerContainer>
-                {tasksForDate.slice(0, 2).map((task, index) => (
-                  <TaskMarker background={backgroundColor} key={index}>
-                    {task.name}
-                  </TaskMarker>
-                ))}
-                {tasksForDate.length > 2 && (
-                  <span>총 {tasksForDate.length}개</span>
-                )}
-              </TaskMarkerContainer>
-            );
-          }
-          return null;
-        }}
-        onClickDay={(value) => setCurrentDate(value)}
-        onActiveStartDateChange={({ activeStartDate }) => {
-          if (activeStartDate) setViewDate(activeStartDate);
-        }}
-      />
-    </CalendarWrapper>
+            const tasksForDate = tasks.filter((task) => {
+              const taskDate = new Date(task.deadline);
+              const localDate = taskDate
+                .toLocaleDateString('ko-KR', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                })
+                .replace(/\\./g, '-');
+              return localDate === formattedDate;
+            });
+
+            if (tasksForDate.length > 0) {
+              return (
+                <TaskMarkerContainer>
+                  {tasksForDate.slice(0, 2).map((task, index) => (
+                    <TaskMarker
+                      background={backgroundColor}
+                      key={index}
+                      onClick={handleTaskClick}
+                    >
+                      {task.name}
+                    </TaskMarker>
+                  ))}
+                  {tasksForDate.length > 2 && (
+                    <span>총 {tasksForDate.length}개</span>
+                  )}
+                </TaskMarkerContainer>
+              );
+            }
+            return null;
+          }}
+          onClickDay={(value) => setCurrentDate(value)}
+          onActiveStartDateChange={({ activeStartDate }) => {
+            if (activeStartDate) setViewDate(activeStartDate);
+          }}
+        />
+      </CalendarWrapper>
+
+      {isModalOpen && (
+        <DemodayTaskModal initialMemo={taskMemo} onSave={handleSaveMemo} />
+      )}
+    </>
   );
 }
 

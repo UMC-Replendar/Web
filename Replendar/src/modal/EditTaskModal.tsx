@@ -276,18 +276,26 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, onClose }) => {
   });
 
   useEffect(() => {
-    setTaskData({
-      assId: task.assId,
-      title: task.title,
-      dueDate: dayjs(task.endDate),
-      dueTime: dayjs(task.endDate).format('HH:mm'),
-      notification: task.notification,
-      visibility: task.visibility,
-      memo: task.memo || '',
-      shareIds: task.shareIds || [],
-      notifyCycle: task.notifyCycle || [],
-      isBookmarked: task.favorite === 'ACTIVE',
-    });
+    if (task) {
+      setTaskData((prev) => ({
+        ...prev,
+        assId: task.assId,
+        title: task.title,
+        dueDate: task.endDate ? dayjs(task.endDate) : dayjs(),
+        dueTime: task.endDate ? dayjs(task.endDate).format('HH:mm') : '',
+        notification: task.notification ?? 'OFF',
+        visibility: task.visibility ?? 'OFF',
+        memo: task.memo || '',
+        shareIds: task.shareIds || [],
+        notifyCycle: task.notifyCycle || [],
+        isBookmarked: task.favorite === 'ACTIVE',
+      }));
+
+      // 상태 업데이트 후 값 확인
+      setTimeout(() => {
+        console.log('📌 업데이트된 taskData:', taskData);
+      }, 100);
+    }
   }, [task]);
 
   const handleChange = (field: keyof typeof taskData, value: any) => {
@@ -351,7 +359,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, onClose }) => {
 
   const handleSave = async () => {
     try {
-      const formattedEndDate = `${taskData.dueDate?.format('YYYY-MM-DD')}T${taskData.dueTime}:00.000Z`;
+      const formattedEndDate = `${dayjs(taskData.dueDate).format('YYYY-MM-DD')}T${taskData.dueTime}:00.000Z`;
 
       await editTask({
         assId: task.assId,
@@ -425,16 +433,21 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, onClose }) => {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <InputContainer>
             <DesktopDatePicker
-              value={taskData.dueDate}
-              onChange={(newValue) => handleChange('dueDate', newValue)}
+              value={dayjs(taskData.dueDate)}
+              onChange={(newValue) =>
+                handleChange('dueDate', newValue?.format('YYYY-MM-DD'))
+              }
               format="YYYY/MM/DD"
               slots={{ textField: StyledTextField }}
             />
             <StyledTimeInput
               type="text"
               value={taskData.dueTime}
+              placeholder="23:59"
               onChange={handleTimeChange}
               onBlur={handleTimeBlur}
+              maxLength={5}
+              required
             />
           </InputContainer>
         </LocalizationProvider>

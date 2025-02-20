@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import useFriendsStore from '../store/useFriendStore';
 import useModalStore from '../store/modalStore';
+import { useAcademicYearStore } from '../store/profileStore';
 import { addTask, storeTask } from '../apis/taskApi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
@@ -23,9 +24,10 @@ import { styled as muiStyled } from '@mui/material/styles';
 import dayjs from 'dayjs';
 
 import Swal from 'sweetalert2';
-
-// import UseNotificationPermission from '../hooks/useNotification';
-import { useAcademicYearStore } from '../store/profileStore';
+import {
+  useNotificationPermission,
+  sendNotification,
+} from '../hooks/useNotification';
 
 dayjs.locale('ko');
 
@@ -351,6 +353,23 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
 }) => {
   const { closeModal } = useModalStore();
   const queryClient = useQueryClient();
+  const { id: userId } = useAuthStore();
+
+  const permission = useNotificationPermission(); // 알림 권한 확인
+
+  const handleToggleNotification = () => {
+    if (!taskData.isOn) {
+      if (permission === 'granted') {
+        handleChange('isOn', true);
+        sendNotification('알림 설정', '과제 마감 알림이 활성화되었습니다.');
+      } else {
+        alert('알림 권한이 필요합니다. 브라우저 설정에서 변경하세요.');
+        handleChange('isOn', false);
+      }
+    } else {
+      handleChange('isOn', false);
+    }
+  };
 
   const [taskData, setTaskData] = useState({
     isBookmarked: false,
@@ -363,7 +382,6 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
     shareIds: [] as number[],
     memo: '',
   });
-  const { id: userId } = useAuthStore();
 
   const {
     isFriendModalOpen,
@@ -386,19 +404,6 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
     assId ? `/api/assignment/${assId}` : ''
   );
 
-  // useEffect(() => {
-  //   if (
-  //     Array.isArray(lectureAssignmentData) &&
-  //     lectureAssignmentData.length > 0
-  //   ) {
-  //     const { title, due_date, due_time, content } = lectureAssignmentData[0];
-  //     setTaskName(title);
-  //     setDeadline(dayjs(due_date));
-  //     setTime(due_time);
-  //     setMemo(content);
-  //   }
-  // }, [lectureAssignmentData]);
-
   useEffect(() => {
     if (
       Array.isArray(lectureAssignmentData) &&
@@ -415,32 +420,6 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
       }));
     }
   }, [lectureAssignmentData]);
-  // useEffect(() => {
-  //   if (Array.isArray(assignmentData) && assignmentData.length > 0) {
-  //     console.log(assignmentData);
-  //     const {
-  //       title,
-  //       due_date,
-  //       memo,
-  //       notification,
-  //       visibility,
-  //       notifyCycle,
-  //       shareFriend,
-  //       favorite,
-  //     } = assignmentData[0];
-  //     const [date, time] = due_date.split(' ');
-
-  //     setTaskName(title);
-  //     setDeadline(dayjs(date));
-  //     setTime(time);
-  //     setMemo(memo);
-  //     setIsOn(notification === 'ON' ? true : false);
-  //     setIsPublic(visibility === 'ON' ? true : false);
-  //     setAlarmCycles(notifyCycle);
-  //     toggleAllFriends(shareFriend);
-  //     setIsBookmarked(favorite === 'ACTIVE' ? true : false);
-  //   }
-  // }, [assignmentData]);
 
   useEffect(() => {
     if (Array.isArray(assignmentData) && assignmentData.length > 0) {
@@ -623,116 +602,6 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
     saveDraftMutation();
   };
 
-  // const saveDraftMutation = useMutation({
-  //   mutationFn: async (taskData) => storeTask(taskData),
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ['tasks', userId] });
-  //     Swal.fire({
-  //       icon: 'success',
-  //       title: '과제가 임시저장 되었습니다.',
-  //       confirmButtonColor: '#25C26C',
-  //     });
-  //     closeModal();
-  //   },
-  //   onError: (error) => {
-  //     console.error('임시저장 중 오류 발생:', error);
-  //     alert('과제 임시저장 중 문제가 발생했습니다.');
-  //   },
-  // });
-
-  // const handleSaveDraft = () => {
-  //   if (!taskData.title.trim()) {
-  //     alert('과제명을 입력해주세요.');
-  //     return;
-  //   }
-  //   if (!taskData.dueDate) {
-  //     alert('마감일을 선택해주세요.');
-  //     return;
-  //   }
-
-  //   const formattedDeadline = new Date(taskData.dueDate.format('YYYY-MM-DD') + 'T' + taskData.dueTime + ':00.000Z').toISOString();
-
-  //   const draftTaskData = {
-  //     title: taskData.title,
-  //     endDate: formattedDeadline,
-  //     notification: taskData.isOn ? 'ON' : 'OFF',
-  //     visibility: taskData.isPublic ? 'ON' : 'OFF',
-  //     notifyCycle: taskData.notifyCycle.length > 0 ? taskData.notifyCycle : [],
-  //     shareIds: taskData.shareIds,
-  //     memo: taskData.memo.trim() || '',
-  //     favorite: taskData.isBookmarked ? 'ACTIVE' : 'INACTIVE',
-  //     originAssId: undefined,
-  //     lectureAssignmentId: undefined,
-  //   };
-
-  //   saveDraftMutation.mutate(draftTaskData);
-  // };
-
-  /*  useEffect(() => {
-    if (lectureAssignmentId) {
-      fetchLectureAssignment(lectureAssignmentId)
-        .then((data) => {
-          if (data) {
-            setTaskData((prev) => ({
-              ...prev,
-              title: data.title,
-              dueDate: dayjs(data.due_date),
-              dueTime: data.due_time,
-              memo: data.memo || '',
-            }));
-          }
-        })
-        .catch((error) =>
-          console.error('강의 과제 데이터 가져오기 실패:', error)
-        );
-    }
-  }, [lectureAssignmentId]);
-
-  const saveDraftMutation = useMutation({
-    mutationFn: async (taskData: Omit<Task, 'assignmentId'>) => {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/assignment/store`,
-        taskData,
-        {
-          headers: { Authorization: `${token}` },
-        }
-      );
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', userId] });
-      Swal.fire({
-        icon: 'success',
-        title: '과제가 임시저장 되었습니다.',
-        confirmButtonColor: '#25C26C',
-      });
-      closeModal();
-    },
-    onError: (error) => {
-      console.error('임시저장 중 오류 발생:', error);
-      alert('과제 임시저장 중 문제가 발생했습니다.');
-    },
-  });
-
-  const handleSaveDraft = async () => {
-
-    const formattedDeadline =
-      deadline && time ? `${deadline.format('YYYY/MM/DD')} ${time}` : '';
-
-    const draftTaskData: Omit<Task, 'assignmentId'> = {
-      title: taskName,
-      endDate: formattedDeadline,
-      notification: isOn ? 'ON' : 'OFF',
-      visibility: isPublic ? 'ON' : 'OFF',
-      notifyCycle: alarmCycles.length > 0 ? alarmCycles : [],
-      shareIds: friendData ? friendData.map((friend) => friend.friendId) : [],
-      memo: memo.trim() === '' ? '' : memo,
-      favorite: isBookmarked ? 'ACTIVE' : 'INACTIVE',
-      originAssId: assId ? assId : null,
-      lectureAssignmentId: lectureAssignmentId ? lectureAssignmentId : null,
-    };
-  }; */
-
   return (
     <ModalOverlay onClick={closeModal}>
       <Modal onClick={(e) => e.stopPropagation()}>
@@ -810,7 +679,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
             <div style={{ transform: 'scale(0.5)', display: 'inline-block' }}>
               <SmallToggleSwitch
                 isOn={taskData.isOn}
-                onToggle={() => handleChange('isOn', !taskData.isOn)}
+                onToggle={handleToggleNotification}
               />
             </div>
           </AlertSettingSection>
