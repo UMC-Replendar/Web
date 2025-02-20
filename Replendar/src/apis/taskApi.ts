@@ -1,10 +1,11 @@
 import { axiosInstance } from './axios-instance';
 import { Task } from '../store/useTaskStore';
+import { extractTimeNumbers, isTaskOverdue } from '../util/timeutil';
 
 // 과제 목록 가져오기
 export const fetchTasks = async (userId: number) => {
   const response = await axiosInstance.get(`/api/assignment?userId=${userId}`);
-  console.log('진행중 과제', response.data.result);
+
   return response.data.result;
 };
 
@@ -17,10 +18,9 @@ export const fetchImportantTasks = async () => {
       sort: 'createdAt,desc',
     },
   });
-  console.log('중요한 과제', response.data.result.content);
+
   return response.data.result.content;
 };
-
 // 과제 상세 조회
 export const fetchTaskDetail = async (assId: number) => {
   const response = await axiosInstance.get(`/api/assignment/${assId}`);

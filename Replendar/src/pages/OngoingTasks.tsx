@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import useTaskStore from '../store/useTaskStore';
 import useModalStore from '../store/modalStore';
 import { fetchTaskDetail, completeTask } from '../apis/taskApi';
 import styled from 'styled-components';
-
+import TaskItem from './TaskItem';
 import CustomCalendar from '../components/OngoingComponents/CustomCalendar';
 import AddTaskModal from '../modal/AddTaskModal';
 import EditTaskModal from '../modal/EditTaskModal';
@@ -18,28 +18,6 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
 dayjs.extend(duration);
-
-interface TaskItem {
-  assignmentId: number;
-  title: string;
-  due_date: string;
-  due_time: string;
-  memo?: string;
-  notification: 'ON' | 'OFF';
-  visibility: 'ON' | 'OFF';
-  notifyCycle?: string[];
-  favorite?: 'ACTIVE' | 'INACTIVE';
-  isOverdue: boolean;
-  due_datetime: string;
-  color: string;
-}
-
-interface TaskProps {
-  task: TaskItem;
-  onComplete: (assId: number) => void;
-  onEdit: (assId: number) => void;
-  selectedTab: 'ongoing' | 'important';
-}
 
 const PageWrapper = styled.div`
   margin-top: 79px;
@@ -137,59 +115,6 @@ const TaskBox = styled.div<{ isScrollable: boolean; background: string }>`
   padding: 52px 64px;
   max-height: ${({ isScrollable }) => (isScrollable ? '744px' : 'none')};
   overflow-y: ${({ isScrollable }) => (isScrollable ? 'auto' : 'visible')};
-`;
-
-const TaskBlockContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 40px;
-  align-self: stretch;
-  margin-bottom: 8px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const TaskBlock = styled.div<{ color: string }>`
-  display: flex;
-  padding: 14px 24px;
-  justify-content: space-between;
-  align-items: center;
-  border-radius: 50px;
-  background-color: ${({ color }) => color};
-  width: 100%;
-  cursor: pointer;
-`;
-
-const TaskInfo = styled.div<{ isOverdue?: boolean }>`
-  color: ${({ isOverdue }) => (isOverdue ? 'red' : 'white')};
-  font-family: Pretendard;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 140%;
-`;
-
-const TaskCompleteButton = styled.button`
-  display: flex;
-  width: 100px;
-  height: 50px;
-  padding: 14px 30px;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  border-radius: 50px;
-  border: none;
-  background: linear-gradient(270deg, #18b9dd 0%, #63d8f2 100%);
-  color: white;
-  font-family: Pretendard;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 140%;
-  cursor: pointer;
-  white-space: nowrap;
 `;
 
 function OngoingTasks() {
@@ -338,118 +263,3 @@ function OngoingTasks() {
 }
 
 export default OngoingTasks;
-
-const TaskItem: React.FC<TaskProps> = ({
-  task,
-  onComplete,
-  onEdit,
-  selectedTab,
-}) => {
-  const { fetchTasks, fetchImportantTasks } = useTaskStore();
-
-  const isFetched = useRef(false);
-  const isImportantFetched = useRef(false);
-
-  useEffect(() => {
-    if (selectedTab === 'ongoing' && !isFetched.current) {
-      fetchTasks();
-      isFetched.current = true; // 이후 다시 실행되지 않도록 설정
-    } else if (selectedTab === 'important' && !isImportantFetched.current) {
-      isImportantFetched.current = true;
-      fetchImportantTasks(); //
-    }
-  }, [selectedTab, fetchTasks, fetchImportantTasks]);
-  const initialTime =
-    selectedTab === 'ongoing'
-      ? convertToSeconds(task.due_time)
-      : convertToSeconds(task.due_datetime);
-
-  const [remainingTime, setRemainingTime] = useState<number>(initialTime);
-  const [isOverdue, setIsOverdue] = useState(false);
-  const [notified, setNotified] = useState(false); // 알림 상태 추가
-
-  useEffect(() => {
-    const updateRemainingTime = () => {
-      if (remainingTime <= 0) {
-        setIsOverdue(true);
-        return;
-      }
-
-      setRemainingTime((prev) => prev - 1);
-
-      // 1시간 전 알림 (한 번만 실행)
-      if (
-        task.notification === 'ON' &&
-        remainingTime == 3600 && // 1시간 이하
-        !notified &&
-        Notification.permission === 'granted'
-      ) {
-        new Notification('과제 마감 알림', {
-          body: `🔔 '${task.title}' 과제가 1시간 후 마감됩니다!`,
-        });
-        setNotified(false); // 한 번만 실행되도록 설정
-      }
-    };
-
-    const interval = setInterval(updateRemainingTime, 1000);
-    return () => clearInterval(interval);
-  }, [remainingTime, notified, task]);
-
-  useEffect(() => {
-    // 알림 권한 요청
-    if (Notification.permission !== 'granted') {
-      Notification.requestPermission();
-    }
-  }, []);
-
-  const formatTime = (seconds: number) => {
-    if (seconds <= 0) return '과제 마감됨';
-    const days = Math.floor(seconds / 86400);
-    const hours = Math.floor((seconds % 86400) / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${days}d ${hours}h ${minutes}m ${secs}s`;
-  };
-
-  function convertToSeconds(timeString: string) {
-    if (!timeString) return 0;
-
-    if (selectedTab === 'ongoing') {
-      const timeMatch = timeString.match(/(\d{1,2})h (\d{1,2})m/);
-      if (timeMatch) {
-        const hours = parseInt(timeMatch[1], 10) * 3600;
-        const minutes = parseInt(timeMatch[2], 10) * 60;
-        return hours + minutes;
-      }
-    }
-
-    const timeMatch = timeString.match(/(-?\d+)d (-?\d+)h (-?\d+)m (-?\d+)s/);
-    if (timeMatch) {
-      const days = parseInt(timeMatch[1]) * 86400;
-      const hours = parseInt(timeMatch[2]) * 3600;
-      const minutes = parseInt(timeMatch[3]) * 60;
-      const seconds = parseInt(timeMatch[4]);
-      return days + hours + minutes + seconds;
-    }
-    return 0;
-  }
-
-  return (
-    <TaskBlockContainer onClick={() => onEdit(task.assignmentId)}>
-      <TaskBlock color={task.color}>
-        <TaskInfo>{task.title}</TaskInfo>
-        <TaskInfo isOverdue={isOverdue}>
-          {isOverdue ? '과제 마감됨' : formatTime(remainingTime)}
-        </TaskInfo>
-      </TaskBlock>
-      <TaskCompleteButton
-        onClick={(e) => {
-          e.stopPropagation();
-          onComplete(task.assignmentId);
-        }}
-      >
-        완료
-      </TaskCompleteButton>
-    </TaskBlockContainer>
-  );
-};
