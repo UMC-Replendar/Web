@@ -359,6 +359,7 @@ function OngoingTasks() {
   const [importantTasksCount, setImportantTasksCount] = useState(3); // 중요한 과제 개수
 
   const displayTask = selectedTab === 'ongoing' ? tasks : importantTasks;
+
   useEffect(() => {
     if (selectedTab === 'ongoing') {
       fetchTasks(); // 진행 중인 과제 가져오기
@@ -383,6 +384,7 @@ function OngoingTasks() {
 
   const visibleCount =
     selectedTab === 'ongoing' ? ongoingTasksCount : importantTasksCount;
+
   const handleEditTask = async (assId: number) => {
     try {
       const taskDetail = await fetchTaskDetail(assId);
@@ -562,7 +564,7 @@ function OngoingTasks() {
       >
         {displayTask.slice(0, visibleCount).map((task: any, index: number) => (
           <TaskItem
-            key={task.assId}
+            key={task.assignmentId}
             task={{
               ...task,
               color: index < 4 ? taskColors[index] : themeColors[4],
