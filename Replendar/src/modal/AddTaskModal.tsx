@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
 import useGetData from '../hooks/useGetData';
 import SelectFriendsModal from './SelectFriendsModal';
+import TaskDraftModal from './TaskDraftModal';
 import ToggleSwitch from '../components/OngoingComponents/ToggleSwitch';
 import useAuthStore from '../store/authStore';
 import BookmarkIcon from '../assets/images/BookmarkIcon.svg';
@@ -352,6 +353,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
   assId,
 }) => {
   const { closeModal } = useModalStore();
+  const [isDraftModalOpen, setIsDraftModalOpen] = useState(false);
   const queryClient = useQueryClient();
   const { id: userId } = useAuthStore();
 
@@ -604,6 +606,21 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
     saveDraftMutation();
   };
 
+  // 임시보관된 과제 선택 후 불러오기
+  const handleSelectDraftTask = (assignment: {
+    name: string;
+    deadline: string;
+  }) => {
+    const [date, time] = assignment.deadline.split(' ');
+    setTaskData((prev) => ({
+      ...prev,
+      title: assignment.name,
+      dueDate: dayjs(date),
+      dueTime: time,
+    }));
+    setIsDraftModalOpen(false);
+  };
+
   return (
     <ModalOverlay onClick={closeModal}>
       <Modal onClick={(e) => e.stopPropagation()}>
@@ -619,7 +636,9 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
             />
           </TitleContainer>
 
-          <ActionButton>불러오기</ActionButton>
+          <ActionButton onClick={() => setIsDraftModalOpen(true)}>
+            불러오기
+          </ActionButton>
         </Header>
 
         <Section>
