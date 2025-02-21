@@ -1,4 +1,4 @@
-import{a as u,t as j,r as w,j as e,d as t}from"./index-DCLxYTjz.js";import{t as b}from"./Task-C-RTHX55.js";import{u as k,a as v,C as y}from"./useGetInfiniteData-DUTu3KS2.js";import{S as l}from"./skeleton-2MwILm4q.js";import"./useBaseQuery-CLL0ZrG3.js";const T=t.div`
+import{a as u,t as j,r as w,j as e,d as t}from"./index-_E89fCQW.js";import{t as b}from"./Task-C-RTHX55.js";import{u as k,a as v,C as y}from"./useGetInfiniteData-BDxzNoAQ.js";import{S as l}from"./skeleton-RmRIKzMd.js";import"./useBaseQuery-BEw4jf_8.js";const T=t.div`
   display: flex;
   flex-direction: column;
   align-items: left;
