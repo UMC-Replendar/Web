@@ -1,4 +1,4 @@
-import{v as L,b as v,r as d,j as e,d as o,e as k,S as y,u as V,i as Y,g as G,M as J}from"./index-CFPyf70Z.js";import{P as U}from"./ProfileUpload-C_An1l09.js";const M=L(n=>({schools:[],selectedSchool:null,setSchools:t=>n({schools:t}),addSchool:t=>n(i=>({schools:[...i.schools,t]})),setSelectedSchool:t=>n({selectedSchool:t})})),Z=o.div`
+import{l as L,b as v,r as d,j as e,d as o,e as k,S as y,u as V,i as Y,g as G,M as J}from"./index-HSlvYZEY.js";import{P as U}from"./ProfileUpload-B24gthCn.js";const M=L(n=>({schools:[],selectedSchool:null,setSchools:t=>n({schools:t}),addSchool:t=>n(i=>({schools:[...i.schools,t]})),setSelectedSchool:t=>n({selectedSchool:t})})),Z=o.div`
   padding: 20px;
 `,q=o.h2`
   font-size: 20px;
@@ -107,7 +107,7 @@ import{v as L,b as v,r as d,j as e,d as o,e as k,S as y,u as V,i as Y,g as G,M a
   color: red;
   font-size: 14px;
   margin-bottom: 10px;
-`,me=()=>{const{closeModal:n}=v(),[t,i]=d.useState(""),[s,a]=d.useState(""),{addDepartment:g}=B(),{selectedSchool:x}=M(),m=async()=>{var l,r;if(!t.trim()){a("학과 이름을 입력해주세요.");return}if(!x){a("학교를 먼저 선택해주세요.");return}try{const u=await k.post("api/majors",{schoolId:x.id,majorName:t});(l=u.data)!=null&&l.isSuccess?(g({id:u.data.result.id,name:u.data.result.majorName}),n()):a(((r=u.data)==null?void 0:r.message)||"학과 등록 중 오류가 발생했습니다.")}catch(u){a("학과 등록 중 오류가 발생했습니다. 다시 시도해주세요."),console.error(u)}};return e.jsxs(de,{children:[e.jsx(pe,{children:"학과 등록하기"}),s&&e.jsx(ge,{children:s}),e.jsx(xe,{type:"text",placeholder:"학과 이름 입력",value:t,onChange:l=>i(l.target.value)}),e.jsx(ue,{onClick:m,children:"등록하기"}),e.jsx(he,{onClick:n,children:"취소"})]})},be=o.div`
+`,me=()=>{const{closeModal:n}=v(),[t,i]=d.useState(""),[s,a]=d.useState(""),{addDepartment:g}=B(),{selectedSchool:x}=M(),m=async()=>{var l,r;if(!t.trim()){a("학과 이름을 입력해주세요.");return}if(!x){a("학교를 먼저 선택해주세요.");return}try{const u=await k.post("api/major",{schoolId:x.id,majorName:t});(l=u.data)!=null&&l.isSuccess?(g({id:u.data.result.id,name:u.data.result.majorName}),n()):a(((r=u.data)==null?void 0:r.message)||"학과 등록 중 오류가 발생했습니다.")}catch(u){a("학과 등록 중 오류가 발생했습니다. 다시 시도해주세요."),console.error(u)}};return e.jsxs(de,{children:[e.jsx(pe,{children:"학과 등록하기"}),s&&e.jsx(ge,{children:s}),e.jsx(xe,{type:"text",placeholder:"학과 이름 입력",value:t,onChange:l=>i(l.target.value)}),e.jsx(ue,{onClick:m,children:"등록하기"}),e.jsx(he,{onClick:n,children:"취소"})]})},be=o.div`
   padding: 20px;
 `,fe=o.h2`
   font-size: 20px;

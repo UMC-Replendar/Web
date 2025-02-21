@@ -1,4 +1,4 @@
-import{a as g,t as m,r as u,j as e,d as t}from"./index-CFPyf70Z.js";import{B as w}from"./blueButton-BAhRILi5.js";import{t as j}from"./Task-C-RTHX55.js";import{u as b,a as v,C as k}from"./useGetInfiniteData-BfthvyBA.js";import"./useBaseQuery-D1s1blM3.js";const y=t.div`
+import{a as m,t as u,r as w,j as e,d as t}from"./index-HSlvYZEY.js";import{B as j}from"./blueButton-CEU8-eJw.js";import{t as b}from"./Task-C-RTHX55.js";import{u as k,a as v,C as y}from"./useGetInfiniteData-CpjWvf4I.js";import{c as l}from"./skeleton-B5_-emf1.js";import"./useBaseQuery-Dcs-aCZV.js";const T=t.div`
   display: flex;
   flex-direction: column;
   height: 90%;
@@ -6,26 +6,26 @@ import{a as g,t as m,r as u,j as e,d as t}from"./index-CFPyf70Z.js";import{B as 
   margin-left: 79px;
   margin-top: 70px;
   gap: 20px;
-`,T=t.div`
-  background-color: ${({background:i})=>i};
+`,C=t.div`
+  background-color: ${({background:s})=>s};
   box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
   width: 100%;
   height: 100%;
   padding: 34.5px 109px 30.5px 37px;
-`,I=t.div`
+`,B=t.div`
   display: flex;
   align-items: center;
   gap: 20px;
   margin-bottom: 20px;
-`,C=t.img`
+`,I=t.img`
   width: 30px;
   height: 30px;
-`,B=t.div`
+`,P=t.div`
   font-weight: bold;
   font-size: 28px;
   font-family: Pretendard, sans-serif;
-`,P=t.div`
+`,N=t.div`
   background-color: white;
   border-radius: 20px;
   width: 100%;
@@ -42,14 +42,14 @@ import{a as g,t as m,r as u,j as e,d as t}from"./index-CFPyf70Z.js";import{B as 
   justify-content: space-between;
   align-items: center;
   padding: 10px 0;
-`,N=t.div`
+`,S=t.div`
   width: 100vw;
   height: 50px;
   margin-top: 50px;
   display: flex;
   justify-content: center;
   align-items: flex-end;
-`,l=t.div`
+`,x=t.div`
   font-size: 19px;
   font-family: Pretendard, sans-serif;
   font-weight: 500;
@@ -69,4 +69,4 @@ import{a as g,t as m,r as u,j as e,d as t}from"./index-CFPyf70Z.js";import{B as 
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-`,G=()=>{var d;const{data:i,isPending:x,isFetching:s,hasNextPage:o,fetchNextPage:a}=b("/api/assignment/unfinished",5),{ref:c,inView:r}=v({threshold:0}),{selectedTheme:p}=g(),h=m[p][1];return u.useEffect(()=>{r&&o&&!s&&a()},[r,o,s,a]),x?e.jsx("div",{children:"스켈레톤 UI (로딩 중...)"}):e.jsxs(y,{children:[e.jsxs(I,{children:[e.jsx(C,{src:j,alt:"Task Icon"}),e.jsx(B,{children:"미완료 과제"})]}),e.jsx(T,{background:h,children:(d=i==null?void 0:i.pages)==null?void 0:d.flatMap(f=>f.content.map(n=>(console.log("과제 데이터:",n),e.jsx(P,{children:e.jsxs(E,{children:[e.jsxs(D,{children:[e.jsx(l,{children:n.due_date}),e.jsx(l,{children:n.title})]}),e.jsx(w,{status:"미완료",children:"미완료"})]})},n.dueDate))))}),s&&e.jsx("div",{children:"스켈레톤 UI (추가 로딩 중...)"}),e.jsx(N,{ref:c,children:s&&e.jsx(k,{color:"black"})})]})};export{G as default};
+`,R=()=>{var d;const{data:s,isPending:c,isFetching:i,hasNextPage:o,fetchNextPage:a}=k("/api/assignment/unfinished",5),{ref:p,inView:r}=v({threshold:0}),{selectedTheme:h}=m(),f=u[h][1];return w.useEffect(()=>{r&&o&&!i&&a()},[r,o,i,a]),c?e.jsx(l,{count:5}):e.jsxs(T,{children:[e.jsxs(B,{children:[e.jsx(I,{src:b,alt:"Task Icon"}),e.jsx(P,{children:"미완료 과제"})]}),e.jsxs(C,{background:f,children:[(d=s==null?void 0:s.pages)==null?void 0:d.flatMap(g=>g.content.map(n=>(console.log("과제 데이터:",n),e.jsx(N,{children:e.jsxs(E,{children:[e.jsxs(D,{children:[e.jsx(x,{children:n.due_date}),e.jsx(x,{children:n.title})]}),e.jsx(j,{status:"미완료",children:"미완료"})]})},n.dueDate)))),i&&e.jsx(l,{count:5}),e.jsx(S,{ref:p,children:i&&e.jsx(y,{color:"black"})})]})]})};export{R as default};
